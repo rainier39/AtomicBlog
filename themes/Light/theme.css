@@ -1,0 +1,46 @@
+body {max-width: 75%; margin: auto; font-family:'Helvetica'; background-image: url(background.jpg); background-repeat: no-repeat; background-size: cover}
+.header {border-bottom: 1px solid grey; border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; font-size: 160%; background: #ef2b2d; color: #ffffff; text-align: center}
+.header img {border: 1px solid black}
+.navbar {border-left: 1px solid grey; border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 8px; background: rgb(140, 140, 140); text-align: center}
+.navbar a {text-decoration: none; margin-right: 5%; margin-left: 5%; font-size: 140%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #002c8a; margin-bottom: 5px; margin-top: 5px; display: inline-block; color: #ffffff}
+.content {border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; background: #ffffff}
+.footer {border: 1px solid grey; padding: 20px; background: #ffffff; text-align: center}
+.installForm {text-align: center}
+.installForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.installForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.installForm textarea {resize: vertical; height: 120px}
+#button {width: 70px; background: #002c8a; color: #ffffff; border: 1px solid black; font-size: 105%; padding: 8px}
+.loginForm {text-align: center}
+.loginForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.loginForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.loginForm textarea {resize: vertical; height: 120px}
+.registerForm {text-align: center}
+.registerForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.registerForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.registerForm textarea {resize: vertical; height: 120px}
+#buttonRegister {width: 80px; background: #002c8a; color: #ffffff; border: 1px solid black; font-size: 105%; padding: 8px}
+.newPostForm {text-align: center}
+.newPostForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.newPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.newPostForm textarea {resize: vertical; height: 120px}
+#buttonNewPost {width: 108px; background: #002c8a; color: #ffffff; border: 1px solid black; font-size: 105%; padding: 8px}
+.posts {border: 1px solid grey; padding: 15px; margin: 14px; min-width: 160px; max-width: 160px; min-height: 200px; display: inline-block; text-align: center; vertical-align: top}
+.posts a {text-decoration: none; color: #000000; font-size: 150%}
+.posts img {max-width: 100%; height: auto; border: 1px solid grey;}
+#imgPost {max-width: 100%; height: auto}
+.contact {text-align: center}
+.contact a {text-decoration: none; color: rgb(50, 50 240); margin-bottom: 5px; display: inline-block}
+.about {text-align: center}
+.post {padding: 15px}
+.post h2 {text-align: center}
+.post img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
+.postContent {line-height: 1.5}
+.starred {border: 1px solid grey}
+.starred legend {font-size: 120%}
+.mostViewed {border: 1px solid grey}
+.mostViewed legend {font-size: 120%}
+.mostRecent {border: 1px solid grey}
+.mostRecent legend {font-size: 120%}
+.allPosts {border: 1px solid grey}
+.allPosts legend {font-size: 120%}
+
