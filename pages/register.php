@@ -6,7 +6,7 @@
 if (!defined('INDEX')) exit;
 
 // If the user is already logged in, don't let them into the page.
-if ($_SESSION["logged_in"] == true) {
+if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
     echo("You're already logged in.");
 }
 // Otherwise, proceed as normal.
@@ -71,10 +71,10 @@ else {
         echo("<div class='registerForm'>
             <h2>Register</h2>
             <form method='post'>
-                <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' value='" . htmlspecialchars($_POST["username"]) . "' required></input></br>
-                <label>Email Address: </label><input type='email' name='email' autocomplete='email' maxlength='64' value='" . htmlspecialchars($_POST["email"]) . "' required></input></br>
-                <label>Password: </label><input type='password' name='password' autocomplete='new-password' value='" . htmlspecialchars($_POST["password"]) . "' required></input></br>
-                <label>Repeat password: </label><input type='password' name='repeatpassword' value='" . htmlspecialchars($_POST["repeatpassword"]) . "' required></input></br>
+                <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' value='" . (isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : "") . "' required></input></br>
+                <label>Email Address: </label><input type='email' name='email' autocomplete='email' maxlength='64' value='" . (isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "") . "' required></input></br>
+                <label>Password: </label><input type='password' name='password' autocomplete='new-password' value='" . (isset($_POST["password"]) ? htmlspecialchars($_POST["password"]) : "") . "' required></input></br>
+                <label>Repeat password: </label><input type='password' name='repeatpassword' value='" . (isset($_POST["repeatpassword"]) ? htmlspecialchars($_POST["repeatpassword"]) : "") . "' required></input></br>
                 <br><input type='submit' value='Register' id='buttonRegister'></input>
             </form>
         </div>");
