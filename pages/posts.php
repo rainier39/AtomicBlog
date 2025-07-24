@@ -11,9 +11,16 @@ $posts = $db->query("SELECT * FROM `posts`");
 // Display the allPosts fieldset.
 echo("<fieldset class='allPosts'><legend>All Posts</legend>");
 
-// Display the posts.
-while ($p = $posts->fetch_assoc()) {
-    echo("<div class='posts'><a href='/post/" . $p["id"] . "/'><img src='/images/" . $p["id"] . "." . $p["icon"] . "'></a></br><a href='/post/" . $p["id"] . "/'>" . htmlspecialchars($p["title"]) . "</a></div>");
+// If there are posts, display them.
+if ($posts->num_rows > 0) {
+    // Display the posts.
+    while ($p = $posts->fetch_assoc()) {
+        echo("<div class='posts'><a href='/post/" . $p["id"] . "/'><img src='/images/" . $p["id"] . "." . $p["icon"] . "'></a></br><a href='/post/" . $p["id"] . "/'>" . htmlspecialchars($p["title"]) . "</a></div>");
+    }
+}
+// Otherwise print a message.
+else {
+    echo("No posts yet.");
 }
 
 // End the fieldset.
