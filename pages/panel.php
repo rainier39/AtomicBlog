@@ -6,11 +6,11 @@
 if (!defined('INDEX')) exit;
 
 // If the user isn't logged in, don't let them into the panel.
-if ($_SESSION["logged_in"] != true) {
+if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
     echo("You must be logged in to access the panel.");
 }
 // Display the default page.
-elseif (!$url[1] or $url[1] == "") {
+elseif (!isset($url[1]) or $url[1] == "") {
     echo("<a href='/panel/newpost/'>Create a new post</a>");
 }
 // Direct the user to the "create a new post" page.
