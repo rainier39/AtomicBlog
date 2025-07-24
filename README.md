@@ -5,4 +5,4 @@ As of the time of writing, AtomicBlog is officially public and in development. I
 
 AtomicBlog has so far been developed and tested with Apache2. I intend on making installation instructions for Nginx at some point, currently there are only instructions for [Apache2](https://github.com/rainier39/AtomicBlog/wiki/Installation-Instructions-(Apache2)). I will also update the software so that it works on new PHP versions as they are released. I also intend on testing the software in a wide range of environments.
 
-AtomicBlog has been tested on Debian 12 with PHP 8.2.28, Apache/2.4.62, and Ver 15.1 Distrib 10.11.11-MariaDB.
+AtomicBlog has been tested on Debian 12 with PHP 8.2.28, Apache/2.4.62, and MariaDB 10.11.11.
