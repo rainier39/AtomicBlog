@@ -9,7 +9,7 @@ define("INDEX", "1");
 require "core/config.php";
 
 // Make sure that the page is accessed over HTTPS if applicable.
-if (($_SERVER["HTTPS"] != "on") && $config["https"])
+if ((isset($_SERVER["HTTPS"])) && ($_SERVER["HTTPS"] != "on") && $config["https"])
 {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
     exit();
