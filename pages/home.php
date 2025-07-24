@@ -51,7 +51,7 @@ if ($postids->num_rows > 0) {
     $mostViewed = array();
 
     // Populate the array.
-    for ($i = 0; $i < 5; $i++) {
+    for ($i = 0; (($i < 5) and (count($views) !== 0)); $i++) {
         // Find the highest viewed post.
         $value = max($views);
 
@@ -71,12 +71,14 @@ echo("</br><fieldset class='mostViewed'><legend>Most Viewed</legend>");
 
 // Only try to display posts if there are any.
 if ($postids->num_rows > 0) {
-    // Get the posts we wish to display.
-    $mostViewedPosts = $db->query("SELECT * FROM `posts` WHERE id='" . $mostViewed[0] . "' OR id='" . $mostViewed[1] . "' OR id='" . $mostViewed[2] . "' OR id='" . $mostViewed[3] . "' OR id='" . $mostViewed[4] . "' ORDER BY FIELD(ID," . $mostViewed[0] . ", " . $mostViewed[1] . ", " . $mostViewed[2] . ", " . $mostViewed[3] . ", " . $mostViewed[4] . ")");
+    foreach ($mostViewed as $mv) {
+        // Get the posts we wish to display.
+        $mostViewedPosts = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($mv) . "'");
 
-    // Display the posts.
-    while ($m = $mostViewedPosts->fetch_assoc()) {
-        echo("<div class='posts'><a href='/post/" . $m["id"] . "/'><img src='/images/" . $m["id"] . "." . $m["icon"] . "'></a></br><a href='/post/" . $m["id"] . "/'>" . $m["title"] . "</a></div>");
+        // Display the posts.
+        while ($m = $mostViewedPosts->fetch_assoc()) {
+            echo("<div class='posts'><a href='/post/" . $m["id"] . "/'><img src='/images/" . $m["id"] . "." . $m["icon"] . "'></a></br><a href='/post/" . $m["id"] . "/'>" . htmlspecialchars($m["title"]) . "</a></div>");
+        }
     }
 }
 // Otherwise print a message.
