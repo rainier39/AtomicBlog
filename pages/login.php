@@ -6,7 +6,7 @@
 if (!defined('INDEX')) exit;
 
 // If the user is already logged in, don't let them into the page.
-if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] == true)) {
+if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
     echo("You're already logged in.");
 }
 // Otherwise, proceed as normal.
