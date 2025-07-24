@@ -14,7 +14,7 @@ echo("<!DOCTYPE html>
 <link rel='icon' type='image/x-icon' href='/themes/" . htmlspecialchars($config["theme"]) . "/icon.png'>
 <body>
 
-<div class='header'><img src='/themes/" . htmlspecialchars($config["theme"]) . "/flag.png'> <b>" . htmlspecialchars($config["title"]) . "</b></br><small>" . htmlspecialchars($config["description"]) . "</small></div>
+<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b></br><small>" . htmlspecialchars($config["description"]) . "</small></div>
 
 <div class='navbar'><a href='/'>Home</a> <a href='/posts/'>Posts</a> <a href='/about/'>About</a> <a href='/contact/'>Contact</a></div>
 
