@@ -15,7 +15,7 @@ echo("<fieldset class='starred'><legend>Starred Posts</legend>");
 if ($starred->num_rows > 0) {
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
-        echo("<div class='posts'><a href='/post/" . $s["id"] . "/'><img src='/images/" . $s["id"] . "." . $s["icon"] . "'></a></br><a href='/post/" . $s["id"] . "/'>" . $s["title"] . "</a></div>");
+        echo("<div class='posts'><a href='/post/" . $s["id"] . "/'><img src='/images/" . $s["id"] . "." . $s["icon"] . "'></a></br><a href='/post/" . $s["id"] . "/'>" . htmlspecialchars($s["title"]) . "</a></div>");
     }
 }
 // Otherwise print a message.
@@ -99,7 +99,7 @@ echo("</br><fieldset class='mostRecent'><legend>Most Recent</legend>");
 if ($recent->num_rows > 0) {
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        echo("<div class='posts'><a href='/post/" . $r["id"] . "/'><img src='/images/" . $r["id"] . "." . $r["icon"] . "'></a></br><a href='/post/" . $r["id"] . "/'>" . $r["title"] . "</a></div>");
+        echo("<div class='posts'><a href='/post/" . $r["id"] . "/'><img src='/images/" . $r["id"] . "." . $r["icon"] . "'></a></br><a href='/post/" . $r["id"] . "/'>" . htmlspecialchars($r["title"]) . "</a></div>");
     }
 }
 // Otherwise print a message.
