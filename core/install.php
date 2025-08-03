@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $db = mysqli_connect($_POST["SQLServer"], $_POST["SQLUsername"], $_POST["SQLPassword"], $_POST["SQLDatabase"]);
 
     // Write the database.
-    $db->query("CREATE TABLE `accounts` (
+    $db->query("CREATE TABLE IF NOT EXISTS `accounts` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `username` varchar(32) NOT NULL,
         `email` varchar(64) NOT NULL,
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         UNIQUE KEY `email` (`email`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
 
-    $db->query("CREATE TABLE `posts` (
+    $db->query("CREATE TABLE IF NOT EXISTS `posts` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `title` varchar(32) NOT NULL,
         `tags` varchar(128) NOT NULL,
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
 
-    $db->query("CREATE TABLE `comments` (
+    $db->query("CREATE TABLE IF NOT EXISTS `comments` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `account` int unsigned NOT NULL,
         `email` varchar(64) NOT NULL,
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
 
-    $db->query("CREATE TABLE `views` (
+    $db->query("CREATE TABLE IF NOT EXISTS `views` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `ip` int unsigned NOT NULL,
         `useragent` varchar(128) NOT NULL,
@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
 
-    $db->query("CREATE TABLE `extensions` (
+    $db->query("CREATE TABLE IF NOT EXISTS `extensions` (
         `id` int unsigned NOT NULL AUTO_INCREMENT,
         `name` varchar(32) NOT NULL,
         `author` varchar(32) NOT NULL,
