@@ -1,6 +1,7 @@
 <?php
 // formatter.php
 // Formats content in a bbcode style.
+// Is currently deprecated, will be replaced with a markdown implementation.
 
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
