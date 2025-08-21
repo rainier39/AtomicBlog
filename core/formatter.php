@@ -13,8 +13,14 @@ function format($string) {
     // Apply the various formatter functions to the string.
     $string = format_bold($string);
     $string = format_italic($string);
+    $string = format_code_block($string);
     $string = format_inline_code($string);
+    $string = format_heading($string);
+    $string = format_subheading($string);
     $string = format_horizontal_rule($string);
+    $string = format_blockquote($string);
+    $string = format_paragraphs($string);
+    $string = format_linebreaks($string);
 
     // In the end, return the string.
     return $string;
@@ -29,12 +35,38 @@ function format_italic($string) {
     return preg_replace("/\*(.+?)\*|_(.+?)_/is", "<i>$1$2</i>", $string);
 }
 
+function format_code_block($string) {
+    return preg_replace("/```(.+?)```/is", "<div class='codeblock'>$1</div>", $string);
+}
+
 function format_inline_code($string) {
     return preg_replace("/`(.+?)`/is", "<code>$1</code>", $string);
+}
+
+function format_heading($string) {
+    return preg_replace("/^#\s+(.+?)$/mis", "<h1>$1</h1>", $string);
+}
+
+function format_subheading($string) {
+    return preg_replace("/^##\s+(.+?)$/mis", "<h2>$1</h2>", $string);
 }
 
 function format_horizontal_rule($string) {
     return preg_replace("/\-\-\-/is", "<hr>", $string);
 }
+
+function format_blockquote($string) {
+    return preg_replace("/^&gt;\s+(.+?)$/mis", "<blockquote>$1</blockquote>", $string);
+}
+
+function format_paragraphs($string) {
+    return preg_replace("/\r\n\r\n|\r\r|\n\n/is", "</p>", $string);
+}
+
+function format_linebreaks($string) {
+    return preg_replace("/\s\s$/mis", "</br>", $string);
+}
+
+// TODO: lists, images, links
 
 ?>
