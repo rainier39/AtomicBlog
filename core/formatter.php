@@ -1,7 +1,6 @@
 <?php
 // formatter.php
-// Formats content in a bbcode style.
-// Is currently deprecated, will be replaced with a markdown implementation.
+// Formats content with custom markdown implementation.
 
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
@@ -13,42 +12,29 @@ function format($string) {
 
     // Apply the various formatter functions to the string.
     $string = format_bold($string);
-    $string = format_p($string);
-    $string = format_link($string);
-    $string = format_br($string);
-    $string = format_img($string);
+    $string = format_italic($string);
+    $string = format_inline_code($string);
+    $string = format_horizontal_rule($string);
 
     // In the end, return the string.
     return $string;
 }
 
-// Format bold tags.
+// Define the various formatter functions.
 function format_bold($string) {
-    return preg_replace("/\[b\](.+?)\[\/b\]/is", "<b>$1</b>", $string);
+    return preg_replace("/\*\*(.+?)\*\*|__(.+?)__/is", "<b>$1$2</b>", $string);
 }
 
-// Format paragraph breaks.
-function format_p($string) {
-    return str_replace("[/p]", "</p>", $string);
+function format_italic($string) {
+    return preg_replace("/\*(.+?)\*|_(.+?)_/is", "<i>$1$2</i>", $string);
 }
 
-// Format links.
-function format_link($string) {
-    $string = preg_replace("/\[url=(http|ftp|https):\/\/(.+?)\](.+?)\[\/url\]/is", "<a href='$1://$2' target='_blank'>$3</a>", $string);
-    $string = preg_replace("/\[url=(.+?)\](http|ftp|https):\/\/(.+?)\[\/url\]/is", "<a href='$2://$3' target='_blank'>$1</a>", $string);
-    $string = preg_replace("/\[url\](http|ftp|https):\/\/(.+?)\[\/url\]/is", "<a href='$1://$2' target='_blank'>$2</a>", $string);
-    return $string;
+function format_inline_code($string) {
+    return preg_replace("/`(.+?)`/is", "<code>$1</code>", $string);
 }
 
-// Format line breaks.
-function format_br($string) {
-    return str_replace("[/br]", "</br>", $string);
-}
-
-// Format images.
-function format_img($string) {
-    return preg_replace("/\[img\](http|https):\/\/(.+?)\[\/img\]/is", "<img id='imgPost' src='$1://$2'>", $string);
+function format_horizontal_rule($string) {
+    return preg_replace("/\-\-\-/is", "<hr>", $string);
 }
 
 ?>
-
