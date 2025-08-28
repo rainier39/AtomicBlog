@@ -1,4 +1,4 @@
-body {max-width: 75%; margin: auto; font-family: Helvetica, Arial}
+body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .header {border-bottom: 1px solid grey; border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; font-size: 160%; background: grey; color: white; text-align: center}
 .navbar {border-left: 1px solid grey; border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 8px; background: lightgrey; text-align: center}
 .navbar a {text-decoration: none; margin-right: 5%; margin-left: 5%; font-size: 140%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; margin-bottom: 5px; margin-top: 5px; display: inline-block; color: white}
@@ -31,10 +31,10 @@ body {max-width: 75%; margin: auto; font-family: Helvetica, Arial}
 .contact a {text-decoration: none; color: navy; margin-bottom: 5px; display: inline-block}
 .about {text-align: center}
 .post {padding: 15px}
-.post h2 {text-align: center}
-.post img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
+.postHeader h2 {text-align: center}
+.postHeader img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 .postContent {line-height: 1.5}
-.postContent h2 {text-align: left;}
+.postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 .starred {border: 1px solid grey}
 .starred legend {font-size: 120%}
 .mostViewed {border: 1px solid grey}
