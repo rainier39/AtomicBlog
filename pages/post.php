@@ -17,8 +17,10 @@ else {
     while ($p = $post->fetch_assoc()) {
         echo("
         <div class='post'>
-            <h2>" . htmlspecialchars($p["title"]) . "</h2>
-            <img src='/images/" . $p["id"] . "." . $p["icon"] . "'></br>
+            <div class='postHeader'>
+                <h2>" . htmlspecialchars($p["title"]) . "</h2>
+                <img src='/images/" . $p["id"] . "." . $p["icon"] . "'></br>
+            </div>
             <div class='postContent'>
             " . format($p["content"]) . "
             </div>
