@@ -29,7 +29,8 @@ if ($config["installed"])
 }
 
 // Initialize the language file.
-require "languages/" . $config["language"] . ".php";
+// TODO: implement languages, loader function to read a JSON file for languages.
+//require "languages/" . $config["language"] . ".php";
 
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
@@ -42,6 +43,11 @@ $url = explode('/', $_GET['url']);
 
 // Initialize the session.
 session_start();
+
+// Generate a CSRF token if needed.
+if (!isset($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+}
 
 // Serve the header.
 require "pages/header.php";
