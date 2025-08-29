@@ -14,11 +14,13 @@ echo("<!DOCTYPE html>
 <link rel='icon' type='image/x-icon' href='/themes/" . htmlspecialchars($config["theme"]) . "/icon.png'>
 <body>
 
-<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b></br><small>" . htmlspecialchars($config["description"]) . "</small></div>
+<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b></br><small>" . htmlspecialchars($config["description"]) . "</small></div>";
 
-<div class='navbar'><a href='/'>Home</a> <a href='/posts/'>Posts</a> <a href='/about/'>About</a> <a href='/contact/'>Contact</a>" . ((isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) ? " <a href='/panel/'>Panel</a> <a href='/logout/'>Logout</a>" : " <a href='/login/'>Login</a> <a href='/register/'>Register</a>") . "</div>
+if ($config["installed"]) {
+    echo("<div class='navbar'><a href='/'>Home</a> <a href='/posts/'>Posts</a> <a href='/about/'>About</a> <a href='/contact/'>Contact</a>" . ((isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) ? " <a href='/panel/'>Panel</a> <a href='/logout/'>Logout</a>" : " <a href='/login/'>Login</a> <a href='/register/'>Register</a>") . "</div>";
+}
 
-<div class='content'>");
+echo("<div class='content'>");
 
 ?>
 
