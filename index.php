@@ -49,9 +49,6 @@ if (!isset($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
-// Serve the header.
-require "pages/header.php";
-
 // If the software hasn't been installed yet, direct all requests to the install page.
 if ($config["installed"] == false)
 {
@@ -65,6 +62,7 @@ elseif ($url[0] == "logout")
 elseif ($url[0] == "contact")
 {
     // Display the contact page content.
+    require "pages/header.php";
     echo("
     <div class='contact'>
         <h2>Contact Us</h2>
@@ -72,16 +70,19 @@ elseif ($url[0] == "contact")
         <label>Phone: </label>000-000-0000
     </div>
     ");
+    require "pages/footer.php";
 }
 elseif ($url[0] == "about")
 {
     // Display the about page content.
+    require "pages/header.php";
     echo("
     <div class='about'>
         <h2>About Us</h2>
         Lorem ipsum...
     </div>
     ");
+    require "pages/footer.php";
 }
 elseif ($url[0] == "login")
 {
@@ -108,8 +109,5 @@ else
 {
     require "pages/home.php";
 }
-
-// Serve the footer.
-require "pages/footer.php";
 
 ?>

@@ -5,37 +5,39 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+$content = "";
+
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Stop if the config file isn't writable.
     if (!is_writable("./core/config.php")) {
-        echo("Cannot install, config file isn't writable.");
+        $content .= "Cannot install, config file isn't writable.";
     }
     // Stop if any of the SQL details aren't set.
     elseif (!isset($_POST["SQLServer"])) {
-        echo("Cannot install, SQLServer field cannot be blank.");
+        $content .= "Cannot install, SQLServer field cannot be blank.";
     }
     elseif (!isset($_POST["SQLUsername"])) {
-        echo("Cannot install, SQLUsername field cannot be blank.");
+        $content .= "Cannot install, SQLUsername field cannot be blank.";
     }
     elseif (!isset($_POST["SQLPassword"])) {
-        echo("Cannot install, SQLPassword field cannot be blank.");
+        $content .= "Cannot install, SQLPassword field cannot be blank.";
     }
     elseif (!isset($_POST["SQLDatabase"])) {
-        echo("Cannot install, SQLDatabase field cannot be blank.");
+        $content .= "Cannot install, SQLDatabase field cannot be blank.";
     }
     // Stop if any of the SQL details are blank.
     elseif ($_POST["SQLServer"] == "") {
-        echo("Cannot install, SQLServer field cannot be blank.");
+        $content .= "Cannot install, SQLServer field cannot be blank.";
     }
     elseif ($_POST["SQLUsername"] == "") {
-        echo("Cannot install, SQLUsername field cannot be blank.");
+        $content .= "Cannot install, SQLUsername field cannot be blank.";
     }
     elseif ($_POST["SQLPassword"] == "") {
-        echo("Cannot install, SQLPassword field cannot be blank.");
+        $content .= "Cannot install, SQLPassword field cannot be blank.";
     }
     elseif ($_POST["SQLDatabase"] == "") {
-        echo("Cannot install, SQLDatabase field cannot be blank.");
+        $content .= "Cannot install, SQLDatabase field cannot be blank.";
     }
     else {
         // Connect to the database with the given credentials.
@@ -43,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db = mysqli_connect($_POST["SQLServer"], $_POST["SQLUsername"], $_POST["SQLPassword"], $_POST["SQLDatabase"]);
         }
         catch (Exception $e) {
-            echo("Database Connection Error: " . $e->getMessage());
+            $content .= "Database Connection Error: " . $e->getMessage();
             require "pages/footer.php";
             exit();
         }
@@ -133,14 +135,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         file_put_contents("./core/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($newConfig, true) . "\n\n?>\n");
 
         // Print a message that the software has been installed.
-        echo("Software successfully installed!");
+        $content .= "Software successfully installed!";
     }
 }
 
 // Display the install page form.
 else {
-echo("
-    <div class='installForm'>
+$content .= 
+    "<div class='installForm'>
         <h2>Installer</h2>
         <form method='post'>
             <b>SQL Details</b></br>
@@ -161,7 +163,10 @@ echo("
             <br><input type='submit' value='Install' id='button'></input>
         </form>
     </div>
-");
+";
 }
 
+render($content);
+
 ?>
+

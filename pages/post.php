@@ -5,18 +5,20 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+$content = "";
+
 // Get the requested post.
 $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
-    echo("The requested post doesn't exist.");
+    $content .= "The requested post doesn't exist.";
 }
 // Otherwise, display the post.
 else {
     while ($p = $post->fetch_assoc()) {
-        echo("
-        <div class='post'>
+        $content .=
+        "<div class='post'>
             <div class='postHeader'>
                 <h2>" . htmlspecialchars($p["title"]) . "</h2>
                 <img src='/images/" . $p["id"] . "." . $p["icon"] . "'></br>
@@ -24,8 +26,7 @@ else {
             <div class='postContent'>
             " . format($p["content"]) . "
             </div>
-        </div>
-        ");
+        </div>";
     }
 
     // Get views from this IP on this post, if any.
@@ -36,6 +37,8 @@ else {
         $db->query("INSERT INTO `views` (ip, useragent, timestamp, post) VALUES ('" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string($url[1]) . "')");
     }
 }
+
+render($content);
 
 ?>
 

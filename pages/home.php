@@ -5,26 +5,28 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+$content = "";
+
 // Get all of the starred blog posts.
 $starred = $db->query("SELECT * FROM `posts` WHERE starred='1'");
 
 // Display the starred posts fieldset.
-echo("<fieldset class='starred'><legend>Starred Posts</legend>");
+$content .= "<fieldset class='starred'><legend>Starred Posts</legend>";
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
-        echo("<div class='posts'><a href='/post/" . $s["id"] . "/'><img src='/images/" . $s["id"] . "." . $s["icon"] . "'></a></br><a href='/post/" . $s["id"] . "/'>" . htmlspecialchars($s["title"]) . "</a></div>");
+        $content .= "<div class='posts'><a href='/post/" . $s["id"] . "/'><img src='/images/" . $s["id"] . "." . $s["icon"] . "'></a></br><a href='/post/" . $s["id"] . "/'>" . htmlspecialchars($s["title"]) . "</a></div>";
     }
 }
 // Otherwise print a message.
 else {
-    echo("No starred posts yet.");
+    $content .= "No starred posts yet.";
 }
 
 // End the starred posts fieldset.
-echo("</fieldset>");
+$content .= "</fieldset>";
 
 // Create an array to store every postid and later how many views each one has.
 $views = array();
@@ -67,7 +69,7 @@ if ($postids->num_rows > 0) {
 }
 
 // Display the most viewed fieldset.
-echo("</br><fieldset class='mostViewed'><legend>Most Viewed</legend>");
+$content .= "</br><fieldset class='mostViewed'><legend>Most Viewed</legend>";
 
 // Only try to display posts if there are any.
 if ($postids->num_rows > 0) {
@@ -77,37 +79,40 @@ if ($postids->num_rows > 0) {
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
-            echo("<div class='posts'><a href='/post/" . $m["id"] . "/'><img src='/images/" . $m["id"] . "." . $m["icon"] . "'></a></br><a href='/post/" . $m["id"] . "/'>" . htmlspecialchars($m["title"]) . "</a></div>");
+            $content .= "<div class='posts'><a href='/post/" . $m["id"] . "/'><img src='/images/" . $m["id"] . "." . $m["icon"] . "'></a></br><a href='/post/" . $m["id"] . "/'>" . htmlspecialchars($m["title"]) . "</a></div>";
         }
     }
 }
 // Otherwise print a message.
 else {
-    echo("No posts yet.");
+    $content .= "No posts yet.";
 }
 
 // End the fieldset.
-echo ("</fieldset>");
+$content .= "</fieldset>";
 
 // Get the 5 most recent posts.
 $recent = $db->query("SELECT * FROM `posts` ORDER BY starttime DESC LIMIT 5");
 
 // Display the most recent fieldset.
-echo("</br><fieldset class='mostRecent'><legend>Most Recent</legend>");
+$content .= "</br><fieldset class='mostRecent'><legend>Most Recent</legend>";
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        echo("<div class='posts'><a href='/post/" . $r["id"] . "/'><img src='/images/" . $r["id"] . "." . $r["icon"] . "'></a></br><a href='/post/" . $r["id"] . "/'>" . htmlspecialchars($r["title"]) . "</a></div>");
+        $content .= "<div class='posts'><a href='/post/" . $r["id"] . "/'><img src='/images/" . $r["id"] . "." . $r["icon"] . "'></a></br><a href='/post/" . $r["id"] . "/'>" . htmlspecialchars($r["title"]) . "</a></div>";
     }
 }
 // Otherwise print a message.
 else {
-    echo("No posts yet.");
+    $content .= "No posts yet.";
 }
 
 // End the fieldset.
-echo ("</fieldset>");
+$content .= "</fieldset>";
+
+// Finally, render the page.
+render($content);
 
 ?>
