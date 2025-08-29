@@ -11,5 +11,12 @@ function logout() {
     session_destroy();
 }
 
+// Render a page, placing the header and footer accordingly.
+function render(string $content) {
+    require "pages/header.php";
+    echo($content);
+    require "pages/footer.php";
+}
+
 ?>
 
