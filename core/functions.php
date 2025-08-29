@@ -13,6 +13,7 @@ function logout() {
 
 // Render a page, placing the header and footer accordingly.
 function render(string $content) {
+    global $config;
     require "pages/header.php";
     echo($content);
     require "pages/footer.php";
