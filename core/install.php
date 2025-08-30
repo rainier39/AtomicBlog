@@ -9,8 +9,12 @@ $content = "";
 
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Hard stop if this is a CSRF attack.
+    if ((!isset($_POST["csrf_token"])) or ($_POST["csrf_token"] !== $_SESSION["csrf_token"])) {
+        exit();
+    }
     // Stop if the config file isn't writable.
-    if (!is_writable("./core/config.php")) {
+    elseif (!is_writable("./core/config.php")) {
         $content .= "Cannot install, config file isn't writable.";
     }
     // Stop if any of the SQL details aren't set.
@@ -182,6 +186,7 @@ $content .=
     "<div class='installForm'>
         <h2>Installer</h2>
         <form method='post'>
+            <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
             <b>SQL Details</b></br>
             <label>SQL Server: </label><input type='text' name='SQLServer'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . "></input></br>
             <label>SQL Database: </label><input type='text' name='SQLDatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . "></input></br>
