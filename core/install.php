@@ -13,8 +13,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ((!isset($_POST["csrf_token"])) or ($_POST["csrf_token"] !== $_SESSION["csrf_token"])) {
         exit();
     }
+    // If not, generate a fresh new token for additional security.
+    else {
+        generateCSRFToken();
+    }
     // Stop if the config file isn't writable.
-    elseif (!is_writable("./core/config.php")) {
+    if (!is_writable("./core/config.php")) {
         $content .= "Cannot install, config file isn't writable.";
     }
     // Stop if any of the SQL details aren't set.
