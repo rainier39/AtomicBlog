@@ -19,5 +19,10 @@ function render(string $content) {
     require "pages/footer.php";
 }
 
+// Set the user's CSRF token, overwriting the prior one if any.
+function generateCSRFToken() {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+}
+
 ?>
 
