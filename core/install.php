@@ -39,6 +39,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     elseif ($_POST["SQLDatabase"] == "") {
         $content .= "Cannot install, SQLDatabase field cannot be blank.";
     }
+    // Stop if the title is too long or too short.
+    elseif ((!isset($_POST["title"])) or (strlen($_POST["title"]) < 1)) {
+        $content .= "Cannot install, title must be at least 1 character long.";
+    }
+    elseif (strlen($_POST["title"]) > 32) {
+        $content .= "Cannot install, title cannot be longer than 32 characters.";
+    }
+    // Stop if the description is too long or too short.
+    elseif ((!isset($_POST["description"])) or (strlen($_POST["description"]) < 1)) {
+        $content .= "Cannot install, description must be at least 1 character long.";
+    }
+    elseif (strlen($_POST["description"]) > 128) {
+        $content .= "Cannot install, description cannot be longer than 128 characters.";
+    }
+    // Stop if the username is too long or too short.
+    elseif ((!isset($_POST["username"])) or (strlen($_POST["username"]) < 1)) {
+        $content .= "Cannot install, username must be at least 1 character long.";
+    }
+    elseif (strlen($_POST["username"]) > 32) {
+        $content .= "Cannot install, username cannot be longer than 32 characters.";
+    }
+    // Stop if the email is too long or too short.
+    elseif ((!isset($_POST["email"])) or (strlen($_POST["email"]) < 1)) {
+        $content .= "Cannot install, email must be at least 1 character long.";
+    }
+    elseif (strlen($_POST["email"]) > 64) {
+        $content .= "Cannot install, email cannot be longer than 64 characters.";
+    }
+    // TODO: make sure email looks valid.
+    // Stop if the password(s) is/are too short.
+    elseif ((!isset($_POST["password"])) or (strlen($_POST["password"]) < 8)) {
+        $content .= "Cannot install, password must be at least 8 characters long.";
+    }
+    elseif ((!isset($_POST["repeatpassword"])) or ($_POST["password"] !== $_POST["repeatpassword"])) {
+        $content .= "Cannot install, passwords do not match.";
+    }
+    // TODO: enforce more advanced, stringent password requirements.
     else {
         // Connect to the database with the given credentials.
         try {
@@ -122,17 +159,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
 
-        // Write the administrator account.
-        $db->query("INSERT INTO `accounts` (username, email, password, birthday, name, role, ip, useragent, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '00000000', 'Owner', 'Owner', '" . ip2long($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+        // Write the administrator account. Will replace any existing account with the same username or email (I.E. there is an old install of the software).
+        $db->query("REPLACE INTO `accounts` (username, email, password, birthday, name, role, ip, useragent, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '00000000', 'Owner', 'Owner', '" . ip2long($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
 
         // Create a new array of our new config values.
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
 
         // Merge the old config array with the new one.
-        $newConfig = array_merge($config, $newConfig);
+        $config = array_merge($config, $newConfig);
 
         // Write the new config array to the config file.
-        file_put_contents("./core/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($newConfig, true) . "\n\n?>\n");
+        file_put_contents("./core/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($config, true) . "\n\n?>\n");
 
         // Print a message that the software has been installed.
         $content .= "Software successfully installed!";
@@ -140,26 +177,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Display the install page form.
-else {
+if (!$config["installed"]) {
 $content .= 
     "<div class='installForm'>
         <h2>Installer</h2>
         <form method='post'>
             <b>SQL Details</b></br>
-            <label>SQL Server: </label><input type='text' name='SQLServer'></input></br>
-            <label>SQL Database: </label><input type='text' name='SQLDatabase'></input></br>
-            <label>SQL Username: </label><input type='text' name='SQLUsername'></input></br>
-            <label>SQL Password: </label><input type='text' name='SQLPassword'></input></br>
+            <label>SQL Server: </label><input type='text' name='SQLServer'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . "></input></br>
+            <label>SQL Database: </label><input type='text' name='SQLDatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . "></input></br>
+            <label>SQL Username: </label><input type='text' name='SQLUsername'" . (isset($_POST["SQLUsername"]) ? " value='" . htmlspecialchars($_POST["SQLUsername"]) . "'" : "") . "></input></br>
+            <label>SQL Password: </label><input type='text' name='SQLPassword'" . (isset($_POST["SQLPassword"]) ? " value='" . htmlspecialchars($_POST["SQLPassword"]) . "'" : "") . "></input></br>
 
             <br><b>Blog Configuration</b></br>
-            <label>Blog Title: </label><input type='text' name='title' maxlength='32'></input></br>
-            <label>Blog Description: </label><textarea name='description' maxlength='2048'></textarea></br>
+            <label>Blog Title: </label><input type='text' name='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
+            <label>Blog Description: </label><textarea name='description' maxlength='128'>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
 
             <br><b>Administrator Account Details</b></br>
-            <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32'></input></br>
-            <label>Email Address: </label><input type='email' name='email' maxlength='64'></input></br>
-            <label>Password: </label><input type='password' name='password'></input></br>
-            <label>Repeat password: </label><input type='password' name='repeatpassword'></input></br>
+            <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
+            <label>Email Address: </label><input type='email' name='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . "></input></br>
+            <label>Password: </label><input type='password' name='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
+            <label>Repeat password: </label><input type='password' name='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . "></input></br>
             <br><input type='submit' value='Install' id='button'></input>
         </form>
     </div>
@@ -169,4 +206,3 @@ $content .=
 render($content);
 
 ?>
-
