@@ -46,7 +46,7 @@ session_start();
 
 // Generate a CSRF token if needed.
 if (!isset($_SESSION["csrf_token"])) {
-    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+    generateCSRFToken();
 }
 
 // If the software hasn't been installed yet, direct all requests to the install page.
