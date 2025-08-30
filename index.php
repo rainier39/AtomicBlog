@@ -59,31 +59,6 @@ elseif ($url[0] == "logout")
     logout();
     require "pages/home.php";
 }
-elseif ($url[0] == "contact")
-{
-    // Display the contact page content.
-    require "pages/header.php";
-    echo("
-    <div class='contact'>
-        <h2>Contact Us</h2>
-        <label>Email: </label><a href='mailto:placeholder@example.com'>placeholder@example.com</a></br>
-        <label>Phone: </label>000-000-0000
-    </div>
-    ");
-    require "pages/footer.php";
-}
-elseif ($url[0] == "about")
-{
-    // Display the about page content.
-    require "pages/header.php";
-    echo("
-    <div class='about'>
-        <h2>About Us</h2>
-        Lorem ipsum...
-    </div>
-    ");
-    require "pages/footer.php";
-}
 elseif ($url[0] == "login")
 {
     require "pages/login.php";
