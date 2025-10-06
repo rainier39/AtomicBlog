@@ -1,0 +1,11 @@
+@import url("/themes/Light/theme.css");
+html {background: #222222; color: white}
+.content, .footer {background: #333333; border-color: white}
+.header {border-color: white; background: #282828}
+.navbar {border-color: white; background: #555555}
+.navbar a {background: black; border-color: white}
+.posts {border-color: white}
+.posts a {color: white}
+.starred, .mostViewed, .mostRecent, .allPosts {border-color: white}
+#button, #buttonRegister, #buttonNewPost {background: black; border-color: white}
+a {color: lightblue}
