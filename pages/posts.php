@@ -17,7 +17,7 @@ $content .= "<fieldset class='allPosts'><legend>All Posts</legend>";
 if ($posts->num_rows > 0) {
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
-        $content .= "<div class='posts'><a href='/post/" . $p["id"] . "/'><img src='/images/" . $p["id"] . "." . $p["icon"] . "'></a></br><a href='/post/" . $p["id"] . "/'>" . htmlspecialchars($p["title"]) . "</a></div>";
+        $content .= displayPost($p["id"], $p["icon"], $p["title"]);
     }
 }
 // Otherwise print a message.
