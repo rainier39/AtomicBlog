@@ -17,7 +17,7 @@ $content .= "<fieldset class='starred'><legend>Starred Posts</legend>";
 if ($starred->num_rows > 0) {
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
-        $content .= displayPost($s["id"], $s["icon"], $s["title"]);
+        $content .= displayPost($s["id"], $s["icon"], $s["title"], $s["account"]);
     }
 }
 // Otherwise print a message.
@@ -79,7 +79,7 @@ if ($postids->num_rows > 0) {
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
-            $content .= displayPost($m["id"], $m["icon"], $m["title"]);
+            $content .= displayPost($m["id"], $m["icon"], $m["title"], $m["account"]);
         }
     }
 }
@@ -101,7 +101,7 @@ $content .= "</br><fieldset class='mostRecent'><legend>Most Recent</legend>";
 if ($recent->num_rows > 0) {
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        $content .= displayPost($r["id"], $r["icon"], $r["title"]);
+        $content .= displayPost($r["id"], $r["icon"], $r["title"], $r["account"]);
     }
 }
 // Otherwise print a message.

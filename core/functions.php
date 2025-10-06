@@ -25,9 +25,12 @@ function generateCSRFToken() {
 }
 
 // Display a blog post tile.
-function displayPost($id, $icon, $title) {
+function displayPost($id, $icon, $title, $account) {
+    global $db;
+    
     $id = (int)$id;
     $formats = array("png", "jpg", "gif");
+    
     $post = "<div class='posts'><a href='/post/" . $id . "/'>";
     // If there is an icon, display it.
     if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
@@ -35,7 +38,19 @@ function displayPost($id, $icon, $title) {
     }
     //else {
     //}
-    $post .= "</a></br><a href='/post/" . $id . "/'>" . htmlspecialchars($title) . "</a></div>";
+    $post .= "</a></br><a href='/post/" . $id . "/'>" . htmlspecialchars($title) . "</a>";
+    // Get the account information of the post author.
+    $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($account) . "'");
+    if ($acc->num_rows > 0) {
+        while ($a = $acc->fetch_assoc()) {
+            $post .= "</br><small>By: " . htmlspecialchars($a["name"]) . "</small>";
+        }
+    }
+    else {
+        $post .= "</br><small>By: Nobody</small>";
+    }
+    $post .= "</div>";
+    
     return $post;
 }
 
