@@ -22,6 +22,16 @@ else {
         "<div class='post'>
             <div class='postHeader'>
                 <h2>" . htmlspecialchars($p["title"]) . "</h2>";
+        // Get the account information of the post author.
+        $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($p["account"]) . "'");
+        if ($acc->num_rows > 0) {
+            while ($a = $acc->fetch_assoc()) {
+                $content .= "<h4>By: " . htmlspecialchars($a["name"]) . "</h4>";
+            }
+        }
+        else {
+            $content .= "<h4>By: Nobody</h4>";
+        }
         $icon = $p["icon"];
         $id = (int)$p["id"];
         // Display the post's image if it exists.

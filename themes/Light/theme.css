@@ -31,7 +31,7 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .contact a {text-decoration: none; color: navy; margin-bottom: 5px; display: inline-block}
 .about {text-align: center}
 .post {padding: 15px}
-.postHeader h2 {text-align: center}
+.postHeader h2, h4 {text-align: center}
 .postHeader img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 .postContent {line-height: 1.5}
 .postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
