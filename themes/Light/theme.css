@@ -44,3 +44,4 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .allPosts {border: 1px solid grey}
 .allPosts legend {font-size: 120%}
 code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px;}
+.error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}

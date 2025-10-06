@@ -17,74 +17,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else {
         generateCSRFToken();
     }
+    
+    $errors = array();
+    
     // Stop if the config file isn't writable.
     if (!is_writable("./core/config.php")) {
-        $content .= "Cannot install, config file isn't writable.";
-    }
-    // Stop if any of the SQL details aren't set.
-    elseif (!isset($_POST["SQLServer"])) {
-        $content .= "Cannot install, SQLServer field cannot be blank.";
-    }
-    elseif (!isset($_POST["SQLUsername"])) {
-        $content .= "Cannot install, SQLUsername field cannot be blank.";
-    }
-    elseif (!isset($_POST["SQLPassword"])) {
-        $content .= "Cannot install, SQLPassword field cannot be blank.";
-    }
-    elseif (!isset($_POST["SQLDatabase"])) {
-        $content .= "Cannot install, SQLDatabase field cannot be blank.";
+        $errors[] = "Cannot install, config file isn't writable.";
     }
     // Stop if any of the SQL details are blank.
-    elseif ($_POST["SQLServer"] == "") {
-        $content .= "Cannot install, SQLServer field cannot be blank.";
+    if ((!isset($_POST["SQLServer"])) or ($_POST["SQLServer"] == "")) {
+        $errors[] = "Cannot install, SQLServer field cannot be blank.";
     }
-    elseif ($_POST["SQLUsername"] == "") {
-        $content .= "Cannot install, SQLUsername field cannot be blank.";
+    if ((!isset($_POST["SQLUsername"])) or ($_POST["SQLUsername"] == "")) {
+        $errors[] = "Cannot install, SQLUsername field cannot be blank.";
     }
-    elseif ($_POST["SQLPassword"] == "") {
-        $content .= "Cannot install, SQLPassword field cannot be blank.";
+    if ((!isset($_POST["SQLPassword"])) or ($_POST["SQLPassword"] == "")) {
+        $errors[] = "Cannot install, SQLPassword field cannot be blank.";
     }
-    elseif ($_POST["SQLDatabase"] == "") {
-        $content .= "Cannot install, SQLDatabase field cannot be blank.";
+    if ((!isset($_POST["SQLDatabase"])) or ($_POST["SQLDatabase"] == "")) {
+        $errors[] = "Cannot install, SQLDatabase field cannot be blank.";
     }
     // Stop if the title is too long or too short.
-    elseif ((!isset($_POST["title"])) or (strlen($_POST["title"]) < 1)) {
-        $content .= "Cannot install, title must be at least 1 character long.";
+    if ((!isset($_POST["title"])) or (strlen($_POST["title"]) < 1)) {
+        $errors[] = "Cannot install, title must be at least 1 character long.";
     }
     elseif (strlen($_POST["title"]) > 32) {
-        $content .= "Cannot install, title cannot be longer than 32 characters.";
+        $errors[] = "Cannot install, title cannot be longer than 32 characters.";
     }
     // Stop if the description is too long or too short.
-    elseif ((!isset($_POST["description"])) or (strlen($_POST["description"]) < 1)) {
-        $content .= "Cannot install, description must be at least 1 character long.";
+    if ((!isset($_POST["description"])) or (strlen($_POST["description"]) < 1)) {
+        $errors[] = "Cannot install, description must be at least 1 character long.";
     }
     elseif (strlen($_POST["description"]) > 128) {
-        $content .= "Cannot install, description cannot be longer than 128 characters.";
+        $errors[] = "Cannot install, description cannot be longer than 128 characters.";
     }
     // Stop if the username is too long or too short.
-    elseif ((!isset($_POST["username"])) or (strlen($_POST["username"]) < 1)) {
-        $content .= "Cannot install, username must be at least 1 character long.";
+    if ((!isset($_POST["username"])) or (strlen($_POST["username"]) < 1)) {
+        $errors[] = "Cannot install, username must be at least 1 character long.";
     }
     elseif (strlen($_POST["username"]) > 32) {
-        $content .= "Cannot install, username cannot be longer than 32 characters.";
+        $errors[] = "Cannot install, username cannot be longer than 32 characters.";
     }
     // Stop if the email is too long or too short.
-    elseif ((!isset($_POST["email"])) or (strlen($_POST["email"]) < 1)) {
-        $content .= "Cannot install, email must be at least 1 character long.";
+    if ((!isset($_POST["email"])) or (strlen($_POST["email"]) < 1)) {
+        $errors[] = "Cannot install, email must be at least 1 character long.";
     }
     elseif (strlen($_POST["email"]) > 64) {
-        $content .= "Cannot install, email cannot be longer than 64 characters.";
+        $errors[] = "Cannot install, email cannot be longer than 64 characters.";
     }
     // TODO: make sure email looks valid.
     // Stop if the password(s) is/are too short.
-    elseif ((!isset($_POST["password"])) or (strlen($_POST["password"]) < 8)) {
-        $content .= "Cannot install, password must be at least 8 characters long.";
+    if ((!isset($_POST["password"])) or (strlen($_POST["password"]) < 8)) {
+        $errors[] = "Cannot install, password must be at least 8 characters long.";
     }
-    elseif ((!isset($_POST["repeatpassword"])) or ($_POST["password"] !== $_POST["repeatpassword"])) {
-        $content .= "Cannot install, passwords do not match.";
+    if ((!isset($_POST["repeatpassword"])) or ($_POST["password"] !== $_POST["repeatpassword"])) {
+        $errors[] = "Cannot install, passwords do not match.";
     }
     // TODO: enforce more advanced, stringent password requirements.
-    else {
+    
+    // If there are no errors, install.
+    if (count($errors) === 0) {
         // Connect to the database with the given credentials.
         try {
             $db = mysqli_connect($_POST["SQLServer"], $_POST["SQLUsername"], $_POST["SQLPassword"], $_POST["SQLDatabase"]);
@@ -181,6 +173,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Print a message that the software has been installed.
         $content .= "Software successfully installed!";
+    }
+    // Otherwise, display the errors.
+    else {
+        foreach ($errors as $e) {
+            $content .= "<div class='error'>" . $e . "</div>";
+        }
     }
 }
 

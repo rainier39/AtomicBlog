@@ -60,8 +60,7 @@ elseif ($url[1] == "newpost") {
         	// Otherwise, print the errors.
         	else {
         	    foreach ($errors as $e) {
-        	        // Temporary, will become an error function and a styled div.
-        	        $content .= "<div>" . $e . "</div>";
+        	        $content .= "<div class='error'>" . $e . "</div>";
         	    }
         	}
         }
