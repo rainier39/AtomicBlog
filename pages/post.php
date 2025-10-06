@@ -16,13 +16,19 @@ if ($post->num_rows < 1) {
 }
 // Otherwise, display the post.
 else {
+    $formats = array("png", "jpg", "gif");
     while ($p = $post->fetch_assoc()) {
         $content .=
         "<div class='post'>
             <div class='postHeader'>
-                <h2>" . htmlspecialchars($p["title"]) . "</h2>
-                <img src='/images/" . $p["id"] . "." . $p["icon"] . "'></br>
-            </div>
+                <h2>" . htmlspecialchars($p["title"]) . "</h2>";
+        $icon = $p["icon"];
+        $id = (int)$p["id"];
+        // Display the post's image if it exists.
+        if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
+            $content .= "<img src='/images/" . $id . "." . $icon . "'></br>";
+        }
+        $content .= "</div>
             <div class='postContent'>
             " . format($p["content"]) . "
             </div>
