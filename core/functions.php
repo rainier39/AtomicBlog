@@ -29,7 +29,7 @@ function displayPost($id, $icon, $title, $account) {
     global $db;
     
     $id = (int)$id;
-    $formats = array("png", "jpg", "gif");
+    $formats = array("png", "jpg", "gif", "webp");
     
     $post = "<div class='posts'><a href='/post/" . $id . "/'>";
     // If there is an icon, display it.
