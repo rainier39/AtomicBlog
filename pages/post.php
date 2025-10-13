@@ -16,7 +16,7 @@ if ($post->num_rows < 1) {
 }
 // Otherwise, display the post.
 else {
-    $formats = array("png", "jpg", "gif");
+    $formats = array("png", "jpg", "gif", "webp");
     while ($p = $post->fetch_assoc()) {
         $content .=
         "<div class='post'>
