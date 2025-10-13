@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `edituseragent` varchar(128) NOT NULL,
             `editedby` int unsigned NOT NULL,
             `edittime` int unsigned NOT NULL,
-            `icon` enum('none', 'png', 'jpg', 'gif') NOT NULL DEFAULT 'none',
+            `icon` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
             `published` tinyint(1) NOT NULL DEFAULT '0',
             `starred` tinyint(1) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)
