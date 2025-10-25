@@ -76,7 +76,7 @@ function format_image($string) {
 }
 
 function format_link($string) {
-    return preg_replace("/\[(.+?)\]\((http|https):\/\/(.+?)\)/is", "<a href='$2://$3' target='_blank'>$1</a>", $string);
+    return preg_replace("/\[(.+?)\]\((http|https):\/\/(.+?)\)/is", "<a href='$2://$3' target='_blank' rel='nofollow'>$1</a>", $string);
 }
 
 function format_paragraphs($string) {
