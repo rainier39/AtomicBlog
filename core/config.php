@@ -18,7 +18,8 @@ $config = array(
     "language" => "english",
     "userlist" => true,
     "https" => false,
-    "prettyURLs" => false
+    "prettyURLs" => false,
+    "allowRegistration" => true
 );
 
 ?>

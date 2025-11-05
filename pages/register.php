@@ -11,6 +11,10 @@ $content = "";
 if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
     $content .= "<div class='error'>You're already logged in.</div>";
 }
+// If registration is disabled, don't let them in.
+elseif (!$config["allowRegistration"]) {
+    $content .= "<div class='error'>Registration is disabled.</div>";
+}
 // Otherwise, proceed as normal.
 else {
     // Keep track of whether or not the user successfully registered.
