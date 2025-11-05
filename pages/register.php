@@ -70,7 +70,7 @@ else {
             // If everything checks out, make the account.
             if (count($errors) === 0) {
                 // Insert the account into the database.
-                $db->query("INSERT INTO `accounts` (username, email, password, birthday, name, role, ip, useragent, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '00000000', 'Anonymous', 'Unapproved', '" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+                $db->query("INSERT INTO `accounts` (username, email, password, name, ip, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Anonymous', '" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
 
                 // Inform the user that they've successfully registered.
                 $content .= "You've successfully registered for an account. Note that it must be approved before it's usable.";

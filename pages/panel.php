@@ -52,7 +52,7 @@ elseif ($url[1] == "newpost") {
         	// If there are no errors, make the post.
         	if (count($errors) === 0) {
         	    // Add the new post to the database.
-        	    $db->query("INSERT INTO `posts` (title, tags, content, account, startip, startuseragent, starttime, editip, edituseragent, editedby, edittime, icon, published, starred) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . $db->real_escape_string(time()) . "', 'none', '0', '0')");
+        	    $db->query("INSERT INTO `posts` (title, tags, content, account, starttime, icon, published) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . $db->real_escape_string(time()) . "', 'none', '1')");
         	    // Print a message.
         	    $content .= "Successfully made post.";
         	    $success = true;

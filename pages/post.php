@@ -50,7 +50,7 @@ else {
 
     // If there are none, count this as a view.
     if ($views->num_rows < 1) {
-        $db->query("INSERT INTO `views` (ip, useragent, timestamp, post) VALUES ('" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string($url[1]) . "')");
+        $db->query("INSERT INTO `views` (ip, timestamp, post) VALUES ('" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string($url[1]) . "')");
     }
 }
 
