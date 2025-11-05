@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
         
         // If mod rewrite is enabled, we can have pretty URLs.
-        if (in_array("mod_rewrite", apache_get_modules())) {
+        if (function_exists("apache_get_modules") && in_array("mod_rewrite", apache_get_modules())) {
             $newConfig["prettyURLs"] = true;
         }
 
