@@ -17,7 +17,8 @@ $config = array(
     "theme" => "Light",
     "language" => "english",
     "userlist" => true,
-    "https" => false
+    "https" => false,
+    "prettyURLs" => false
 );
 
 ?>
