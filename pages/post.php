@@ -32,6 +32,10 @@ else {
         else {
             $content .= "<h4>By: Nobody</h4>";
         }
+        $content .= "<h4>Published: <span title='" . date ("h:i:s", $p["starttime"]). "'>" . date("m-d-Y", $p["starttime"]) . "</span></h4>";
+        if (!empty($p["edittime"])) {
+            $content .= "<h4>Modified: <span title='" . date ("h:i:s", $p["edittime"]). "'>" . date("m-d-Y", $p["edittime"]) . "</span></h4>";
+        }
         $icon = $p["icon"];
         $id = (int)$p["id"];
         // Display the post's image if it exists.
