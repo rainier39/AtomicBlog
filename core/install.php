@@ -93,22 +93,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `username` varchar(32) NOT NULL,
             `email` varchar(64) NOT NULL,
             `password` varchar(128) NOT NULL,
-            `birthday` char(8) NOT NULL,
             `name` varchar(64) NOT NULL,
-            `role` enum('Owner', 'Member', 'Unapproved') NOT NULL DEFAULT 'Unapproved',
+            `role` enum('Owner', 'Moderator', 'Member', 'Unapproved') NOT NULL DEFAULT 'Unapproved',
+            `avatar` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
             `ip` int unsigned NOT NULL,
-            `useragent` varchar(128) NOT NULL,
             `jointime` int unsigned NOT NULL,
             `lastactive` int unsigned NOT NULL,
             `namevisible` tinyint(1) NOT NULL DEFAULT '0',
-            `birthdayvisible` tinyint(1) NOT NULL DEFAULT '0',
-            `agevisible` tinyint(1) NOT NULL DEFAULT '0',
             `emailvisible` tinyint(1) NOT NULL DEFAULT '0',
             `bio` varchar(4096) DEFAULT NULL,
             PRIMARY KEY (`id`),
             UNIQUE KEY `username` (`username`),
             UNIQUE KEY `email` (`email`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         $db->query("CREATE TABLE IF NOT EXISTS `posts` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -116,51 +113,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `tags` varchar(128) NOT NULL,
             `content` text NOT NULL,
             `account` int unsigned NOT NULL,
-            `startip` int unsigned NOT NULL,
-            `startuseragent` varchar(128) NOT NULL,
             `starttime` int unsigned NOT NULL,
-            `editip` int unsigned NOT NULL,
-            `edituseragent` varchar(128) NOT NULL,
             `editedby` int unsigned NOT NULL,
             `edittime` int unsigned NOT NULL,
             `icon` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
             `published` tinyint(1) NOT NULL DEFAULT '0',
             `starred` tinyint(1) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         $db->query("CREATE TABLE IF NOT EXISTS `comments` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
-            `account` int unsigned NOT NULL,
-            `email` varchar(64) NOT NULL,
+            `account` int unsigned DEFAULT NULL,
+            `post` int unsigned NOT NULL,
+            `email` varchar(64) DEFAULT NULL,
             `ip` int unsigned NOT NULL,
-            `useragent` varchar(128) NOT NULL,
             `timestamp` int unsigned NOT NULL,
             `content` text NOT NULL,
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         $db->query("CREATE TABLE IF NOT EXISTS `views` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
             `ip` int unsigned NOT NULL,
-            `useragent` varchar(128) NOT NULL,
             `timestamp` int unsigned NOT NULL,
             `post` int unsigned NOT NULL,
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
-
-        $db->query("CREATE TABLE IF NOT EXISTS `extensions` (
-            `id` int unsigned NOT NULL AUTO_INCREMENT,
-            `name` varchar(32) NOT NULL,
-            `author` varchar(32) NOT NULL,
-            `version` varchar(16) NOT NULL,
-            `description` varchar(128) NOT NULL,
-            `enabled` tinyint(1) NOT NULL DEFAULT '0',
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Write the administrator account. Will replace any existing account with the same username or email (I.E. there is an old install of the software).
-        $db->query("REPLACE INTO `accounts` (username, email, password, birthday, name, role, ip, useragent, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '00000000', 'Owner', 'Owner', '" . ip2long($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+        $db->query("REPLACE INTO `accounts` (username, email, password, name, role, ip, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Owner', 'Owner', '" . ip2long($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
 
         // Create a new array of our new config values.
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
