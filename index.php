@@ -39,7 +39,7 @@ require "core/functions.php";
 require "core/formatter.php";
 
 // Break up the URL for easy use throughout the software.
-$url = explode('/', $_GET['url']);
+$url = explode('/', ($_GET['url'] ?? ""));
 
 // Initialize the session.
 session_start();

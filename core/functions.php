@@ -38,7 +38,7 @@ function displayPost($id, $icon, $title, $account) {
     }
     //else {
     //}
-    $post .= "</a></br><a href='/post/" . $id . "/'>" . htmlspecialchars($title) . "</a>";
+    $post .= "</a></br><a href='" . makeURL("post/" . $id) . "'>" . htmlspecialchars($title) . "</a>";
     // Get the account information of the post author.
     $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($account) . "'");
     if ($acc->num_rows > 0) {
@@ -52,6 +52,25 @@ function displayPost($id, $icon, $title, $account) {
     $post .= "</div>";
     
     return $post;
+}
+
+// Make a valid (relative) URL for a given page.
+function makeURL($page) {
+    global $config;
+    // If we're using pretty URLs.
+    if ($config["prettyURLs"]) {
+        return "/" . (trim($page, "/"));
+    }
+    // If not.
+    else {
+        $trimmed = trim($page, "/");
+        if ($trimmed === "") {
+            return "/";
+        }
+        else {
+            return "/index.php?url=" . $trimmed;
+        }
+    }
 }
 
 ?>

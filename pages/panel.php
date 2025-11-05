@@ -14,7 +14,7 @@ if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
-    $content .= "<a href='/panel/newpost/'>Create a new post</a>";
+    $content .= "<a href='" . makeURL("panel/newpost") . "'>Create a new post</a>";
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
