@@ -45,3 +45,5 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .allPosts legend {font-size: 120%}
 code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px;}
 .error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
+.postButtons {display: flex; flex-flow: row wrap; align-items: center; justify-content: center;}
+.postButton {text-decoration: none; font-size: 120%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; color: white; margin-right: 0.5%; margin-left: 0.5%; min-width: 0;}

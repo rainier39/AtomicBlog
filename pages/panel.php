@@ -25,36 +25,14 @@ elseif ($url[1] == "newpost") {
             // Generate a new token.
             generateCSRFToken();
 
-            $errors = array();
-        	
-        	// Title.
-            if (!isset($_POST["title"]) or (strlen($_POST["title"]) < 1)) {
-                $errors[] = "Error: post title cannot be less than 1 character long.";
-            }
-            elseif (strlen($_POST["title"]) > 32) {
-                $errors[] = "Error: post title cannot be more than 32 characters long.";
-            }
-            // Tags.
-            if (!isset($_POST["tags"]) or (strlen($_POST["tags"]) < 1)) {
-                $errors[] = "Error: post tags cannot be less than 1 character long.";
-            }
-            elseif (strlen($_POST["tags"]) > 128) {
-                $errors[] = "Error: post tags cannot be more than 128 characters long.";
-            }
-            // Content.
-            if (!isset($_POST["content"]) or (strlen($_POST["content"]) < 1)) {
-                $errors[] = "Error: post content cannot be less than 1 character long.";
-            }
-            elseif (strlen($_POST["content"]) > 65500) {
-                $errors[] = "Error: post content cannot be more than 65500 characters long.";
-            }
+            $errors = validatePost();
         	
         	// If there are no errors, make the post.
         	if (count($errors) === 0) {
         	    // Add the new post to the database.
         	    $db->query("INSERT INTO `posts` (title, tags, content, account, starttime, icon, published) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . $db->real_escape_string(time()) . "', 'none', '1')");
         	    // Print a message.
-        	    $content .= "Successfully made post.";
+        	    $content .= "Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.";
         	    $success = true;
         	}
         	// Otherwise, print the errors.
