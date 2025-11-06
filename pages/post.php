@@ -28,6 +28,10 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
                 
                 // Delete the post.
                 $db->query("DELETE FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                // Delete all of the post's views.
+                $db->query("DELETE FROM `views` WHERE post='" . $db->real_escape_string($url[1]) . "'");
+                // Delete all of the post's comments.
+                $db->query("DELETE FROM `comments` WHERE post='" . $db->real_escape_string($url[1]) . "'");
                 $content .= "Successfully deleted the post.";
                 $displayPost = false;
             }
