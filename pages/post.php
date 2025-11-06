@@ -7,6 +7,7 @@ if (!defined('INDEX')) exit;
 
 $content = "";
 $displayPost = true;
+$updatePost = false;
 
 // Get the requested post.
 $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
@@ -15,6 +16,29 @@ $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string(
 if ($post->num_rows < 1) {
     $content .= "The requested post doesn't exist.";
     $displayPost = false;
+}
+// Handle star toggling.
+elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"]))) {
+    while ($p = $post->fetch_assoc()) {
+        // Make sure the user is allowed to star/unstar the post.
+        if (isset($_SESSION["id"]) && ($_SESSION["id"] === $p["account"])) {
+            // If the CSRF token is sent and valid.
+            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                // Generate a new token.
+                generateCSRFToken();
+                
+                // Star.
+                if ($_POST["toggleStar"] == "Star") {
+                    $db->query("UPDATE `posts` SET starred='1' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                }
+                // Unstar.
+                else {
+                    $db->query("UPDATE `posts` SET starred='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                }
+                $updatePost = true;
+            }
+        }
+    }
 }
 // Handle deletions.
 elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
@@ -57,6 +81,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
         	        if (count($errors) === 0) {
         	            $db->query("UPDATE `posts` SET title='" . $db->real_escape_string($_POST["title"]) . "', tags='" . $db->real_escape_string($_POST["tags"]) . "', content='" . $db->real_escape_string($_POST["content"]) . "', editedby='" . $db->real_escape_string($_SESSION["id"]) . "', edittime='" . $db->real_escape_string(time()) . "' WHERE id='" . $db->real_escape_string($url[1]) . "'");
         	            $success = true;
+        	            $updatePost = true;
         	        }
         	        // Otherwise, print the errors.
         	        else {
@@ -85,15 +110,17 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
 // Otherwise, display the post.
 if ($displayPost) {
     $formats = array("png", "jpg", "gif", "webp");
-    // Get the requested post again if the user edited it.
-    if (isset($url[2]) && ($url[2] == "edit")) {
+    // Get the requested post again if the user edited it or starred it.
+    if ($updatePost) {
         $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
     }
     while ($p = $post->fetch_assoc()) {
         $content .=
         "<div class='post'>
             <div class='postButtons'>
-                " . ((($_SESSION["id"] ?? "") === $p["account"]) ? "<a href='" . makeURL("post/{$p["id"]}/edit") . "' class='postButton'>Edit</a> <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='delete' value='Delete'></form>" : "") . "
+                " . ((($_SESSION["id"] ?? "") === $p["account"]) ? "<a href='" . makeURL("post/{$p["id"]}/edit") . "' class='postButton'>Edit</a>
+                <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='delete' value='Delete'></form>
+                <form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>" : "") . "
             </div>
             <div class='postHeader'>
                 <h2>" . htmlspecialchars($p["title"]) . "</h2>";
