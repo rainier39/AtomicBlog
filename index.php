@@ -42,7 +42,12 @@ require "core/formatter.php";
 $url = explode('/', ($_GET['url'] ?? ""));
 
 // Initialize the session.
-session_start();
+session_name("AtomicBlog");
+session_start([
+    'cookie_httponly' => true,
+    'cookie_samesite' => "strict",
+    'cookie_secure' => $config["https"],
+]);
 
 // Generate a CSRF token if needed.
 if (!isset($_SESSION["csrf_token"])) {
