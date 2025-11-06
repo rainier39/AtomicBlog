@@ -86,6 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             require "pages/footer.php";
             exit();
         }
+        
+        if (isset($_POST["overwrite"]) && ($_POST["overwrite"] == "on")) {
+            $db->query("DROP TABLE IF EXISTS `accounts`");
+            $db->query("DROP TABLE IF EXISTS `posts`");
+            $db->query("DROP TABLE IF EXISTS `comments`");
+            $db->query("DROP TABLE IF EXISTS `views`");
+        }
 
         // Write the database.
         $db->query("CREATE TABLE IF NOT EXISTS `accounts` (
@@ -191,6 +198,10 @@ $content .=
             <label>Email Address: </label><input type='email' name='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . "></input></br>
             <label>Password: </label><input type='password' name='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
             <label>Repeat password: </label><input type='password' name='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . "></input></br>
+            
+            <br><b>Settings</b></br>
+            <label for='overwrite'>Overwrite old database: </label><input type='checkbox' name='overwrite' id='overwrite'>
+            
             <br><input type='submit' value='Install' id='button'></input>
         </form>
     </div>
