@@ -55,7 +55,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
         	
         	        // If there are no errors, edit the post.
         	        if (count($errors) === 0) {
-        	            $db->query("UPDATE `posts` SET title='" . $db->real_escape_string($_POST["title"]) . "', tags='" . $db->real_escape_string($_POST["tags"]) . "', content='" . $db->real_escape_string($_POST["content"]) . "' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+        	            $db->query("UPDATE `posts` SET title='" . $db->real_escape_string($_POST["title"]) . "', tags='" . $db->real_escape_string($_POST["tags"]) . "', content='" . $db->real_escape_string($_POST["content"]) . "', editedby='" . $db->real_escape_string($_SESSION["id"]) . "', edittime='" . $db->real_escape_string(time()) . "' WHERE id='" . $db->real_escape_string($url[1]) . "'");
         	            $success = true;
         	        }
         	        // Otherwise, print the errors.

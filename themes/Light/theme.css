@@ -47,3 +47,8 @@ code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2p
 .error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
 .postButtons {display: flex; flex-flow: row wrap; align-items: center; justify-content: center;}
 .postButton {text-decoration: none; font-size: 120%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; color: white; margin-right: 0.5%; margin-left: 0.5%; min-width: 0;}
+.editPostForm {text-align: center}
+.editPostForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.editPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.editPostForm textarea {resize: vertical; height: 120px}
+#buttonEditPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
