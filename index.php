@@ -5,6 +5,10 @@
 // Define a constant to ensure pages are only loaded through this index file.
 define("INDEX", "1");
 
+// Prevent clickjacking by preventing the website from loading in an iframe.
+header("Content-Security-Policy: frame-ancestors 'none';");
+header("X-Frame-Options: DENY");
+
 // Initialize the configuration file.
 require "core/config.php";
 
