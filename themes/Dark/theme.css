@@ -1,11 +1,11 @@
 @import url("/themes/Light/theme.css");
-html {background: #222222; color: white}
-.content, .footer {background: #333333; border-color: white}
-.header {border-color: white; background: #282828}
-.navbar {border-color: white; background: #555555}
-.navbar a {background: black; border-color: white}
-.posts {border-color: white}
-.posts a {color: white}
-.starred, .mostViewed, .mostRecent, .allPosts {border-color: white}
-#button, #buttonRegister, #buttonNewPost {background: black; border-color: white}
+html {background: #121212; color: #e0e0e0}
+.content, .footer {background: #181a1b; border-color: #e0e0e0}
+.header {border-color: #e0e0e0; background: #181a1b}
+.navbar {border-color: #e0e0e0; background: #404040}
+.navbar a {background: #121212; border-color: #e0e0e0}
+.posts {border-color: #e0e0e0}
+.posts a {color: #e0e0e0}
+.starred, .mostViewed, .mostRecent, .allPosts {border-color: #e0e0e0}
+#button, #buttonRegister, #buttonNewPost, #buttonEditPost, .postButton {background: #121212; border-color: #e0e0e0}
 a {color: lightblue}
