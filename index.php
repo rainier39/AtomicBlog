@@ -24,17 +24,10 @@ if ($config["installed"])
 {
     // Establish a connection to the database.
     $db = mysqli_connect($config["SQLServer"], $config["SQLUsername"], $config["SQLPassword"], $config["SQLDatabase"]);
-
-    // Display an error if the connection failed.
-    if (mysqli_connect_errno()) {
-        echo mysqli_connect_error();
-        exit;
-    }
 }
 
 // Initialize the language file.
 // TODO: implement languages, loader function to read a JSON file for languages.
-//require "languages/" . $config["language"] . ".php";
 
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
@@ -50,6 +43,7 @@ session_name("AtomicBlog");
 session_start([
     'cookie_httponly' => true,
     'cookie_samesite' => "strict",
+    // Only set the secure attribute if the site is being served over HTTPS.
     'cookie_secure' => $config["https"],
 ]);
 
