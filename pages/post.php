@@ -123,20 +123,21 @@ if ($displayPost) {
                 <form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>" : "") . "
             </div>
             <div class='postHeader'>
-                <h2>" . htmlspecialchars($p["title"]) . "</h2>";
+                <h1>" . htmlspecialchars($p["title"]) . "</h1>";
         // Get the account information of the post author.
         $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($p["account"]) . "'");
         if ($acc->num_rows > 0) {
             while ($a = $acc->fetch_assoc()) {
-                $content .= "<h4>By: " . htmlspecialchars($a["name"]) . "</h4>";
+                $content .= "<b>By: " . htmlspecialchars($a["name"]) . "</b>";
             }
         }
         else {
-            $content .= "<h4>By: Nobody</h4>";
+            $content .= "<b>By: Nobody</b>";
         }
-        $content .= "<h4>Published: <span title='" . date ("h:i:s", $p["starttime"]). "'>" . date("m-d-Y", $p["starttime"]) . "</span></h4>";
+        $content .= " | ";
+        $content .= "<b>Published: <span title='" . date ("h:i:s", $p["starttime"]). "'>" . date("m-d-Y", $p["starttime"]) . "</span></b>";
         if (!empty($p["edittime"])) {
-            $content .= "<h4>Modified: <span title='" . date ("h:i:s", $p["edittime"]). "'>" . date("m-d-Y", $p["edittime"]) . "</span></h4>";
+            $content .= " | <b>Modified: <span title='" . date ("h:i:s", $p["edittime"]). "'>" . date("m-d-Y", $p["edittime"]) . "</span></b>";
         }
         $icon = $p["icon"];
         $id = (int)$p["id"];

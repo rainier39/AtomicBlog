@@ -35,13 +35,13 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .posts img {max-width: 100%; height: auto; border: 1px solid grey;}
 /* Post page */
 .post {padding: 15px}
-.postHeader h2, h4 {text-align: center}
+.postHeader {text-align: center; margin-bottom: 12px}
 .postHeader img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 .postButtons {display: flex; flex-flow: row wrap; align-items: center; justify-content: center;}
 .postButton {text-decoration: none; font-size: 120%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; color: white; margin-right: 5px; margin-left: 5px; margin-bottom: 2px; margin-top: 2px; min-width: 0;}
 /* Post content formatting */
 code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px;}
-.postContent {line-height: 1.5}
+.postContent {line-height: 1.5; padding: 8px}
 .postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 /* Home page */
 .starred {border: 1px solid grey}
@@ -59,3 +59,11 @@ code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2p
 .editPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 .editPostForm textarea {resize: vertical; height: 120px}
 #buttonEditPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
+/* Phone/Tablet */
+@media only screen and (max-width: 768px) {
+body {max-width: 100%}
+.header {border-left: 0; border-right: 0}
+.navbar {border-left: 0; border-right: 0}
+.content {border-left: 0; border-right: 0}
+.footer {border-left: 0; border-right: 0; border-bottom: 0}
+}
