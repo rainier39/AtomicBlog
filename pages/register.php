@@ -94,10 +94,10 @@ else {
             <h2>Register</h2>
             <form method='post'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' value='" . (isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : "") . "' required></input></br>
-                <label>Email Address: </label><input type='email' name='email' autocomplete='email' maxlength='64' value='" . (isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "") . "' required></input></br>
-                <label>Password: </label><input type='password' name='password' autocomplete='new-password' value='" . (isset($_POST["password"]) ? htmlspecialchars($_POST["password"]) : "") . "' required></input></br>
-                <label>Repeat password: </label><input type='password' name='repeatpassword' value='" . (isset($_POST["repeatpassword"]) ? htmlspecialchars($_POST["repeatpassword"]) : "") . "' required></input></br>
+                <label for='username'>Username: </label><input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='" . (isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : "") . "' required></input></br>
+                <label for='email'>Email Address: </label><input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='" . (isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "") . "' required></input></br>
+                <label for='password'>Password: </label><input type='password' name='password' id='password' autocomplete='new-password' value='" . (isset($_POST["password"]) ? htmlspecialchars($_POST["password"]) : "") . "' required></input></br>
+                <label for='repeatpassword'>Repeat password: </label><input type='password' name='repeatpassword' id='repeatpassword' value='" . (isset($_POST["repeatpassword"]) ? htmlspecialchars($_POST["repeatpassword"]) : "") . "' required></input></br>
                 <br><input type='submit' value='Register' id='buttonRegister'></input>
             </form>
         </div>";

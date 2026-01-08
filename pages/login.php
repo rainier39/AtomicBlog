@@ -62,8 +62,8 @@ else {
             <h2>Log in</h2>
             <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-            <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' required></input></br>
-            <label>Password: </label><input type='password' name='password' autocomplete='current-password' required></input></br>
+            <label for='username'>Username: </label><input type='text' name='username' id='username' autocomplete='username' maxlength='32' required></input></br>
+            <label for='password'>Password: </label><input type='password' name='password' id='password' autocomplete='current-password' required></input></br>
             <input type='submit' value='Log in' id='button'></input>
             </form>
         </div>";

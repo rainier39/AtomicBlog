@@ -14,7 +14,11 @@ if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
+    $content .= "<div class='panelcontent'>";
+    $content .= "<h1>Panel</h1>";
+    $content .= "<h2>User Actions</h2>";
     $content .= "<a href='" . makeURL("panel/newpost") . "'>Create a new post</a>";
+    $content .= "</div>";
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
@@ -50,9 +54,9 @@ elseif ($url[1] == "newpost") {
             <h2>New Post</h2>
             <form method='post'>
             	<input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                <label>Title: </label><input type='text' name='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
-                <label>Tags: </label><input type='text' name='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "") . "></input></br>
-                <label>Content: </label><textarea name='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : "") . "</textarea></br>
+                <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
+                <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "") . "></input></br>
+                <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : "") . "</textarea></br>
                 <br><input type='submit' value='Submit post' id='buttonNewPost'></input>
             </form>
         </div>";

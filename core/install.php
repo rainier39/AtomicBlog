@@ -184,20 +184,20 @@ $content .=
         <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
             <b>SQL Details</b></br>
-            <label>SQL Server: </label><input type='text' name='SQLServer'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . "></input></br>
-            <label>SQL Database: </label><input type='text' name='SQLDatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . "></input></br>
-            <label>SQL Username: </label><input type='text' name='SQLUsername'" . (isset($_POST["SQLUsername"]) ? " value='" . htmlspecialchars($_POST["SQLUsername"]) . "'" : "") . "></input></br>
-            <label>SQL Password: </label><input type='text' name='SQLPassword'" . (isset($_POST["SQLPassword"]) ? " value='" . htmlspecialchars($_POST["SQLPassword"]) . "'" : "") . "></input></br>
+            <label for='sqlserver'>SQL Server: </label><input type='text' name='SQLServer' id='sqlserver'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . "></input></br>
+            <label for='sqldatabase'>SQL Database: </label><input type='text' name='SQLDatabase' id='sqldatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . "></input></br>
+            <label for='sqlusername'>SQL Username: </label><input type='text' name='SQLUsername' id='sqlusername'" . (isset($_POST["SQLUsername"]) ? " value='" . htmlspecialchars($_POST["SQLUsername"]) . "'" : "") . "></input></br>
+            <label for='sqlpassword'>SQL Password: </label><input type='text' name='SQLPassword' id='sqlpassword'" . (isset($_POST["SQLPassword"]) ? " value='" . htmlspecialchars($_POST["SQLPassword"]) . "'" : "") . "></input></br>
 
             <br><b>Blog Configuration</b></br>
-            <label>Blog Title: </label><input type='text' name='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
-            <label>Blog Description: </label><textarea name='description' maxlength='128'>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
+            <label for='title'>Blog Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
+            <label for='description'>Blog Description: </label><textarea name='description' id='description' maxlength='128'>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
 
             <br><b>Administrator Account Details</b></br>
-            <label>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
-            <label>Email Address: </label><input type='email' name='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . "></input></br>
-            <label>Password: </label><input type='password' name='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
-            <label>Repeat password: </label><input type='password' name='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . "></input></br>
+            <label for='username'>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' id='username'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
+            <label for='email'>Email Address: </label><input type='email' name='email' id='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . "></input></br>
+            <label for='password'>Password: </label><input type='password' name='password' id='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
+            <label for='repeatpassword'>Repeat password: </label><input type='password' name='repeatpassword' id='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . "></input></br>
             
             <br><b>Settings</b></br>
             <label for='overwrite'>Overwrite old database: </label><input type='checkbox' name='overwrite' id='overwrite'>

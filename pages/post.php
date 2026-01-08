@@ -96,9 +96,9 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
                     <h2>Edit Post</h2>
                     <form method='post'>
                         <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                        <label>Title: </label><input type='text' name='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "></input></br>
-                        <label>Tags: </label><input type='text' name='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p["tags"]) . "'") . "></input></br>
-                        <label>Content: </label><textarea name='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p["content"])) . "</textarea></br>
+                        <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "></input></br>
+                        <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p["tags"]) . "'") . "></input></br>
+                        <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p["content"])) . "</textarea></br>
                         <br><input type='submit' value='Edit post' id='buttonEditPost'></input>
                     </form>
                 </div>";
@@ -128,16 +128,16 @@ if ($displayPost) {
         $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($p["account"]) . "'");
         if ($acc->num_rows > 0) {
             while ($a = $acc->fetch_assoc()) {
-                $content .= "<b>By: " . htmlspecialchars($a["name"]) . "</b>";
+                $content .= "By: " . htmlspecialchars($a["name"]);
             }
         }
         else {
-            $content .= "<b>By: Nobody</b>";
+            $content .= "By: Nobody";
         }
         $content .= " | ";
-        $content .= "<b>Published: <span title='" . date ("h:i:s", $p["starttime"]). "'>" . date("m-d-Y", $p["starttime"]) . "</span></b>";
+        $content .= "<small>Published: <span title='" . date ("h:i:s", $p["starttime"]). "'>" . date("m-d-Y", $p["starttime"]) . "</span></small>";
         if (!empty($p["edittime"])) {
-            $content .= " | <b>Modified: <span title='" . date ("h:i:s", $p["edittime"]). "'>" . date("m-d-Y", $p["edittime"]) . "</span></b>";
+            $content .= " | <small>Modified: <span title='" . date ("h:i:s", $p["edittime"]). "'>" . date("m-d-Y", $p["edittime"]) . "</span></small>";
         }
         $icon = $p["icon"];
         $id = (int)$p["id"];
