@@ -158,6 +158,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (function_exists("apache_get_modules") && in_array("mod_rewrite", apache_get_modules())) {
             $newConfig["prettyURLs"] = true;
         }
+        
+        // If the blog is being installed in a folder, take note of that fact.
+        $dir = explode("/", $_SERVER["REQUEST_URI"]);
+        if (end($dir) && str_starts_with(end($dir), "index.php")) {
+            array_pop($dir);
+        }
+        if (count($dir) > 0) {
+            $newConfig["dir"] = trim(implode("/", $dir), "/");
+        }
 
         // Merge the old config array with the new one.
         $config = array_merge($config, $newConfig);

@@ -13,8 +13,8 @@ $hcontent .= "<!DOCTYPE html>
 <meta charset='UTF-8'>
 <title>" . htmlspecialchars($config["title"]) . "</title>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
-<link rel='stylesheet' href='/themes/" . htmlspecialchars($config["theme"]) . "/theme.css'>
-<link rel='icon' type='image/x-icon' href='/themes/" . htmlspecialchars($config["theme"]) . "/icon.png'>
+<link rel='stylesheet' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css") . "'>
+<link rel='icon' type='image/x-icon' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png") . "'>
 <body>";
 
 $hcontent .= "<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b></br><small>" . htmlspecialchars($config["description"]) . "</small></div>";

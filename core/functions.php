@@ -59,7 +59,7 @@ function makeURL($page) {
     global $config;
     // If we're using pretty URLs.
     if ($config["prettyURLs"]) {
-        return "/" . (trim($page, "/"));
+        return ($config["dir"] != "" ? "/" . $config["dir"] . "/" : "/") . (trim($page, "/"));
     }
     // If not.
     else {
@@ -104,13 +104,20 @@ function validatePost() {
 
 // Safely redirect to some page.
 function redirect($loc) {
+    global $config;
     if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
         $proto = "https://";
     }
     else {
         $proto = "http://";
     }
-    header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . ltrim($loc, "/"));
+    if ($config["dir"] != "") {
+        $dir = $config["dir"] . "/";
+    }
+    else {
+        $dir = "";
+    }
+    header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
     exit();
 }
 
