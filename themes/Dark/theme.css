@@ -10,4 +10,6 @@ html {background: #121212; color: #d0d0d0}
 #button, #buttonRegister, #buttonNewPost, #buttonEditPost, .postButton {background: #061d38; border-color: #d0d0d0}
 .post h1, .postContent {color: white}
 a {color: lightblue}
-input, textarea {color: white; background: #121212}
+input, textarea {color: white; background: #121212; border: 1px solid #d0d0d0}
+/* Panel */
+.panelcontent a {color: #cccccc}
