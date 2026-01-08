@@ -6,6 +6,7 @@
 if (!defined('INDEX')) exit;
 
 $default_config = array(
+    "version" => "v2.0.0-alpha",
     "installed" => false,
     "SQLServer" => "",
     "SQLDatabase" => "",
