@@ -105,7 +105,10 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
             }
         }
     }
-    if ($success) $displayPost = true;
+    if ($success) {
+        $displayPost = true;
+        redirect("post/" . $url[1]);
+    }
 }
 // Otherwise, display the post.
 if ($displayPost) {

@@ -102,5 +102,17 @@ function validatePost() {
     return $errors;
 }
 
+// Safely redirect to some page.
+function redirect($loc) {
+    if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
+        $proto = "https://";
+    }
+    else {
+        $proto = "http://";
+    }
+    header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . ltrim($loc, "/"));
+    exit();
+}
+
 ?>
 
