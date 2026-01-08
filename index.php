@@ -11,8 +11,15 @@ define("VERSION", "v2.0.0-alpha");
 header("Content-Security-Policy: frame-ancestors 'none';");
 header("X-Frame-Options: DENY");
 
-// Initialize the configuration file.
-require "core/config.php";
+// Get the configuration settings.
+require "core/default_config.php";
+if (file_exists("core/config.php")) {
+    require "core/config.php";
+}
+else {
+    $config = array();
+}
+$config = array_merge($default_config, $config);
 
 // Make sure that the page is accessed over HTTPS if applicable.
 $ishttps = $_SERVER["HTTPS"] ?? "";

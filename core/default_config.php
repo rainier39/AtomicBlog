@@ -5,7 +5,7 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$config = array(
+$default_config = array(
     "installed" => false,
     "SQLServer" => "",
     "SQLDatabase" => "",
@@ -16,9 +16,10 @@ $config = array(
     "footer" => "Powered by AtomicBlog",
     "theme" => "Light",
     "language" => "english",
-    "userlist" => true,
+    // Whether to redirect all HTTP requests to HTTPS.
     "https" => false,
     "prettyURLs" => false,
+    // Whether to allow people to create accounts.
     "allowRegistration" => true
 );
 

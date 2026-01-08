@@ -1,0 +1,2 @@
+# Never commit a production configuration file.
+core/config.php
