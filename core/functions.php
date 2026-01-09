@@ -55,20 +55,20 @@ function displayPost($id, $icon, $title, $account) {
 }
 
 // Make a valid (relative) URL for a given page.
-function makeURL($page) {
+function makeURL($page, $direct=false) {
     global $config;
-    // If we're using pretty URLs.
-    if ($config["prettyURLs"]) {
+    // If we're using pretty URLs or linking directly to a file.
+    if ($config["prettyURLs"] || $direct) {
         return ($config["dir"] != "" ? "/" . $config["dir"] . "/" : "/") . (trim($page, "/"));
     }
     // If not.
     else {
         $trimmed = trim($page, "/");
         if ($trimmed === "") {
-            return "/";
+            return ($config["dir"] != "" ? "/" . $config["dir"] . "/" : "/");
         }
         else {
-            return "/index.php?url=" . $trimmed;
+            return ($config["dir"] != "" ? "/" . $config["dir"] . "/" : "/") . "index.php?url=" . $trimmed;
         }
     }
 }
@@ -117,7 +117,12 @@ function redirect($loc) {
     else {
         $dir = "";
     }
-    header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+    if ($config["prettyURLs"]) {
+        header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+    }
+    else {
+        header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . "index.php?url=" . ltrim($loc, "/"));
+    }
     exit();
 }
 

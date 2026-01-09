@@ -7,6 +7,20 @@ if (!defined('INDEX')) exit;
 
 $content = "";
 
+// If the blog is being installed in a folder, take note of that fact.
+$dir = explode("/", $_SERVER["REQUEST_URI"]);
+if (end($dir) && str_starts_with(end($dir), "index.php")) {
+    array_pop($dir);
+}
+if (count($dir) > 0) {
+    $config["dir"] = trim(implode("/", $dir), "/");
+}
+
+// If mod rewrite is enabled, we can have pretty URLs.
+if (function_exists("apache_get_modules") && in_array("mod_rewrite", apache_get_modules())) {
+    $config["prettyURLs"] = true;
+}
+
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Hard stop if this is a CSRF attack.
@@ -153,20 +167,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Create a new array of our new config values.
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
-        
-        // If mod rewrite is enabled, we can have pretty URLs.
-        if (function_exists("apache_get_modules") && in_array("mod_rewrite", apache_get_modules())) {
-            $newConfig["prettyURLs"] = true;
-        }
-        
-        // If the blog is being installed in a folder, take note of that fact.
-        $dir = explode("/", $_SERVER["REQUEST_URI"]);
-        if (end($dir) && str_starts_with(end($dir), "index.php")) {
-            array_pop($dir);
-        }
-        if (count($dir) > 0) {
-            $newConfig["dir"] = trim(implode("/", $dir), "/");
-        }
 
         // Merge the old config array with the new one.
         $config = array_merge($config, $newConfig);
