@@ -8,7 +8,7 @@ if (!defined('INDEX')) exit;
 $content = "";
 
 // Get all of the blog posts.
-$posts = $db->query("SELECT * FROM `posts`");
+$posts = $db->query("SELECT id, icon, title, account FROM `posts`");
 
 // Display the allPosts fieldset.
 $content .= "<fieldset class='allPosts'><legend>All Posts</legend>";

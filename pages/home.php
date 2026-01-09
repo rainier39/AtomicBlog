@@ -8,10 +8,10 @@ if (!defined('INDEX')) exit;
 $content = "";
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT * FROM `posts` WHERE starred='1'");
+$starred = $db->query("SELECT id, icon, title, account FROM `posts` WHERE starred='1'");
 
 // Display the starred posts fieldset.
-$content .= "<fieldset class='starred'><legend>Starred Posts</legend>";
+$content .= "<fieldset class='starred'><legend>Starred</legend>";
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
@@ -28,11 +28,32 @@ else {
 // End the starred posts fieldset.
 $content .= "</fieldset>";
 
+// Get the 5 most recent posts.
+$recent = $db->query("SELECT id, icon, title, account FROM `posts` ORDER BY starttime DESC LIMIT 5");
+
+// Display the most recent fieldset.
+$content .= "</br><fieldset class='mostRecent'><legend>Most Recent</legend>";
+
+// Only try to display posts if there are any.
+if ($recent->num_rows > 0) {
+    // Display the posts.
+    while ($r = $recent->fetch_assoc()) {
+        $content .= displayPost($r["id"], $r["icon"], $r["title"], $r["account"]);
+    }
+}
+// Otherwise print a message.
+else {
+    $content .= "No posts yet.";
+}
+
+// End the fieldset.
+$content .= "</fieldset>";
+
 // Create an array to store every postid and later how many views each one has.
 $views = array();
 
 // Get all the postids.
-$postids = $db->query("SELECT * FROM `posts`");
+$postids = $db->query("SELECT id FROM `posts`");
 
 // If there are any posts...
 if ($postids->num_rows > 0) {
@@ -41,7 +62,7 @@ if ($postids->num_rows > 0) {
         $views[$p["id"]] = 0;
     }
 
-    // Get all of the views, and just get their posts.
+    // Get all of the views, and just get their post ids.
     $posts = $db->query("SELECT post FROM `views`");
 
     // Fill the array with the proper amount of views per post.
@@ -75,33 +96,12 @@ $content .= "</br><fieldset class='mostViewed'><legend>Most Viewed</legend>";
 if ($postids->num_rows > 0) {
     foreach ($mostViewed as $mv) {
         // Get the posts we wish to display.
-        $mostViewedPosts = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($mv) . "'");
+        $mostViewedPosts = $db->query("SELECT id, icon, title, account FROM `posts` WHERE id='" . $db->real_escape_string($mv) . "'");
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
             $content .= displayPost($m["id"], $m["icon"], $m["title"], $m["account"]);
         }
-    }
-}
-// Otherwise print a message.
-else {
-    $content .= "No posts yet.";
-}
-
-// End the fieldset.
-$content .= "</fieldset>";
-
-// Get the 5 most recent posts.
-$recent = $db->query("SELECT * FROM `posts` ORDER BY starttime DESC LIMIT 5");
-
-// Display the most recent fieldset.
-$content .= "</br><fieldset class='mostRecent'><legend>Most Recent</legend>";
-
-// Only try to display posts if there are any.
-if ($recent->num_rows > 0) {
-    // Display the posts.
-    while ($r = $recent->fetch_assoc()) {
-        $content .= displayPost($r["id"], $r["icon"], $r["title"], $r["account"]);
     }
 }
 // Otherwise print a message.
