@@ -103,21 +103,75 @@ function validatePost() {
     return $errors;
 }
 
+// Checks to be performed when setting or changing a username.
+function validateUsername($username) {
+    global $config, $db;
+    $errors = array();
+    
+    if (strlen($username) < 1) {
+        $errors[] = "Your username must be at least 1 character long.";
+    }
+    elseif (strlen($username) > 32) {
+        $errors[] = "Your username cannot be longer than 32 characters.";
+    }
+    
+    if ($config["installed"]) {
+        $usernameCheck = $db->query("SELECT 1 FROM `accounts` WHERE username='" . $db->real_escape_string($username) . "'");
+        if ($usernameCheck->num_rows != 0) {
+            $errors[] = "Your username is already taken.";
+        }
+    }
+    
+    return $errors;
+}
+
+// Checks to be performed when setting or changing an email address.
+function validateEmail($email, $takenCheck=false) {
+    global $config, $db;
+    $errors = array();
+    
+    // Make sure their email isn't too short.
+    if (strlen($email) < 1) {
+        $errors[] = "Your email address is too short. Make sure your email address is at least 1 character in length.";
+    }
+    // Make sure their email isn't too long.
+    elseif (strlen($email) > 64) {
+        $errors[] = "Your email address is too long. Make sure your email address is no more than 64 characters in length.";
+    }
+    // Make sure their email is valid.
+    // May replace this with custom regex.
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Your email address is invalid. Please try entering a valid email address.";
+    }
+    // Make sure their email isn't taken.
+    if ($config["installed"] && $takenCheck) {
+        $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE email='" . $db->real_escape_string($email) . "'");
+        if ($emailCheck->num_rows != 0) {
+            $errors[] = "Your email address is already taken.";
+        }
+    }
+    
+    return $errors;
+}
+
 // Safely redirect to some page.
 function redirect($loc, int $delay=0) {
     global $config;
+    // Figure out if we're using HTTP or HTTPS.
     if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
         $proto = "https://";
     }
     else {
         $proto = "http://";
     }
+    // Figure out if the blog is installed in a directory.
     if ($config["dir"] != "") {
         $dir = $config["dir"] . "/";
     }
     else {
         $dir = "";
     }
+    // If no delay is specified, immediately redirect with the location header.
     if ($delay < 1) {
         if ($config["prettyURLs"]) {
            header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
@@ -127,6 +181,7 @@ function redirect($loc, int $delay=0) {
         }
         exit();
     }
+    // If a delay is specified, use the delay with the refresh header.
     else {
         if ($config["prettyURLs"]) {
            header("Refresh: " . $delay . "; url=" . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));

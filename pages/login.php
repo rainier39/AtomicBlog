@@ -49,7 +49,7 @@ else {
 
                             $content .= "Successfully logged in. Welcome, " . htmlspecialchars($_SESSION["username"]) . ".";
                             $success = true;
-                            redirect("", 3);
+                            redirect("", 2);
                         }
                     }
                 }

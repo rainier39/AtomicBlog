@@ -58,6 +58,7 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
                 $db->query("DELETE FROM `comments` WHERE post='" . $db->real_escape_string($url[1]) . "'");
                 $content .= "Successfully deleted the post.";
                 $displayPost = false;
+                redirect("", 2);
             }
         }
     }

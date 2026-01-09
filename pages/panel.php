@@ -38,7 +38,7 @@ elseif ($url[1] == "newpost") {
         	    // Print a message.
         	    $content .= "Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.";
         	    $success = true;
-        	    redirect("post/{$db->insert_id}", 3);
+        	    redirect("post/{$db->insert_id}", 2);
         	}
         	// Otherwise, print the errors.
         	else {

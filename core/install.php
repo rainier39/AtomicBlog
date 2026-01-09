@@ -65,29 +65,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     elseif (strlen($_POST["description"]) > 128) {
         $errors[] = "Cannot install, description cannot be longer than 128 characters.";
     }
-    // Stop if the username is too long or too short.
-    if ((!isset($_POST["username"])) or (strlen($_POST["username"]) < 1)) {
-        $errors[] = "Cannot install, username must be at least 1 character long.";
-    }
-    elseif (strlen($_POST["username"]) > 32) {
-        $errors[] = "Cannot install, username cannot be longer than 32 characters.";
-    }
-    // Stop if the email is too long or too short.
-    if ((!isset($_POST["email"])) or (strlen($_POST["email"]) < 1)) {
-        $errors[] = "Cannot install, email must be at least 1 character long.";
-    }
-    elseif (strlen($_POST["email"]) > 64) {
-        $errors[] = "Cannot install, email cannot be longer than 64 characters.";
-    }
-    // TODO: make sure email looks valid.
+    // Stop if the username is invalid.
+    $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
+    // Stop if the email is invalid.
+    $errors = array_merge($errors, validateEmail($_POST["email"] ?? ""));
     // Stop if the password(s) is/are too short.
     if ((!isset($_POST["password"])) or (strlen($_POST["password"]) < 8)) {
         $errors[] = "Cannot install, password must be at least 8 characters long.";
     }
+    // Stop if the password(s) don't match.
     if ((!isset($_POST["repeatpassword"])) or ($_POST["password"] !== $_POST["repeatpassword"])) {
         $errors[] = "Cannot install, passwords do not match.";
     }
-    // TODO: enforce more advanced, stringent password requirements.
+    // TODO: enforce more advanced, stringent password requirements?
     
     // If there are no errors, install.
     if (count($errors) === 0) {
@@ -97,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         catch (Exception $e) {
             $content .= "Database Connection Error: " . $e->getMessage();
-            require "pages/footer.php";
+            render($content);
             exit();
         }
         
@@ -177,8 +167,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Print a message that the software has been installed.
         $content .= "Software successfully installed!";
 
-        // We will want to refresh to take the user to their newly installed blog.
-        header("Refresh: 3");
+        // We will want to take the user to their newly installed blog.
+        redirect("", 2);
     }
     // Otherwise, display the errors.
     else {
@@ -196,23 +186,23 @@ $content .=
         <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
             <b>SQL Details</b></br>
-            <label for='sqlserver'>SQL Server: </label><input type='text' name='SQLServer' id='sqlserver'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . "></input></br>
-            <label for='sqldatabase'>SQL Database: </label><input type='text' name='SQLDatabase' id='sqldatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . "></input></br>
-            <label for='sqlusername'>SQL Username: </label><input type='text' name='SQLUsername' id='sqlusername'" . (isset($_POST["SQLUsername"]) ? " value='" . htmlspecialchars($_POST["SQLUsername"]) . "'" : "") . "></input></br>
-            <label for='sqlpassword'>SQL Password: </label><input type='text' name='SQLPassword' id='sqlpassword'" . (isset($_POST["SQLPassword"]) ? " value='" . htmlspecialchars($_POST["SQLPassword"]) . "'" : "") . "></input></br>
+            <label for='sqlserver'>SQL Server: </label><input type='text' placeholder='localhost' name='SQLServer' id='sqlserver'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . " required></input></br>
+            <label for='sqldatabase'>SQL Database: </label><input type='text' placeholder='AtomicBlog' name='SQLDatabase' id='sqldatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . " required></input></br>
+            <label for='sqlusername'>SQL Username: </label><input type='text' name='SQLUsername' id='sqlusername'" . (isset($_POST["SQLUsername"]) ? " value='" . htmlspecialchars($_POST["SQLUsername"]) . "'" : "") . " required></input></br>
+            <label for='sqlpassword'>SQL Password: </label><input type='text' name='SQLPassword' id='sqlpassword'" . (isset($_POST["SQLPassword"]) ? " value='" . htmlspecialchars($_POST["SQLPassword"]) . "'" : "") . " required></input></br>
 
             <br><b>Blog Configuration</b></br>
-            <label for='title'>Blog Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
-            <label for='description'>Blog Description: </label><textarea name='description' id='description' maxlength='128'>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
+            <label for='title'>Blog Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . " required></input></br>
+            <label for='description'>Blog Description: </label><textarea name='description' id='description' maxlength='128' required>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
 
             <br><b>Administrator Account Details</b></br>
-            <label for='username'>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' id='username'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
-            <label for='email'>Email Address: </label><input type='email' name='email' id='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . "></input></br>
-            <label for='password'>Password: </label><input type='password' name='password' id='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
-            <label for='repeatpassword'>Repeat password: </label><input type='password' name='repeatpassword' id='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . "></input></br>
+            <label for='username'>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' id='username'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . " required></input></br>
+            <label for='email'>Email Address: </label><input type='email' name='email' id='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . " required></input></br>
+            <label for='password'>Password: </label><input type='password' name='password' id='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . " required></input></br>
+            <label for='repeatpassword'>Repeat password: </label><input type='password' name='repeatpassword' id='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . " required></input></br>
             
             <br><b>Settings</b></br>
-            <label for='overwrite'>Overwrite old database: </label><input type='checkbox' name='overwrite' id='overwrite'>
+            <label for='overwrite'>Overwrite old database: </label><input type='checkbox' name='overwrite' id='overwrite'" . (isset($_POST["overwrite"]) ? " checked" : "") . ">
             
             <br><input type='submit' value='Install' id='button'></input>
         </form>

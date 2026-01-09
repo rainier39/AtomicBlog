@@ -29,39 +29,15 @@ else {
             
             $errors = array();
             
-            // Make a database query for accounts with the supplied username.
-            $usernameCheck = $db->query("SELECT 1 FROM `accounts` WHERE username='" . $db->real_escape_string($_POST["username"]) . "'");
             // Make a database query for accounts with the supplied email address.
             $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE email='" . $db->real_escape_string($_POST["email"]) . "'");
             
-            // Make sure their username isn't too short.
-            if (strlen($_POST["username"]) < 1) {
-                $errors[] = "Your username is too short. Make sure your username is at least 1 character in length.";
-            }
-            // Make sure their username isn't too long.
-            elseif (strlen($_POST["username"]) > 32) {
-                $errors[] = "Your username is too long. Make sure your username is no more than 32 characters in length.";
-            }
-            // Make sure their username isn't taken.
-            if ($usernameCheck->num_rows > 0) {
-                $errors[] = "Your username is already taken. Try entering another one.";
-            }
-            // Make sure their email isn't too short.
-            if (strlen($_POST["email"]) < 1) {
-                $errors[] = "Your email address is too short. Make sure your email address is at least 1 character in length.";
-            }
-            // Make sure their email isn't too long.
-            elseif (strlen($_POST["email"]) > 64) {
-                $errors[] = "Your email address is too long. Make sure your email address is no more than 64 characters in length.";
-            }
-            // Make sure their email is valid.
-            if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
-                $errors[] = "Your email address is invalid. Please try entering a valid email address.";
-            }
-            // Make sure their email isn't taken.
-            if ($emailCheck->num_rows > 0) {
-                $errors[] = "Your email address is already taken. Try entering another one.";
-            }
+            // Validate their username.
+            $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
+            
+            // Validate their email.
+            $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
+            
             // Make sure their password is long enough.
             if (strlen($_POST["password"]) < 8) {
                 $errors[] = "Your password isn't long enough. Make sure your password is at least 8 characters in length.";
