@@ -6,9 +6,10 @@
 if (!defined('INDEX')) exit;
 
 // Log a user out.
-function logout() {
+function logout($redirect=false) {
     session_unset();
     session_destroy();
+    if ($redirect) redirect("");
 }
 
 // Render a page, placing the header and footer accordingly.
@@ -103,7 +104,7 @@ function validatePost() {
 }
 
 // Safely redirect to some page.
-function redirect($loc) {
+function redirect($loc, int $delay=0) {
     global $config;
     if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
         $proto = "https://";
@@ -117,13 +118,23 @@ function redirect($loc) {
     else {
         $dir = "";
     }
-    if ($config["prettyURLs"]) {
-        header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+    if ($delay < 1) {
+        if ($config["prettyURLs"]) {
+           header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+        }
+        else {
+            header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . "index.php?url=" . ltrim($loc, "/"));
+        }
+        exit();
     }
     else {
-        header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . "index.php?url=" . ltrim($loc, "/"));
+        if ($config["prettyURLs"]) {
+           header("Refresh: " . $delay . "; url=" . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+        }
+        else {
+            header("Refresh: " . $delay . "; url=" . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . "index.php?url=" . ltrim($loc, "/"));
+        }
     }
-    exit();
 }
 
 ?>

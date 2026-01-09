@@ -69,7 +69,7 @@ if ($config["installed"] == false)
 }
 elseif ($url[0] == "logout")
 {
-    logout();
+    logout(true);
     require "pages/home.php";
 }
 elseif ($url[0] == "login")
