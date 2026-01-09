@@ -7,7 +7,7 @@ if (!defined('INDEX')) exit;
 
 echo("</div>
 
-<div class='footer'>" . htmlspecialchars($config["footer"]) . "</div>
+<div class='footer'>" . format($config["footer"]) . "</div>
 
 </body>
 </html>");

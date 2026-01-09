@@ -15,7 +15,7 @@ $default_config = array(
     "SQLPassword" => "",
     "title" => "AtomicBlog",
     "description" => "A lightweight, easy to use, and easy to administrate blogging software.",
-    "footer" => "Powered by AtomicBlog",
+    "footer" => "Powered by [AtomicBlog](https://github.com/rainier39/AtomicBlog)",
     "theme" => "Light",
     "language" => "english",
     // Whether to redirect all HTTP requests to HTTPS.
