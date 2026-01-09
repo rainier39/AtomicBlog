@@ -176,6 +176,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Print a message that the software has been installed.
         $content .= "Software successfully installed!";
+
+        // We will want to refresh to take the user to their newly installed blog.
+        header("Refresh: 3");
     }
     // Otherwise, display the errors.
     else {
