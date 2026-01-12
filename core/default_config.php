@@ -25,6 +25,7 @@ $default_config = array(
     // Whether to allow people to create accounts.
     "allowRegistration" => true,
     "loginsPerHour" => 5,
+    "accountsPerIP" => 3
 );
 
 ?>

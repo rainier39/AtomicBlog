@@ -29,8 +29,11 @@ else {
             
             $errors = array();
             
-            // Make a database query for accounts with the supplied email address.
-            $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE `email`='" . $db->real_escape_string($_POST["email"]) . "'");
+            // Make sure there aren't too many accounts from this IP.
+            $ipCheck = $db->query("SELECT 1 FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
+            if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
+                $errors[] = "You've made too many accounts.";
+            }
             
             // Validate their name.
             $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
