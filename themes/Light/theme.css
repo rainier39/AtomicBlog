@@ -5,6 +5,7 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .navbar a {text-decoration: none; margin-right: 5%; margin-left: 5%; font-size: 140%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; margin-bottom: 5px; margin-top: 5px; display: inline-block; color: white}
 .content {border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; background: white}
 .footer {border: 1px solid grey; padding: 20px; background: white; text-align: center}
+.footer a {text-decoration: none}
 .error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
 /* Install page */
 .installForm {text-align: center}
