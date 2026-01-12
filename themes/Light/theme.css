@@ -9,25 +9,23 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
 /* Install page */
 .installForm {text-align: center}
-.installForm label {min-width: 12%; display: inline-block; text-align: right}
+.installForm label {min-width: 8em; display: inline-block; text-align: right}
 .installForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 .installForm textarea {resize: vertical; height: 120px; vertical-align: baseline}
 .installForm input[type=checkbox] {width: auto}
 #button {width: 70px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
 /* Login page */
 .loginForm {text-align: center}
-.loginForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
-.loginForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
-.loginForm textarea {resize: vertical; height: 120px}
+.loginForm label {min-width: 6em; display: inline-block; text-align: right}
+.loginForm input {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 /* Register page */
 .registerForm {text-align: center}
-.registerForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
-.registerForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
-.registerForm textarea {resize: vertical; height: 120px}
+.registerForm label {min-width: 8em; display: inline-block; text-align: right}
+.registerForm input {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 #buttonRegister {width: 80px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
 /* New post page */
 .newPostForm {text-align: center}
-.newPostForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.newPostForm label {min-width: 4em; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
 .newPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 .newPostForm textarea {resize: vertical; height: 120px}
 #buttonNewPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
@@ -57,7 +55,7 @@ code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2p
 .allPosts legend {font-size: 120%}
 /* Edit post page */
 .editPostForm {text-align: center}
-.editPostForm label {min-width: 12%; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
+.editPostForm label {min-width: 4em; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
 .editPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 .editPostForm textarea {resize: vertical; height: 120px}
 #buttonEditPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
