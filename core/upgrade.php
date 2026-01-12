@@ -26,7 +26,7 @@ if ($config["version"] != VERSION) {
             `timestamp` bigint NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         // Bump the version.
-        $config["version"] = "newversionplaceholder";
+        $config["version"] = "v2.5.0-alpha";
     }
     
     // Write the new config to a file.
