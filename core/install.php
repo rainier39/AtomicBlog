@@ -82,18 +82,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     // TODO: enforce more advanced, stringent password requirements?
     
+    // Connect to the database with the given credentials.
+    try {
+        $db = mysqli_connect($_POST["SQLServer"], $_POST["SQLUsername"], $_POST["SQLPassword"], $_POST["SQLDatabase"]);
+    }
+    catch (Exception $e) {
+        $errors[] = "Database Connection Error: " . $e->getMessage();
+    }
+    
     // If there are no errors, install.
     if (count($errors) === 0) {
-        // Connect to the database with the given credentials.
-        try {
-            $db = mysqli_connect($_POST["SQLServer"], $_POST["SQLUsername"], $_POST["SQLPassword"], $_POST["SQLDatabase"]);
-        }
-        catch (Exception $e) {
-            $content .= "Database Connection Error: " . $e->getMessage();
-            render($content);
-            exit();
-        }
-        
         if (isset($_POST["overwrite"]) && ($_POST["overwrite"] == "on")) {
             $db->query("DROP TABLE IF EXISTS `accounts`");
             $db->query("DROP TABLE IF EXISTS `posts`");
@@ -163,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `timestamp` bigint NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-        // Write the administrator account. Will replace any existing account with the same username or email (I.E. there is an old install of the software).
+        // Write the administrator account. Will replace any existing account with the same username or email (if there is an old install of the software).
         $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
 
         // Create a new array of our new config values.
