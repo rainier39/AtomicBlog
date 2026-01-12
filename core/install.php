@@ -96,20 +96,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db->query("DROP TABLE IF EXISTS `posts`");
             $db->query("DROP TABLE IF EXISTS `comments`");
             $db->query("DROP TABLE IF EXISTS `views`");
+            $db->query("DROP TABLE IF EXISTS `logins`");
         }
 
         // Write the database.
+        // We store IP addresses as varchar(45) for IPv6 support (IP addresses are stored as strings).
+        // We store UNIX timestamps as bigint (64 bit signed integer) to prevent Y2038 problem.
+        // All IDs are int unsigned.
         $db->query("CREATE TABLE IF NOT EXISTS `accounts` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
             `username` varchar(32) NOT NULL,
             `email` varchar(64) NOT NULL,
             `password` varchar(128) NOT NULL,
             `name` varchar(64) NOT NULL,
-            `role` enum('Owner', 'Moderator', 'Member', 'Unapproved') NOT NULL DEFAULT 'Unapproved',
+            `role` enum('Owner', 'Moderator', 'Member', 'Suspended', 'Unapproved') NOT NULL DEFAULT 'Unapproved',
             `avatar` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
-            `ip` int unsigned NOT NULL,
-            `jointime` int unsigned NOT NULL,
-            `lastactive` int unsigned NOT NULL,
+            `joinip` varchar(45) NOT NULL,
+            `ip` varchar(45) NOT NULL,
+            `jointime` bigint NOT NULL,
+            `lastactive` bigint NOT NULL,
             `namevisible` tinyint(1) NOT NULL DEFAULT '0',
             `emailvisible` tinyint(1) NOT NULL DEFAULT '0',
             `bio` varchar(4096) DEFAULT NULL,
@@ -124,9 +129,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `tags` varchar(128) NOT NULL,
             `content` text NOT NULL,
             `account` int unsigned NOT NULL,
-            `starttime` int unsigned NOT NULL,
+            `starttime` bigint NOT NULL,
             `editedby` int unsigned DEFAULT NULL,
-            `edittime` int unsigned DEFAULT NULL,
+            `edittime` bigint DEFAULT NULL,
             `icon` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
             `published` tinyint(1) NOT NULL DEFAULT '0',
             `starred` tinyint(1) NOT NULL DEFAULT '0',
@@ -138,22 +143,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `account` int unsigned DEFAULT NULL,
             `post` int unsigned NOT NULL,
             `email` varchar(64) DEFAULT NULL,
-            `ip` int unsigned NOT NULL,
-            `timestamp` int unsigned NOT NULL,
+            `ip` varchar(45) NOT NULL,
+            `timestamp` bigint NOT NULL,
             `content` text NOT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         $db->query("CREATE TABLE IF NOT EXISTS `views` (
-            `id` int unsigned NOT NULL AUTO_INCREMENT,
-            `ip` int unsigned NOT NULL,
-            `timestamp` int unsigned NOT NULL,
-            `post` int unsigned NOT NULL,
-            PRIMARY KEY (`id`)
+            `ip` varchar(45) NOT NULL,
+            `timestamp` bigint NOT NULL,
+            `post` int unsigned NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        
+        $db->query("CREATE TABLE IF NOT EXISTS `logins` (
+            `ip` varchar(45) NOT NULL,
+            `timestamp` bigint NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Write the administrator account. Will replace any existing account with the same username or email (I.E. there is an old install of the software).
-        $db->query("REPLACE INTO `accounts` (username, email, password, name, role, ip, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Owner', 'Owner', '" . ip2long($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+        $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Owner', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
 
         // Create a new array of our new config values.
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);

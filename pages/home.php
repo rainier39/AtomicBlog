@@ -8,7 +8,7 @@ if (!defined('INDEX')) exit;
 $content = "";
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT id, icon, title, account FROM `posts` WHERE starred='1'");
+$starred = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE `starred`='1'");
 
 // Display the starred posts fieldset.
 $content .= "<fieldset class='starred'><legend>Starred</legend>";
@@ -29,7 +29,7 @@ else {
 $content .= "</fieldset>";
 
 // Get the 5 most recent posts.
-$recent = $db->query("SELECT id, icon, title, account FROM `posts` ORDER BY starttime DESC LIMIT 5");
+$recent = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` ORDER BY `starttime` DESC LIMIT 5");
 
 // Display the most recent fieldset.
 $content .= "</br><fieldset class='mostRecent'><legend>Most Recent</legend>";
@@ -53,7 +53,7 @@ $content .= "</fieldset>";
 $views = array();
 
 // Get all the postids.
-$postids = $db->query("SELECT id FROM `posts`");
+$postids = $db->query("SELECT `id` FROM `posts`");
 
 // If there are any posts...
 if ($postids->num_rows > 0) {
@@ -63,7 +63,7 @@ if ($postids->num_rows > 0) {
     }
 
     // Get all of the views, and just get their post ids.
-    $posts = $db->query("SELECT post FROM `views`");
+    $posts = $db->query("SELECT `post` FROM `views`");
 
     // Fill the array with the proper amount of views per post.
     while ($p = $posts->fetch_assoc()) {
@@ -96,7 +96,7 @@ $content .= "</br><fieldset class='mostViewed'><legend>Most Viewed</legend>";
 if ($postids->num_rows > 0) {
     foreach ($mostViewed as $mv) {
         // Get the posts we wish to display.
-        $mostViewedPosts = $db->query("SELECT id, icon, title, account FROM `posts` WHERE id='" . $db->real_escape_string($mv) . "'");
+        $mostViewedPosts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {

@@ -41,7 +41,7 @@ function displayPost($id, $icon, $title, $account) {
     //}
     $post .= "</a></br><a href='" . makeURL("post/" . $id) . "'>" . htmlspecialchars($title) . "</a>";
     // Get the account information of the post author.
-    $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($account) . "'");
+    $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($account) . "'");
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
             $post .= "</br><small>By: " . htmlspecialchars($a["name"]) . "</small>";
@@ -116,7 +116,7 @@ function validateUsername($username) {
     }
     
     if ($config["installed"]) {
-        $usernameCheck = $db->query("SELECT 1 FROM `accounts` WHERE username='" . $db->real_escape_string($username) . "'");
+        $usernameCheck = $db->query("SELECT 1 FROM `accounts` WHERE `username`='" . $db->real_escape_string($username) . "'");
         if ($usernameCheck->num_rows != 0) {
             $errors[] = "Your username is already taken.";
         }
@@ -145,7 +145,7 @@ function validateEmail($email, $takenCheck=false) {
     }
     // Make sure their email isn't taken.
     if ($config["installed"] && $takenCheck) {
-        $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE email='" . $db->real_escape_string($email) . "'");
+        $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE `email`='" . $db->real_escape_string($email) . "'");
         if ($emailCheck->num_rows != 0) {
             $errors[] = "Your email address is already taken.";
         }

@@ -30,7 +30,7 @@ else {
             $errors = array();
             
             // Make a database query for accounts with the supplied email address.
-            $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE email='" . $db->real_escape_string($_POST["email"]) . "'");
+            $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE `email`='" . $db->real_escape_string($_POST["email"]) . "'");
             
             // Validate their username.
             $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
@@ -50,7 +50,8 @@ else {
             // If everything checks out, make the account.
             if (count($errors) === 0) {
                 // Insert the account into the database.
-                $db->query("INSERT INTO `accounts` (username, email, password, name, ip, jointime, lastactive) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Anonymous', '" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+                $now = time();
+                $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Anonymous', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
 
                 // Inform the user that they've successfully registered.
                 $content .= "You've successfully registered for an account. Note that it must be approved before it's usable.";
@@ -59,7 +60,7 @@ else {
             // Otherwise, display the errors.
             else {
                 foreach ($errors as $e) {
-                    $content .= "<div class='error'>" . $e . "</div>";
+                    $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
                 }
             }
         }

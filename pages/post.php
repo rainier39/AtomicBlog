@@ -29,11 +29,11 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"])))
                 
                 // Star.
                 if ($_POST["toggleStar"] == "Star") {
-                    $db->query("UPDATE `posts` SET starred='1' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                    $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($url[1]) . "'");
                 }
                 // Unstar.
                 else {
-                    $db->query("UPDATE `posts` SET starred='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                    $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
                 }
                 $updatePost = true;
             }
@@ -51,11 +51,11 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
                 generateCSRFToken();
                 
                 // Delete the post.
-                $db->query("DELETE FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
                 // Delete all of the post's views.
-                $db->query("DELETE FROM `views` WHERE post='" . $db->real_escape_string($url[1]) . "'");
+                $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
                 // Delete all of the post's comments.
-                $db->query("DELETE FROM `comments` WHERE post='" . $db->real_escape_string($url[1]) . "'");
+                $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
                 $content .= "Successfully deleted the post.";
                 $displayPost = false;
                 redirect("", 2);
@@ -80,14 +80,14 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
         	
         	        // If there are no errors, edit the post.
         	        if (count($errors) === 0) {
-        	            $db->query("UPDATE `posts` SET title='" . $db->real_escape_string($_POST["title"]) . "', tags='" . $db->real_escape_string($_POST["tags"]) . "', content='" . $db->real_escape_string($_POST["content"]) . "', editedby='" . $db->real_escape_string($_SESSION["id"]) . "', edittime='" . $db->real_escape_string(time()) . "' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+        	            $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
         	            $success = true;
         	            $updatePost = true;
         	        }
         	        // Otherwise, print the errors.
         	        else {
         	            foreach ($errors as $e) {
-        	                $content .= "<div class='error'>" . $e . "</div>";
+        	                $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
         	            }
         	        }
                 }
@@ -116,7 +116,7 @@ if ($displayPost) {
     $formats = array("png", "jpg", "gif", "webp");
     // Get the requested post again if the user edited it or starred it.
     if ($updatePost) {
-        $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
+        $post = $db->query("SELECT * FROM `posts` WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
     }
     while ($p = $post->fetch_assoc()) {
         $content .=
@@ -129,7 +129,7 @@ if ($displayPost) {
             <div class='postHeader'>
                 <h1>" . htmlspecialchars($p["title"]) . "</h1>";
         // Get the account information of the post author.
-        $acc = $db->query("SELECT name FROM `accounts` WHERE id='" . $db->real_escape_string($p["account"]) . "'");
+        $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p["account"]) . "'");
         if ($acc->num_rows > 0) {
             while ($a = $acc->fetch_assoc()) {
                 $content .= "By: " . htmlspecialchars($a["name"]);
@@ -144,7 +144,7 @@ if ($displayPost) {
             $content .= " | <small>Modified: <span title='" . date ("h:i:s", $p["edittime"]). "'>" . date("m-d-Y", $p["edittime"]) . "</span></small>";
         }
         $icon = $p["icon"];
-        $id = (int)$p["id"];
+        $id = $p["id"];
         // Display the post's image if it exists.
         if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
             $content .= "<img src='/images/" . $id . "." . $icon . "'></br>";
@@ -157,11 +157,11 @@ if ($displayPost) {
     }
 
     // Get views from this IP on this post, if any.
-    $views = $db->query("SELECT 1 FROM `views` WHERE ip='" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "' AND post='" . $db->real_escape_string($url[1]) . "'");
+    $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($url[1]) . "'");
 
     // If there are none, count this as a view.
     if ($views->num_rows < 1) {
-        $db->query("INSERT INTO `views` (ip, timestamp, post) VALUES ('" . $db->real_escape_string(ip2long($_SERVER["REMOTE_ADDR"])) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string($url[1]) . "')");
+        $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($url[1]) . "')");
     }
 }
 
