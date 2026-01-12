@@ -29,6 +29,9 @@ if (($ishttps != "on") && $config["https"])
     exit();
 }
 
+// Initialize the file containing all of the global functions.
+require "core/functions.php";
+
 // If the forum is installed, create a database connection.
 if ($config["installed"])
 {
@@ -40,9 +43,6 @@ if ($config["installed"])
 
 // Initialize the language file.
 // TODO: implement languages, loader function to read a JSON file for languages.
-
-// Initialize the file containing all of the global functions.
-require "core/functions.php";
 
 // Initialize the formatter.
 require "core/formatter.php";
