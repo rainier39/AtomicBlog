@@ -8,6 +8,7 @@ if (!defined('INDEX')) exit;
 $content = "";
 $displayPost = true;
 $updatePost = false;
+$title = "";
 
 // Get the requested post.
 $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
@@ -65,6 +66,7 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
 }
 // Handle editing.
 elseif (isset($url[2]) && ($url[2] == "edit")) {
+    $title = "Editing Post";
     $displayPost = false;
     $success = false;
     while ($p = $post->fetch_assoc()) {
@@ -94,7 +96,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
             }
             if (!$success) {
                 $content .= "<div class='editPostForm'>
-                    <h2>Edit Post</h2>
+                    <h1>Edit Post</h1>
                     <form method='post'>
                         <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                         <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "></input></br>
@@ -119,6 +121,7 @@ if ($displayPost) {
         $post = $db->query("SELECT * FROM `posts` WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
     }
     while ($p = $post->fetch_assoc()) {
+        $title = $p["title"];
         $content .=
         "<div class='post'>
             <div class='postButtons'>
@@ -165,7 +168,7 @@ if ($displayPost) {
     }
 }
 
-render($content);
+render($content, $title);
 
 ?>
 

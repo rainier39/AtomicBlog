@@ -7,6 +7,7 @@ if (!defined('INDEX')) exit;
 
 $content = "";
 $success = false;
+$title = "";
 
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
@@ -14,6 +15,7 @@ if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
+    $title = "Panel";
     $content .= "<div class='panelcontent'>";
     $content .= "<h1>Panel</h1>";
     $content .= "<h2>User Actions</h2>";
@@ -22,6 +24,7 @@ elseif (!isset($url[1]) or $url[1] == "") {
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
+    $title = "New Post";
     // Handle requests.
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // If the CSRF token is sent and valid.
@@ -52,7 +55,7 @@ elseif ($url[1] == "newpost") {
     if (!$success) {
         $content .=
         "<div class='newPostForm'>
-            <h2>New Post</h2>
+            <h1>New Post</h1>
             <form method='post'>
             	<input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
@@ -68,7 +71,7 @@ else {
     $content .= "The page you requested doesn't exist.";
 }
 
-render($content);
+render($content, $title);
 
 ?>
 

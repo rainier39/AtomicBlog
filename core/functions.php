@@ -13,8 +13,14 @@ function logout($redirect=false) {
 }
 
 // Render a page, placing the header and footer accordingly.
-function render(string $content) {
+function render(string $content, string $htitle="") {
     global $config;
+    if ($htitle == "") {
+        $htitle = $config["title"];
+    }
+    else {
+        $htitle = $htitle . " - " . $config["title"];
+    }
     require "pages/header.php";
     echo($content);
     require "pages/footer.php";

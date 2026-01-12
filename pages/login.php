@@ -7,6 +7,7 @@ if (!defined('INDEX')) exit;
 
 $content = "";
 $success = false;
+$title = "Login";
 
 function handleLogin() {
     global $db, $config, $content, $success;
@@ -93,7 +94,7 @@ else {
     if (!$success) {
         $content .= "
         <div class='loginForm'>
-            <h2>Log in</h2>
+            <h1>Log in</h1>
             <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
             <label for='username'>Username: </label><input type='text' name='username' id='username' autocomplete='username' maxlength='32' required" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
@@ -104,7 +105,7 @@ else {
     }
 }
 
-render($content);
+render($content, $title);
 
 ?>
 

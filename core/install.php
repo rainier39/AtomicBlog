@@ -6,6 +6,7 @@
 if (!defined('INDEX')) exit;
 
 $content = "";
+$title = "Installer";
 
 // If the blog is being installed in a folder, take note of that fact.
 $dir = explode("/", $_SERVER["REQUEST_URI"]);
@@ -192,7 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 if (!$config["installed"]) {
 $content .= 
     "<div class='installForm'>
-        <h2>Installer</h2>
+        <h1>Installer</h1>
         <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
             <b>SQL Details</b></br>
@@ -221,6 +222,6 @@ $content .=
 ";
 }
 
-render($content);
+render($content, $title);
 
 ?>

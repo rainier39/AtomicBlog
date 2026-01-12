@@ -6,6 +6,7 @@
 if (!defined('INDEX')) exit;
 
 $content = "";
+$title = "Posts";
 
 // Get all of the blog posts.
 $posts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts`");
@@ -28,7 +29,7 @@ else {
 // End the fieldset.
 $content .= "</fieldset>";
 
-render($content);
+render($content, $title);
 
 ?>
 

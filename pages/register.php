@@ -6,6 +6,7 @@
 if (!defined('INDEX')) exit;
 
 $content = "";
+$title = "Register";
 
 // If the user is already logged in, don't let them into the page.
 if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
@@ -80,7 +81,7 @@ else {
     // Display the registration form if the user didn't successfully register.
     if (!$registerSuccess) {
         $content .= "<div class='registerForm'>
-            <h2>Register</h2>
+            <h1>Register</h1>
             <form method='post'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <label for='name'>Name: </label><input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='" . (isset($_POST["name"]) ? htmlspecialchars($_POST["name"]) : "") . "' required></input></br>
@@ -94,7 +95,7 @@ else {
     }
 }
 
-render($content);
+render($content, $title);
 
 ?>
 
