@@ -30,9 +30,15 @@ else {
             $errors = array();
             
             // Make sure there aren't too many accounts from this IP.
-            $ipCheck = $db->query("SELECT 1 FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
+            $ipCheck = $db->query("SELECT `jointime` FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
             if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
                 $errors[] = "You've made too many accounts.";
+            }
+            // Enforce a time based rate limit.
+            while ($r = $ipCheck->fetch_assoc()) {
+                if ((time()-$r["jointime"]) <= $config["accountCooldown"]) {
+                    $errors[] = "You've made an account too recently. Wait a while and try again.";
+                }
             }
             
             // Validate their name.

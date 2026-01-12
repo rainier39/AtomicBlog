@@ -25,7 +25,9 @@ $default_config = array(
     // Whether to allow people to create accounts.
     "allowRegistration" => true,
     "loginsPerHour" => 5,
-    "accountsPerIP" => 3
+    "accountsPerIP" => 3,
+    // How long a user must wait before creating another account. 600 seconds = 10 minutes.
+    "accountCooldown" => 600
 );
 
 ?>
