@@ -43,7 +43,7 @@ elseif ($url[1] == "newpost") {
         	// Otherwise, print the errors.
         	else {
         	    foreach ($errors as $e) {
-        	        $content .= "<div class='error'>" . $e . "</div>";
+        	        $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
         	    }
         	}
         }

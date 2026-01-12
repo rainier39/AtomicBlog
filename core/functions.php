@@ -76,28 +76,35 @@ function makeURL($page, $direct=false) {
 
 // Checks to be performed when making/editing posts.
 function validatePost() {
+    global $db, $config;
     $errors = array();
         	
     // Title.
     if (!isset($_POST["title"]) or (strlen($_POST["title"]) < 1)) {
-        $errors[] = "Error: post title cannot be less than 1 character long.";
+        $errors[] = "Post title cannot be less than 1 character long.";
     }
     elseif (strlen($_POST["title"]) > 32) {
-        $errors[] = "Error: post title cannot be more than 32 characters long.";
+        $errors[] = "Post title cannot be more than 32 characters long.";
     }
     // Tags.
     if (!isset($_POST["tags"]) or (strlen($_POST["tags"]) < 1)) {
-        $errors[] = "Error: post tags cannot be less than 1 character long.";
+        $errors[] = "Post tags cannot be less than 1 character long.";
     }
     elseif (strlen($_POST["tags"]) > 128) {
-        $errors[] = "Error: post tags cannot be more than 128 characters long.";
+        $errors[] = "Post tags cannot be more than 128 characters long.";
     }
     // Content.
     if (!isset($_POST["content"]) or (strlen($_POST["content"]) < 1)) {
-        $errors[] = "Error: post content cannot be less than 1 character long.";
+        $errors[] = "Post content cannot be less than 1 character long.";
     }
     elseif (strlen($_POST["content"]) > 65500) {
-        $errors[] = "Error: post content cannot be more than 65500 characters long.";
+        $errors[] = "Post content cannot be more than 65500 characters long.";
+    }
+    
+    // Rate limit.
+    $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `starttime`>=" . (time()-$config["postDelay"]) . "");
+    if ($lastPost->num_rows > 0) {
+        $errors[] = "You made a post too recently. Wait a little while and try again.";
     }
             
     return $errors;

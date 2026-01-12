@@ -26,8 +26,10 @@ $default_config = array(
     "allowRegistration" => true,
     "loginsPerHour" => 5,
     "accountsPerIP" => 3,
-    // How long a user must wait before creating another account. 600 seconds = 10 minutes.
-    "accountCooldown" => 600
+    // How long a user must wait (in seconds) before creating another account. 600 seconds = 10 minutes.
+    "accountCooldown" => 600,
+    // How long a user must wait (in seconds) before creating another blog post. 300 seconds = 5 minutes.
+    "postDelay" => 300
 );
 
 ?>
