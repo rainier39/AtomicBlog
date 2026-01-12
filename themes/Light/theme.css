@@ -30,7 +30,7 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .newPostForm textarea {resize: vertical; height: 120px}
 #buttonNewPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px}
 /* Post tiles */
-.posts {border: 1px solid grey; padding: 15px; margin: 14px; min-width: 160px; max-width: 160px; min-height: 200px; display: inline-block; text-align: center; vertical-align: top}
+.posts {border: 1px solid grey; padding: 15px; margin: 14px; min-width: 160px; max-width: 160px; min-height: 200px; display: inline-block; text-align: center; vertical-align: top; overflow-wrap: break-word}
 .posts a {text-decoration: none; color: black; font-size: 150%}
 .posts img {max-width: 100%; height: auto; border: 1px solid grey;}
 /* Post page */
@@ -41,7 +41,7 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .postButton {text-decoration: none; font-size: 120%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; color: white; margin-right: 5px; margin-left: 5px; margin-bottom: 2px; margin-top: 2px; min-width: 0;}
 /* Post content formatting */
 code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px;}
-.postContent {line-height: 1.5; padding: 8px}
+.postContent {line-height: 1.5; padding: 8px; overflow-wrap: break-word}
 .postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 /* Home page */
 .starred {border: 1px solid grey}
