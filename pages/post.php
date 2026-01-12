@@ -76,7 +76,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
                     // Generate a new token.
                     generateCSRFToken();
 
-                    $errors = validatePost();
+                    $errors = validatePost(true);
         	
         	        // If there are no errors, edit the post.
         	        if (count($errors) === 0) {

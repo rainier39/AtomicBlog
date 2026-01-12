@@ -81,7 +81,7 @@ function makeURL($page, $direct=false) {
 }
 
 // Checks to be performed when making/editing posts.
-function validatePost() {
+function validatePost($edit=false) {
     global $db, $config;
     $errors = array();
         	
@@ -108,9 +108,17 @@ function validatePost() {
     }
     
     // Rate limit.
-    $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `starttime`>=" . (time()-$config["postDelay"]) . "");
-    if ($lastPost->num_rows > 0) {
-        $errors[] = "You made a post too recently. Wait a little while and try again.";
+    if ($edit) {
+        $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `edittime`>=" . (time()-$config["editDelay"]) . "");
+        if ($lastPost->num_rows > 0) {
+            $errors[] = "You edited a post too recently. Wait a few seconds and try again.";
+        }
+    }
+    else { 
+        $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `starttime`>=" . (time()-$config["postDelay"]) . "");
+        if ($lastPost->num_rows > 0) {
+            $errors[] = "You made a post too recently. Wait a little while and try again.";
+        }
     }
             
     return $errors;
