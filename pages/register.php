@@ -32,6 +32,9 @@ else {
             // Make a database query for accounts with the supplied email address.
             $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE `email`='" . $db->real_escape_string($_POST["email"]) . "'");
             
+            // Validate their name.
+            $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
+            
             // Validate their username.
             $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
             
@@ -51,7 +54,7 @@ else {
             if (count($errors) === 0) {
                 // Insert the account into the database.
                 $now = time();
-                $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Anonymous', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
+                $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Unapproved', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
 
                 // Inform the user that they've successfully registered.
                 $content .= "You've successfully registered for an account. Note that it must be approved before it's usable.";
@@ -71,6 +74,7 @@ else {
             <h2>Register</h2>
             <form method='post'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
+                <label for='name'>Name: </label><input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='" . (isset($_POST["name"]) ? htmlspecialchars($_POST["name"]) : "") . "' required></input></br>
                 <label for='username'>Username: </label><input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='" . (isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : "") . "' required></input></br>
                 <label for='email'>Email Address: </label><input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='" . (isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "") . "' required></input></br>
                 <label for='password'>Password: </label><input type='password' name='password' id='password' autocomplete='new-password' value='" . (isset($_POST["password"]) ? htmlspecialchars($_POST["password"]) : "") . "' required></input></br>

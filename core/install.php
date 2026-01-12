@@ -65,6 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     elseif (strlen($_POST["description"]) > 128) {
         $errors[] = "Cannot install, description cannot be longer than 128 characters.";
     }
+    // Stop if the name is invalid.
+    $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
     // Stop if the username is invalid.
     $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
     // Stop if the email is invalid.
@@ -161,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Write the administrator account. Will replace any existing account with the same username or email (I.E. there is an old install of the software).
-        $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', 'Owner', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+        $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
 
         // Create a new array of our new config values.
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
@@ -204,6 +206,7 @@ $content .=
             <label for='description'>Blog Description: </label><textarea name='description' id='description' maxlength='128' required>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
 
             <br><b>Administrator Account Details</b></br>
+            <label for='name'>Name: </label><input type='text' name='name' autocomplete='name' maxlength='64' id='name'" . (isset($_POST["name"]) ? " value='" . htmlspecialchars($_POST["name"]) . "'" : "") . " required></input></br>
             <label for='username'>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' id='username'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . " required></input></br>
             <label for='email'>Email Address: </label><input type='email' name='email' id='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . " required></input></br>
             <label for='password'>Password: </label><input type='password' name='password' id='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . " required></input></br>

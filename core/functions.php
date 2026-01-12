@@ -103,6 +103,20 @@ function validatePost() {
     return $errors;
 }
 
+// Checks to be performed when setting or changing a name.
+function validateName($name) {
+    $errors = array();
+    
+    if (strlen($name) < 1) {
+        $errors[] = "Your name must be at least 1 character long.";
+    }
+    elseif (strlen($name) > 64) {
+        $errors[] = "Your name cannot be longer than 64 characters.";
+    }
+    
+    return $errors;
+}
+
 // Checks to be performed when setting or changing a username.
 function validateUsername($username) {
     global $config, $db;
