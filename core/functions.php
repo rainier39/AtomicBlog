@@ -25,6 +25,12 @@ function generateCSRFToken() {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
+// Write the current configuration to the config file.
+function flushConfig() {
+    global $config;
+    return file_put_contents("./core/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($config, true) . "\n\n?>\n");
+}
+
 // Display a blog post tile.
 function displayPost($id, $icon, $title, $account) {
     global $db;

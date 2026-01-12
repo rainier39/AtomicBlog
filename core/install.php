@@ -172,7 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $config = array_merge($config, $newConfig);
 
         // Write the new config array to the config file.
-        file_put_contents("./core/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($config, true) . "\n\n?>\n");
+        flushConfig();
 
         // Print a message that the software has been installed.
         $content .= "Software successfully installed!";

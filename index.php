@@ -34,6 +34,8 @@ if ($config["installed"])
 {
     // Establish a connection to the database.
     $db = mysqli_connect($config["SQLServer"], $config["SQLUsername"], $config["SQLPassword"], $config["SQLDatabase"]);
+    // Run the upgrade script.
+    require "core/upgrade.php";
 }
 
 // Initialize the language file.
