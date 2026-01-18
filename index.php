@@ -8,6 +8,7 @@ define("INDEX", "1");
 define("VERSION", "v2.5.0-alpha");
 
 // Prevent clickjacking by preventing the website from loading in an iframe.
+// TODO: make it possible to disable this in the config.
 header("Content-Security-Policy: frame-ancestors 'none';");
 header("X-Frame-Options: DENY");
 
@@ -56,7 +57,7 @@ session_start([
     'cookie_httponly' => true,
     'cookie_samesite' => "strict",
     // Only set the secure attribute if the site is being served over HTTPS.
-    'cookie_secure' => $config["https"],
+    'cookie_secure' => (($ishttps == "on") ? true : false),
 ]);
 
 // Generate a CSRF token if needed.
