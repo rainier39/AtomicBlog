@@ -1,6 +1,6 @@
 <?php
-// config.php
-// Stores the configuration for the software.
+// default_config.php
+// Stores the default configuration for the software.
 
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
