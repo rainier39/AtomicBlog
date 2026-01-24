@@ -1,6 +1,6 @@
 <?php
 // panel.php
-// Serves as an all-purpose utility for the blog administrator.
+// Serves as an all-purpose utility for the blog administrator and users.
 
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
@@ -11,7 +11,7 @@ $title = "";
 
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
-    $content .= "You must be logged in to access the panel.";
+    $content .= "<div class='error'>You must be logged in to access this page.</div>";
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
@@ -19,11 +19,18 @@ elseif (!isset($url[1]) or $url[1] == "") {
     $content .= "<div class='panelcontent'>";
     $content .= "<h1>Panel</h1>";
     $content .= "<h2>User Actions</h2>";
-    $content .= "<a href='" . makeURL("panel/newpost") . "'>Create a new post</a>";
+    if (checkPerm(PERM_NEW_POST)) {
+        $content .= "<a href='" . makeURL("panel/newpost") . "'>Create a new post</a>";
+    }
     $content .= "</div>";
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
+    if (!checkPerm(PERM_NEW_POST)) {
+        $content .= "<div class='error'>You don't have permission to do this.</div>";
+        render($content, $title);
+        exit();
+    }
     $title = "New Post";
     // Handle requests.
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -68,7 +75,7 @@ elseif ($url[1] == "newpost") {
 }
 // Display an error page.
 else {
-    $content .= "The page you requested doesn't exist.";
+    $content .= "<div class='error'>The page you requested doesn't exist.</div>";
 }
 
 render($content, $title);

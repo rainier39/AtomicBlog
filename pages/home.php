@@ -7,6 +7,12 @@ if (!defined('INDEX')) exit;
 
 $content = "";
 
+if (!checkPerm(PERM_VIEW_POSTS)) {
+    $content .= "<div class='error'>You don't have permission to view posts.</div>";
+    render($content);
+    exit();
+}
+
 // Get all of the starred blog posts.
 $starred = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE `starred`='1'");
 
@@ -22,7 +28,7 @@ if ($starred->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "No starred posts yet.";
+    $content .= "<div class='error'>No starred posts yet.</div>";
 }
 
 // End the starred posts fieldset.
@@ -43,7 +49,7 @@ if ($recent->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "No posts yet.";
+    $content .= "<div class='error'>No posts yet.</div>";
 }
 
 // End the fieldset.
@@ -106,7 +112,7 @@ if ($postids->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "No posts yet.";
+    $content .= "<div class='error'>No posts yet.</div>";
 }
 
 // End the fieldset.

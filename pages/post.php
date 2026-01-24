@@ -10,19 +10,25 @@ $displayPost = true;
 $updatePost = false;
 $title = "";
 
+if (!checkPerm(PERM_VIEW_POST)) {
+    $content .= "<div class='error'>You don't have permission to view this post.</div>";
+    render($content, $title);
+    exit();
+}
+
 // Get the requested post.
 $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
-    $content .= "The requested post doesn't exist.";
+    $content .= "<div class='error'>The requested post doesn't exist.</div>";
     $displayPost = false;
 }
 // Handle star toggling.
 elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"]))) {
     while ($p = $post->fetch_assoc()) {
         // Make sure the user is allowed to star/unstar the post.
-        if (isset($_SESSION["id"]) && ($_SESSION["id"] === $p["account"])) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_STAR_POST)) {
             // If the CSRF token is sent and valid.
             if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
                 // Generate a new token.
@@ -39,13 +45,17 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"])))
                 $updatePost = true;
             }
         }
+        else {
+            $content .= "<div class='error'>You don't have permission to do this.</div>";
+            $updatePost = true;
+        }
     }
 }
 // Handle deletions.
 elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
     while ($p = $post->fetch_assoc()) {
         // Make sure the user is allowed to delete the post.
-        if (isset($_SESSION["id"]) && ($_SESSION["id"] === $p["account"])) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_DELETE_POST)) {
             // If the CSRF token is sent and valid.
             if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
                 // Generate a new token.
@@ -62,6 +72,10 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
                 redirect("", 2);
             }
         }
+        else {
+            $content .= "<div class='error'>You don't have permission to do this.</div>";
+            $updatePost = true;
+        }
     }
 }
 // Handle editing.
@@ -71,7 +85,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     $success = false;
     while ($p = $post->fetch_assoc()) {
         // Make sure the user is allowed to edit the post.
-        if (isset($_SESSION["id"]) && ($_SESSION["id"] === $p["account"])) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p["account"]) and checkPerm(PERM_EDIT_POST)) {
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // If the CSRF token is sent and valid.
                 if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
@@ -107,6 +121,10 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
                 </div>";
             }
         }
+        else {
+            $content .= "<div class='error'>You don't have permission to do this.</div>";
+            $updatePost = true;
+        }
     }
     if ($success) {
         $displayPost = true;
@@ -124,11 +142,21 @@ if ($displayPost) {
         $title = $p["title"];
         $content .=
         "<div class='post'>
-            <div class='postButtons'>
-                " . ((($_SESSION["id"] ?? "") === $p["account"]) ? "<a href='" . makeURL("post/{$p["id"]}/edit") . "' class='postButton'>Edit</a>
-                <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='delete' value='Delete'></form>
-                <form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>" : "") . "
-            </div>
+            <div class='postButtons'>";
+        if (checkPerm(PERM_EDIT_POST)) {
+            $content .= "
+                <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='postButton'>Edit</a>";
+        }
+        if (checkPerm(PERM_DELETE_POST)) {
+            $content .= 
+                "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='delete' value='Delete'></form>";
+        }
+        if (checkPerm(PERM_STAR_POST)) {
+            $content .=
+                "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
+        }
+        $content .=
+            "</div>
             <div class='postHeader'>
                 <h1>" . htmlspecialchars($p["title"]) . "</h1>";
         // Get the account information of the post author.

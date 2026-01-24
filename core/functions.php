@@ -233,5 +233,61 @@ function redirect($loc, int $delay=0) {
     }
 }
 
+// Check whether a user is permitted to perform a given action or not.
+function checkPerm($perm) {
+    global $permissions, $db;
+    
+    // If a user is signed in.
+    if (isset($_SESSION["logged_in"]) and ($_SESSION["logged_in"] == true)) {
+        $roleCheck = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_SESSION["id"]) . "'");
+        
+        // If the account doesn't exist, deny.
+        if ($roleCheck->num_rows < 1) {
+            return false;
+        }
+        
+        while ($r = $roleCheck->fetch_assoc()) {
+            // If no permissions are defined for the role, deny.
+            if (!array_key_exists($r["role"], $permissions)) {
+                return false;
+            }
+            elseif ($permissions[$r["role"]]&$perm) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+    // If it's a guest.
+    else {
+        if ($permissions["Guest"]&$perm) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    
+    // Default to false if we somehow fall through to here.
+    return false;
+}
+
+// Check whether a given target role has a permission or not.
+function checkRolePerm($perm, $role) {
+    global $permissions;
+    
+    // If no permissions are defined for the role, deny.
+    if (!array_key_exists($role, $permissions)) {
+        return false;
+    }
+    elseif ($permissions[$role]&$perm) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 ?>
 

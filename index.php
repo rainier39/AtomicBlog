@@ -30,6 +30,8 @@ if (($ishttps != "on") && $config["https"])
     exit();
 }
 
+// Initialize the permissions file.
+require "core/default_permissions.php";
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
 

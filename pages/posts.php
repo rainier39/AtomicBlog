@@ -8,6 +8,12 @@ if (!defined('INDEX')) exit;
 $content = "";
 $title = "Posts";
 
+if (!checkPerm(PERM_VIEW_POSTS)) {
+    $content .= "<div class='error'>You don't have permission to view posts.</div>";
+    render($content, $title);
+    exit();
+}
+
 // Get all of the blog posts.
 $posts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts`");
 

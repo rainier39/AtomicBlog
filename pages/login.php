@@ -53,14 +53,14 @@ function handleLogin() {
             $content .= "<div class='error'>The username or password you entered was incorrect.</div>";
             return;
         }
-        // Check if the user is unapproved. If so, don't let them log in.
-        if ($r["role"] == "Unapproved") {
-            $content .= "<div class='error'>Your account must be approved before you can log in.</div>";
-            return;
-        }
-        // Check if the user is suspended. If so, don't let them log in.
-        if ($r["role"] == "Suspended") {
-            $content .= "<div class='error'>Your account is suspended.</div>";
+        // Make sure the account is allowed to be logged into.
+        if (!checkRolePerm(PERM_LOGIN, $r["role"])) {
+            if ($r["role"] == "Unapproved") {
+                $content .= "<div class='error'>Your account must be approved before you can log in.</div>";
+            }
+            else {
+                $content .= "<div class='error'>This account cannot be logged into.</div>";
+            }
             return;
         }
         // Finally, log the user in.
