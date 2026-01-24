@@ -31,7 +31,7 @@ function handleLogin() {
     
     // Stop if they've logged in or tried to too many times.
     if ($attempts->num_rows >= $config["loginsPerHour"]) {
-        $content .= "<div class='error'>Too many logins/login attempts. Try again later.</div>";
+        $content .= "<div class='error'>Too many logins or login attempts. Try again later.</div>";
         return;
     }
     // Otherwise, record this as a login attempt.
@@ -41,17 +41,16 @@ function handleLogin() {
 
     // First find the account they want to log into.
     $result = $db->query("SELECT `id`, `username`, `role`, `password` FROM `accounts` WHERE `username`='" . $db->real_escape_string($_POST["username"]) . "'");
-
-    // If the login failed, let them know.
+    // If there's no account with that name, give them the generic failure message. This helps prevent username enumeration.
     if ($result->num_rows < 1) {
-        $content .= "<div class='error'>Failed to find requested account.</div>";
+        $content .= "<div class='error'>The username or password you entered was incorrect.</div>";
         return;
     }
     
     while ($r = $result->fetch_assoc()) {
         // Wrong password.
         if (!password_verify($_POST["password"], $r["password"])) {
-            $content .= "<div class='error'>The password you entered was incorrect.</div>";
+            $content .= "<div class='error'>The username or password you entered was incorrect.</div>";
             return;
         }
         // Check if the user is unapproved. If so, don't let them log in.
