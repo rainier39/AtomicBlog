@@ -56,11 +56,11 @@ function format_inline_code($string) {
 }
 
 function format_heading($string) {
-    return preg_replace("/^#\s+(.+?)$/mis", "<h1>$1</h1>", $string);
+    return preg_replace("/^#\s+(.+?)$/mis", "<h2>$1</h2>", $string);
 }
 
 function format_subheading($string) {
-    return preg_replace("/^##\s+(.+?)$/mis", "<h2>$1</h2>", $string);
+    return preg_replace("/^##\s+(.+?)$/mis", "<h3>$1</h3>", $string);
 }
 
 function format_horizontal_rule($string) {
