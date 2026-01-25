@@ -67,6 +67,11 @@ if (!isset($_SESSION["csrf_token"])) {
     generateCSRFToken();
 }
 
+// If a user is logged in but lacks permission to log in (i.e. their role has been changed since they logged in), log them out.
+if (isset($_SESSION["logged_in"]) and $_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
+    logout(true);
+}
+
 // If the software hasn't been installed yet, direct all requests to the install page.
 if ($config["installed"] == false)
 {
