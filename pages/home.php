@@ -28,7 +28,7 @@ if ($starred->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "<div class='error'>No starred posts yet.</div>";
+    $content .= "<div class='info'>No starred posts yet.</div>";
 }
 
 // End the starred posts fieldset.
@@ -49,7 +49,7 @@ if ($recent->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "<div class='error'>No posts yet.</div>";
+    $content .= "<div class='info'>No posts yet.</div>";
 }
 
 // End the fieldset.
@@ -112,7 +112,7 @@ if ($postids->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "<div class='error'>No posts yet.</div>";
+    $content .= "<div class='info'>No posts yet.</div>";
 }
 
 // End the fieldset.

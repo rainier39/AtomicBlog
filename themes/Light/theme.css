@@ -6,6 +6,9 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .content {border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; background: white}
 .footer {border: 1px solid grey; padding: 20px; background: white; text-align: center}
 .footer a {text-decoration: none}
+/* Messages */
+.success {border: 1px solid green; padding: 4px; margin: 2px; background: #77ff77}
+.info {border: 1px solid goldenrod; padding: 4px; margin: 2px; background: #ffff77}
 .error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
 /* Install page */
 .installForm {text-align: center}

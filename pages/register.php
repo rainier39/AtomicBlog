@@ -67,7 +67,7 @@ else {
                 $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Unapproved', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
 
                 // Inform the user that they've successfully registered.
-                $content .= "You've successfully registered for an account. Note that it must be approved before it's usable.";
+                $content .= "<div class='success'>You've successfully registered for an account. Note that it must be approved before it's usable.</div>";
                 $registerSuccess = true;
             }
             // Otherwise, display the errors.

@@ -67,7 +67,7 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
                 $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
                 // Delete all of the post's comments.
                 $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
-                $content .= "Successfully deleted the post.";
+                $content .= "<div class='error'>Successfully deleted the post.</div>";
                 $displayPost = false;
                 redirect("", 2);
             }

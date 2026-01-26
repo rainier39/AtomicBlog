@@ -29,7 +29,7 @@ if ($posts->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "No posts yet.";
+    $content .= "<div class='info'>No posts yet.</div>";
 }
 
 // End the fieldset.

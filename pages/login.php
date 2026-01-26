@@ -40,7 +40,7 @@ function handleLogin() {
     }
 
     // First find the account they want to log into.
-    $result = $db->query("SELECT `id`, `username`, `role`, `password` FROM `accounts` WHERE `username`='" . $db->real_escape_string($_POST["username"]) . "'");
+    $result = $db->query("SELECT `id`, `name`, `role`, `password` FROM `accounts` WHERE `username`='" . $db->real_escape_string($_POST["username"]) . "'");
     // If there's no account with that name, give them the generic failure message. This helps prevent username enumeration.
     if ($result->num_rows < 1) {
         $content .= "<div class='error'>The username or password you entered was incorrect.</div>";
@@ -66,10 +66,8 @@ function handleLogin() {
         // Finally, log the user in.
         $_SESSION["logged_in"] = true;
         $_SESSION["id"] = $r["id"];
-        $_SESSION["username"] = $r["username"];
-        $_SESSION["role"] = $r["role"];
 
-        $content .= "Successfully logged in. Welcome, " . htmlspecialchars($_SESSION["username"]) . ".";
+        $content .= "<div class='success'>Successfully logged in. Welcome, " . htmlspecialchars($r["name"]) . ".</div>";
         $success = true;
                             
         // Update the user's lastactive time and IP.

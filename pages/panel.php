@@ -46,7 +46,7 @@ elseif ($url[1] == "newpost") {
         	    // Add the new post to the database.
         	    $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `icon`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', 'none', '1')");
         	    // Print a message.
-        	    $content .= "Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.";
+        	    $content .= "<div class='success'>Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.</div>";
         	    $success = true;
         	    redirect("post/{$db->insert_id}", 2);
         	}
