@@ -11,11 +11,11 @@ function format($string) {
     $string = htmlspecialchars($string);
 
     // Apply the various formatter functions to the string.
+    $string = format_code_block($string);
     $string = format_list($string);
     $string = format_numeric_list($string);
     $string = format_bold($string);
     $string = format_italic($string);
-    $string = format_code_block($string);
     $string = format_inline_code($string);
     $string = format_heading($string);
     $string = format_subheading($string);
@@ -31,6 +31,26 @@ function format($string) {
 }
 
 // Define the various formatter functions.
+function format_code_block($string) {
+    return preg_replace_callback("/```(.*?)$(.+?)```/mis",
+    function ($matches) {
+        # We don't want to format anything inside a codeblock as markdown.
+        $matches[2] = str_replace(" ", "&nbsp;", $matches[2]);
+        $matches[2] = str_replace("#", "&#35;", $matches[2]);
+        $matches[2] = str_replace(")", "&#41;", $matches[2]);
+        $matches[2] = str_replace("*", "&#42;", $matches[2]);
+        $matches[2] = str_replace("-", "&#45;", $matches[2]);
+        $matches[2] = str_replace(".", "&#46;", $matches[2]);
+        $formatLangs = array("php");
+        if (in_array(trim($matches[1]), $formatLangs)) {
+            $matches[2] = call_user_func("format_lang_" . trim($matches[1]), $matches[2]);
+        }
+        // ltrim pesky leading newlines.
+        return "<div class='codeblock'>" . ltrim($matches[2], "\n\r") . "</div>";
+    },
+    $string);
+}
+
 function format_list($string) {
     return preg_replace("/^\*\s+(.+?)$|^-\s+(.+?)$/mis", "<li>$1$2</li>", $string);
 }
@@ -40,15 +60,11 @@ function format_numeric_list($string) {
 }
 
 function format_bold($string) {
-    return preg_replace("/\*\*(.+?)\*\*|__(.+?)__/is", "<b>$1$2</b>", $string);
+    return preg_replace("/\*\*(.+?)\*\*/is", "<b>$1</b>", $string);
 }
 
 function format_italic($string) {
-    return preg_replace("/\*(.+?)\*|_(.+?)_/is", "<i>$1$2</i>", $string);
-}
-
-function format_code_block($string) {
-    return preg_replace("/```(.+?)```/is", "<div class='codeblock'>$1</div>", $string);
+    return preg_replace("/\*(.+?)\*/is", "<i>$1</i>", $string);
 }
 
 function format_inline_code($string) {
@@ -64,7 +80,7 @@ function format_subheading($string) {
 }
 
 function format_horizontal_rule($string) {
-    return preg_replace("/---/is", "<hr>", $string);
+    return preg_replace("/---$/is", "<hr>", $string);
 }
 
 function format_blockquote($string) {
@@ -72,7 +88,7 @@ function format_blockquote($string) {
 }
 
 function format_image($string) {
-    return preg_replace("/!\[(.+?)\]\((http|https):\/\/(.+?)\)/is", "<img src='$2://$3' alt='$1'>", $string);
+    return preg_replace("/!\[(.*?)\]\((http|https):\/\/(.+?)\)/is", "<img src='$2://$3' alt='$1'>", $string);
 }
 
 function format_link($string) {
@@ -85,6 +101,16 @@ function format_paragraphs($string) {
 
 function format_linebreaks($string) {
     return preg_replace("/\s\s$/mis", "</br>", $string);
+}
+
+// Define the formatter functions for any supported coding/markup languages.
+function format_lang_php($string) {
+    // WIP code, will be replaced with regex later. TODO
+    $keywords = array("break", "function", "return");
+    foreach ($keywords as $k) {
+        $string = str_replace($k, "<font color=red>" . $k . "</font>", $string);
+    }
+    return $string;
 }
 
 ?>

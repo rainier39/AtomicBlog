@@ -43,7 +43,7 @@ body {max-width: 75%; margin: auto; font-family:'Helvetica'}
 .postButtons {display: flex; flex-flow: row wrap; align-items: center; justify-content: center;}
 .postButton {text-decoration: none; font-size: 120%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; color: white; margin-right: 5px; margin-left: 5px; margin-bottom: 2px; margin-top: 2px; min-width: 0;}
 /* Post content formatting */
-code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px;}
+code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px; white-space: pre-wrap}
 .postContent {line-height: 1.5; padding: 8px; overflow-wrap: break-word}
 .postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 /* Home page */
