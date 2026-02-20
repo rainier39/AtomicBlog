@@ -34,7 +34,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $starred = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE `starred`='1'");
 
 // Display the starred posts fieldset.
-$content .= "<fieldset class='starred'><legend>Starred</legend>";
+$content .= "<fieldset class='posts'><legend>Starred</legend>";
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
@@ -55,7 +55,7 @@ $content .= "</fieldset>";
 $recent = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` ORDER BY `starttime` DESC LIMIT 5");
 
 // Display the most recent fieldset.
-$content .= "</br><fieldset class='mostRecent'><legend>Most Recent</legend>";
+$content .= "</br><fieldset class='posts'><legend>Most Recent</legend>";
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
@@ -113,7 +113,7 @@ if ($postids->num_rows > 0) {
 }
 
 // Display the most viewed fieldset.
-$content .= "</br><fieldset class='mostViewed'><legend>Most Viewed</legend>";
+$content .= "</br><fieldset class='posts'><legend>Most Viewed</legend>";
 
 // Only try to display posts if there are any.
 if ($postids->num_rows > 0) {

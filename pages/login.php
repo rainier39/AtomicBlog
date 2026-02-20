@@ -107,13 +107,13 @@ else {
     // Display the login form.
     if (!$success) {
         $content .= "
-        <div class='loginForm'>
+        <div class='form'>
             <h1>Log in</h1>
             <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
             <label for='username'>Username: </label><input type='text' name='username' id='username' autocomplete='username' maxlength='32' required" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
             <label for='password'>Password: </label><input type='password' name='password' id='password' autocomplete='current-password' required" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
-            <input type='submit' value='Log in' id='button'></input>
+            <input type='submit' value='Log in' class='button'></input>
             </form>
         </div>";
     }

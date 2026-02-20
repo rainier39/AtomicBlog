@@ -1,15 +1,21 @@
 @import url("../Light/theme.css");
+
+/** Global **/
 html {background: #121212; color: #d0d0d0}
+a {color: lightblue}
+a:hover {color: cornflowerblue}
 .content, .footer {background: #181a1b; border-color: #d0d0d0}
 .header {border-color: #d0d0d0; background: #181a1b}
 .navbar {border-color: #d0d0d0; background: #181a1b}
-.navbar a {background: #061d38; border-color: #d0d0d0}
+.navbar a {background: midnightblue; border-color: #d0d0d0}
+.form input, textarea {color: white; background: #121212; border: 1px solid #d0d0d0}
+.button, .form .button {background: midnightblue; border-color: #d0d0d0}
+
+/** Pages **/
+/* Post tiles */
+.postTile {border-color: #d0d0d0}
+.postTile a {color: white}
+/* Home page */
 .posts {border-color: #d0d0d0}
-.posts a {color: white}
-.starred, .mostViewed, .mostRecent, .allPosts {border-color: #d0d0d0}
-#button, #buttonRegister, #buttonNewPost, #buttonEditPost, .postButton {background: #061d38; border-color: #d0d0d0}
+/* Post page */
 .post h1, .postContent {color: white}
-a {color: lightblue}
-input, textarea {color: white; background: #121212; border: 1px solid #d0d0d0}
-/* Panel */
-.panelcontent a {color: #cccccc}

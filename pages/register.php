@@ -97,7 +97,7 @@ else {
     }
     // Display the registration form if the user didn't successfully register.
     if (!$registerSuccess) {
-        $content .= "<div class='registerForm'>
+        $content .= "<div class='form registerForm'>
             <h1>Register</h1>
             <form method='post'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
@@ -106,7 +106,7 @@ else {
                 <label for='email'>Email Address: </label><input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='" . (isset($_POST["email"]) ? htmlspecialchars($_POST["email"]) : "") . "' required></input></br>
                 <label for='password'>Password: </label><input type='password' name='password' id='password' autocomplete='new-password' value='" . (isset($_POST["password"]) ? htmlspecialchars($_POST["password"]) : "") . "' required></input></br>
                 <label for='repeatpassword'>Repeat password: </label><input type='password' name='repeatpassword' id='repeatpassword' value='" . (isset($_POST["repeatpassword"]) ? htmlspecialchars($_POST["repeatpassword"]) : "") . "' required></input></br>
-                <br><input type='submit' value='Register' id='buttonRegister'></input>
+                <br><input type='submit' value='Register' class='button'></input>
             </form>
         </div>";
     }

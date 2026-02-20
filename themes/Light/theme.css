@@ -1,71 +1,58 @@
-/* Global */
+/** Global **/
 body {max-width: 75%; margin: auto; font-family:'Helvetica'}
+a {color: blue; text-decoration: none}
+a:hover {color: navy}
 .header {border-bottom: 1px solid grey; border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; font-size: 160%; background: grey; color: white; text-align: center}
 .navbar {border-left: 1px solid grey; border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 8px; background: lightgrey; text-align: center}
-.navbar a {text-decoration: none; margin-right: 5%; margin-left: 5%; font-size: 140%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; margin-bottom: 5px; margin-top: 5px; display: inline-block; color: white}
+.navbar a {margin-right: 5%; margin-left: 5%; font-size: 140%; border: 1px solid black; padding: 5px; background: #666666; margin-bottom: 5px; margin-top: 5px; display: inline-block; color: white}
+.navbar a:hover {color: white}
 .content {border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; background: white}
 .footer {border: 1px solid grey; padding: 20px; background: white; text-align: center}
-.footer a {text-decoration: none}
 /* Messages */
 .success {border: 1px solid green; padding: 4px; margin: 2px; background: #77ff77}
 .info {border: 1px solid goldenrod; padding: 4px; margin: 2px; background: #ffff77}
 .error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
+/* Forms/Buttons */
+.form {text-align: center}
+.form label {min-width: 6em; display: inline-block; text-align: right}
+.form input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.form input[type=checkbox] {width: auto}
+.button {width: fit-content!important; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 6px; cursor: pointer}
+.button:hover {color: white}
+
+/** Pages **/
 /* Install page */
-.installForm {text-align: center}
-.installForm label {min-width: 8em; display: inline-block; text-align: right}
-.installForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.installForm label {min-width: 8em}
 .installForm textarea {resize: vertical; height: 120px; vertical-align: baseline}
-.installForm input[type=checkbox] {width: auto}
-#button {width: 70px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px; cursor: pointer}
-/* Login page */
-.loginForm {text-align: center}
-.loginForm label {min-width: 6em; display: inline-block; text-align: right}
-.loginForm input {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
 /* Register page */
-.registerForm {text-align: center}
-.registerForm label {min-width: 8em; display: inline-block; text-align: right}
-.registerForm input {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
-#buttonRegister {width: 80px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px; cursor: pointer}
+.registerForm label {min-width: 8em}
 /* New post page */
-.newPostForm {text-align: center}
-.newPostForm label {min-width: 4em; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
-.newPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.newPostForm label {min-width: 4em; vertical-align: top; margin-top: 10px}
 .newPostForm textarea {resize: vertical; height: 120px}
-#buttonNewPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px; cursor: pointer}
 /* Post tiles */
-.posts {border: 1px solid grey; padding: 15px; margin: 14px; min-width: 160px; max-width: 160px; min-height: 200px; display: inline-block; text-align: center; vertical-align: top; overflow-wrap: break-word}
-.posts a {text-decoration: none; color: black; font-size: 150%}
-.posts img {max-width: 100%; height: auto; border: 1px solid grey;}
+.postTile {border: 1px solid grey; padding: 15px; margin: 14px; min-width: 160px; max-width: 160px; min-height: 200px; display: inline-block; text-align: center; vertical-align: top; overflow-wrap: break-word}
+.postTile a {color: black; font-size: 150%}
+.postTile img {max-width: 100%; height: auto; border: 1px solid grey;}
 /* Post page */
 .post {padding: 15px}
 .postHeader {text-align: center; margin-bottom: 12px}
 .postHeader img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
 .postButtons {display: flex; flex-flow: row wrap; align-items: center; justify-content: center;}
-.postButton {text-decoration: none; font-size: 120%; border: 1px solid black; border-radius: 2px; padding: 5px; background: #666666; color: white; margin-right: 5px; margin-left: 5px; margin-bottom: 2px; margin-top: 2px; min-width: 0; cursor: pointer}
+.postButton {margin: 2px 5px; min-width: 0;}
 /* Post content formatting */
 code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px; white-space: pre-wrap}
 .postContent {line-height: 1.5; padding: 8px; overflow-wrap: break-word}
 .postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
-/* Home page */
-.starred {border: 1px solid grey}
-.starred legend {font-size: 120%}
-.mostViewed {border: 1px solid grey}
-.mostViewed legend {font-size: 120%}
-.mostRecent {border: 1px solid grey}
-.mostRecent legend {font-size: 120%}
-/* All posts page */
-.allPosts {border: 1px solid grey}
-.allPosts legend {font-size: 120%}
+/* Home page/All posts page */
+.posts {border: 1px solid grey}
+.posts legend {font-size: 120%}
 /* Edit post page */
-.editPostForm {text-align: center}
-.editPostForm label {min-width: 4em; display: inline-block; text-align: right; vertical-align: top; margin-top: 12px}
-.editPostForm input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
+.editPostForm label {min-width: 4em; vertical-align: top; margin-top: 12px}
 .editPostForm textarea {resize: vertical; height: 120px}
-#buttonEditPost {width: 108px; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 8px; cursor: pointer}
 /* Panel */
 .panelcontent {text-align: center}
-.panelcontent a {text-decoration: none; color: #222222}
-/* Phone/Tablet */
+
+/** Phone/Tablet **/
 @media only screen and (max-width: 768px) {
 body {max-width: 100%}
 .header {border-left: 0; border-right: 0}

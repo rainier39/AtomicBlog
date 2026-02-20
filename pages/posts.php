@@ -35,7 +35,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $posts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts`");
 
 // Display the allPosts fieldset.
-$content .= "<fieldset class='allPosts'><legend>All Posts</legend>";
+$content .= "<fieldset class='posts'><legend>All Posts</legend>";
 
 // If there are posts, display them.
 if ($posts->num_rows > 0) {

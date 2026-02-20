@@ -126,14 +126,14 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
                 }
             }
             if (!$success) {
-                $content .= "<div class='editPostForm'>
+                $content .= "<div class='form editPostForm'>
                     <h1>Edit Post</h1>
                     <form method='post'>
                         <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                         <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "></input></br>
                         <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p["tags"]) . "'") . "></input></br>
                         <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p["content"])) . "</textarea></br>
-                        <br><input type='submit' value='Edit post' id='buttonEditPost'></input>
+                        <br><input type='submit' value='Edit post' class='button'></input>
                     </form>
                 </div>";
             }
@@ -162,15 +162,15 @@ if ($displayPost) {
             <div class='postButtons'>";
         if (checkPerm(PERM_EDIT_POST)) {
             $content .= "
-                <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='postButton'>Edit</a>";
+                <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='button postButton'>Edit</a>";
         }
         if (checkPerm(PERM_DELETE_POST)) {
             $content .= 
-                "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='delete' value='Delete'></form>";
+                "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
         }
         if (checkPerm(PERM_STAR_POST)) {
             $content .=
-                "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
+                "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
         }
         $content .=
             "</div>

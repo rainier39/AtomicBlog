@@ -207,7 +207,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Display the install page form.
 if (!$config["installed"]) {
 $content .= 
-    "<div class='installForm'>
+    "<div class='form installForm'>
         <h1>Installer</h1>
         <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
@@ -231,7 +231,7 @@ $content .=
             <br><b>Settings</b></br>
             <label for='overwrite'>Overwrite old database: </label><input type='checkbox' name='overwrite' id='overwrite'" . (isset($_POST["overwrite"]) ? " checked" : "") . ">
             
-            <br><input type='submit' value='Install' id='button'></input>
+            <br><input type='submit' value='Install' class='button'></input>
         </form>
     </div>
 ";
