@@ -27,11 +27,11 @@ $title = "Register";
 
 // If the user is already logged in, don't let them into the page.
 if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
-    $content .= "<div class='error'>You're already logged in.</div>";
+    $content .= error("You're already logged in.");
 }
 // If registration is disabled, don't let them in.
 elseif (!$config["allowRegistration"]) {
-    $content .= "<div class='error'>Registration is disabled.</div>";
+    $content .= error("Registration is disabled.");
 }
 // Otherwise, proceed as normal.
 else {
@@ -84,13 +84,13 @@ else {
                 $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Unapproved', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
 
                 // Inform the user that they've successfully registered.
-                $content .= "<div class='success'>You've successfully registered for an account. Note that it must be approved before it's usable.</div>";
+                $content .= success("You've successfully registered for an account. Note that it must be approved before it's usable.");
                 $registerSuccess = true;
             }
             // Otherwise, display the errors.
             else {
                 foreach ($errors as $e) {
-                    $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
+                    $content .= error($e);
                 }
             }
         }

@@ -28,7 +28,7 @@ $updatePost = false;
 $title = "";
 
 if (!checkPerm(PERM_VIEW_POST)) {
-    $content .= "<div class='error'>You don't have permission to view this post.</div>";
+    $content .= error("You don't have permission to view this post.");
     render($content, $title);
     exit();
 }
@@ -38,7 +38,7 @@ $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string(
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
-    $content .= "<div class='error'>The requested post doesn't exist.</div>";
+    $content .= error("The requested post doesn't exist.");
     $displayPost = false;
 }
 // Handle star toggling.
@@ -63,7 +63,7 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"])))
             }
         }
         else {
-            $content .= "<div class='error'>You don't have permission to do this.</div>";
+            $content .= error("You don't have permission to do this.");
             $updatePost = true;
         }
     }
@@ -84,13 +84,13 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
                 $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
                 // Delete all of the post's comments.
                 $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
-                $content .= "<div class='error'>Successfully deleted the post.</div>";
+                $content .= success("Successfully deleted the post.");
                 $displayPost = false;
                 redirect("", 2);
             }
         }
         else {
-            $content .= "<div class='error'>You don't have permission to do this.</div>";
+            $content .= error("You don't have permission to do this.");
             $updatePost = true;
         }
     }
@@ -120,7 +120,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
         	        // Otherwise, print the errors.
         	        else {
         	            foreach ($errors as $e) {
-        	                $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
+        	                $content .= error($e);
         	            }
         	        }
                 }
@@ -139,7 +139,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
             }
         }
         else {
-            $content .= "<div class='error'>You don't have permission to do this.</div>";
+            $content .= error("You don't have permission to do this.");
             $updatePost = true;
         }
     }

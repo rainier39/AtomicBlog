@@ -31,7 +31,7 @@ function logout($redirect=false) {
 
 // Render a page, placing the header and footer accordingly.
 function render(string $content, string $htitle="") {
-    global $config;
+    global $config, $hcontent;
     if ($htitle == "") {
         $htitle = $config["title"];
     }
@@ -82,6 +82,18 @@ function displayPost($id, $icon, $title, $account) {
     $post .= "</div>";
     
     return $post;
+}
+
+function success($message) {
+    return "<div class='success'>" . htmlspecialchars($message) . "</div>";
+}
+
+function info($message) {
+    return "<div class='info'>" . htmlspecialchars($message) . "</div>";
+}
+
+function error($message) {
+    return "<div class='error'>" . htmlspecialchars($message) . "</div>";
 }
 
 // Make a valid (relative) URL for a given page.

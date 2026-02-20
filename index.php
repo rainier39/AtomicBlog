@@ -119,9 +119,14 @@ elseif ($url[0] == "post")
 {
     require "pages/post.php";
 }
-// Default everything else to the homepage.
+elseif ($url[0] == "")
+{
+    require "pages/home.php";
+}
+// Default everything else to the homepage, and show an error message.
 else
 {
+    $hcontent = error("Page not found.");
     require "pages/home.php";
 }
 

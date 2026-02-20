@@ -27,7 +27,7 @@ $title = "";
 
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
-    $content .= "<div class='error'>You must be logged in to access this page.</div>";
+    $content .= error("You must be logged in to access this page.");
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
@@ -46,7 +46,7 @@ elseif ($url[1] == "newpost") {
 }
 // Display an error page.
 else {
-    $content .= "<div class='error'>The page you requested doesn't exist.</div>";
+    $content .= error("The page you requested doesn't exist.");
 }
 
 render($content, $title);

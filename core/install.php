@@ -191,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         flushConfig();
 
         // Print a message that the software has been installed.
-        $content .= "<div class='success'>Software successfully installed!</div>";
+        $content .= success("Software successfully installed!");
 
         // We will want to take the user to their newly installed blog.
         redirect("", 2);
@@ -199,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Otherwise, display the errors.
     else {
         foreach ($errors as $e) {
-            $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
+            $content .= error($e);
         }
     }
 }

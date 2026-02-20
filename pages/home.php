@@ -25,7 +25,7 @@ if (!defined('INDEX')) exit;
 $content = "";
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
-    $content .= "<div class='error'>You don't have permission to view posts.</div>";
+    $content .= error("You don't have permission to view posts.");
     render($content);
     exit();
 }
@@ -45,7 +45,7 @@ if ($starred->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "<div class='info'>No starred posts yet.</div>";
+    $content .= info("No starred posts yet.");
 }
 
 // End the starred posts fieldset.
@@ -66,7 +66,7 @@ if ($recent->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "<div class='info'>No posts yet.</div>";
+    $content .= info("No posts yet.");
 }
 
 // End the fieldset.
@@ -129,7 +129,7 @@ if ($postids->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $content .= "<div class='info'>No posts yet.</div>";
+    $content .= info("No posts yet.");
 }
 
 // End the fieldset.

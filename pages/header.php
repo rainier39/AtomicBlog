@@ -23,6 +23,7 @@
 if (!defined('INDEX')) exit;
 
 // Header content.
+$hcontentend = $hcontent ?? "";
 $hcontent = "";
 
 $hcontent .= "<!DOCTYPE html>
@@ -51,6 +52,8 @@ if ($config["installed"]) {
 }
 
 $hcontent .= "<div class='content'>";
+
+$hcontent .= $hcontentend;
 
 echo($hcontent);
 

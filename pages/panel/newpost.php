@@ -25,7 +25,7 @@ if (!defined('INDEX')) exit;
 $success = false;
 
 if (!checkPerm(PERM_NEW_POST)) {
-    $content .= "<div class='error'>You don't have permission to do this.</div>";
+    $content .= error("You don't have permission to do this.");
     render($content, $title);
     exit();
 }
@@ -44,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Add the new post to the database.
             $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `icon`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', 'none', '1')");
             // Print a message.
+            // Temporarily leaving this as-is due to htmlspecialchars() call in success().
             $content .= "<div class='success'>Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.</div>";
             $success = true;
             redirect("post/{$db->insert_id}", 2);
@@ -51,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Otherwise, print the errors.
         else {
             foreach ($errors as $e) {
-                $content .= "<div class='error'>" . htmlspecialchars($e) . "</div>";
+                $content .= error($e);
             }
         }
     }
