@@ -35,7 +35,7 @@ $hcontent .= "<!DOCTYPE html>
 <link rel='icon' type='image/x-icon' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true) . "'>
 <body>";
 
-$hcontent .= "<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b></br><small>" . htmlspecialchars($config["description"]) . "</small></div>";
+$hcontent .= "<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b><br><small>" . htmlspecialchars($config["description"]) . "</small></div>";
 
 if ($config["installed"]) {
     $hcontent .= "<div class='navbar'><a href='" . makeURL("") . "'>Home</a> <a href='" . makeURL("posts") . "'>Posts</a>";

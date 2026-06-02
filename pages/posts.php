@@ -32,7 +32,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 }
 
 // Get all of the blog posts.
-$posts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts`");
+$posts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $_SESSION["id"] . "'))");
 
 // Display the allPosts fieldset.
 $content .= "<fieldset class='posts'><legend>All Posts</legend>";

@@ -34,7 +34,7 @@ if (!checkPerm(PERM_VIEW_POST)) {
 }
 
 // Get the requested post.
-$post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "'");
+$post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $_SESSION["id"] . "'))");
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
@@ -58,6 +58,33 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"])))
                 // Unstar.
                 else {
                     $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                }
+                $updatePost = true;
+            }
+        }
+        else {
+            $content .= error("You don't have permission to do this.");
+            $updatePost = true;
+        }
+    }
+}
+// Handle published toggling.
+elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["togglePublished"]))) {
+    while ($p = $post->fetch_assoc()) {
+        // Make sure the user is allowed to publish/unpublish the post.
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_PUBLISH_POST)) {
+            // If the CSRF token is sent and valid.
+            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                // Generate a new token.
+                generateCSRFToken();
+                
+                // Star.
+                if ($_POST["togglePublished"] == "Publish") {
+                    $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($url[1]) . "'");
+                }
+                // Unstar.
+                else {
+                    $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
                 }
                 $updatePost = true;
             }
@@ -103,7 +130,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     while ($p = $post->fetch_assoc()) {
         // Make sure the user is allowed to edit the post.
         if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p["account"]) and checkPerm(PERM_EDIT_POST)) {
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            if (($_SERVER["REQUEST_METHOD"] == "POST") and (isset($_POST["edit"]))) {
                 // If the CSRF token is sent and valid.
                 if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
                     // Generate a new token.
@@ -125,15 +152,20 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
         	        }
                 }
             }
+            // If the user pressed the cancel button, fallthrough to the redirect.
+            elseif (isset($_POST["cancel"])) {
+                $success = true;
+            }
             if (!$success) {
                 $content .= "<div class='form editPostForm'>
                     <h1>Edit Post</h1>
                     <form method='post'>
                         <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                        <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "></input></br>
-                        <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p["tags"]) . "'") . "></input></br>
-                        <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p["content"])) . "</textarea></br>
-                        <br><input type='submit' value='Edit post' class='button'></input>
+                        <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "><br>
+                        <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p["tags"]) . "'") . "><br>
+                        <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p["content"])) . "</textarea><br><br>
+                        <input type='submit' value='Edit post' class='button' name='edit'>
+                        <input type='submit' value='Cancel edit' class='button' name='cancel'>
                     </form>
                 </div>";
             }
@@ -171,6 +203,10 @@ if ($displayPost) {
         if (checkPerm(PERM_STAR_POST)) {
             $content .=
                 "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
+        }
+        if (checkPerm(PERM_PUBLISH_POST)) {
+            $content .=
+                "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "'></form>";
         }
         $content .=
             "</div>

@@ -41,8 +41,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         	
         // If there are no errors, make the post.
         if (count($errors) === 0) {
+            if (isset($_POST["unpublished"]) and ($_POST["unpublished"] == "on")) {
+                $published = "0";
+            }
+            else {
+                $published = "1";
+            }
+        
             // Add the new post to the database.
-            $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `icon`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', 'none', '1')");
+            $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `icon`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', 'none', '" . $published . "')");
             // Print a message.
             // Temporarily leaving this as-is due to htmlspecialchars() call in success().
             $content .= "<div class='success'>Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.</div>";
@@ -67,6 +74,7 @@ if (!$success) {
             <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
             <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "") . "></input></br>
             <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : "") . "</textarea></br>
+            <label for='unpublished'>Unpublished: </label><input type='checkbox' name='unpublished' id='unpublished'" . (isset($_POST["unpublished"]) ? " checked" : "") . "><br>
             <br><input type='submit' value='Submit post' class='button'></input>
         </form>
     </div>";

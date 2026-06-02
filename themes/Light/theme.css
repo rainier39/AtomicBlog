@@ -1,22 +1,106 @@
 /** Global **/
-body {max-width: 75%; margin: auto; font-family:'Helvetica'}
-a {color: blue; text-decoration: none}
-a:hover {color: navy}
-.header {border-bottom: 1px solid grey; border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; font-size: 160%; background: grey; color: white; text-align: center}
-.navbar {border-left: 1px solid grey; border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 8px; background: lightgrey; text-align: center}
-.navbar a {margin-right: 5%; margin-left: 5%; font-size: 140%; border: 1px solid black; padding: 5px; background: #666666; margin-bottom: 5px; margin-top: 5px; display: inline-block; color: white}
-.navbar a:hover {color: white}
-.content {border-left: 1px solid grey; border-right: 1px solid grey; padding: 20px; background: white}
-.footer {border: 1px solid grey; padding: 20px; background: white; text-align: center}
+body {
+ max-width: 75%;
+ margin: auto;
+ font-family:'Helvetica';
+}
+a {
+ color: blue;
+ text-decoration: none
+}
+a:hover {
+ color: navy
+}
+.header {
+ border-bottom: 1px solid grey;
+ border-left: 1px solid grey;
+ border-right: 1px solid grey;
+ padding: 20px;
+ font-size: 160%;
+ background: grey;
+ color: white;
+ text-align: center;
+}
+.navbar {
+ border-left: 1px solid grey;
+ border-right: 1px solid grey;
+ border-bottom: 1px solid grey;
+ padding: 8px;
+ background: lightgrey;
+ text-align: center
+}
+.navbar a {
+ margin-right: 5%;
+ margin-left: 5%;
+ font-size: 140%;
+ border: 1px solid black;
+ padding: 5px;
+ background: #666666;
+ margin-bottom: 5px;
+ margin-top: 5px;
+ display: inline-block;
+ color: white
+}
+.navbar a:hover {
+ color: white
+}
+.content {
+ border-left: 1px solid grey;
+ border-right: 1px solid grey;
+ padding: 20px;
+ background: white
+}
+.footer {
+ border: 1px solid grey;
+ padding: 20px;
+ background: white;
+ text-align: center
+}
 /* Messages */
-.success {border: 1px solid green; padding: 4px; margin: 2px; background: #77ff77}
-.info {border: 1px solid goldenrod; padding: 4px; margin: 2px; background: #ffff77}
-.error {border: 1px solid red; padding: 4px; margin: 2px; background: #ff7777}
+.success {
+ border: 1px solid green;
+ padding: 4px;
+ margin: 2px;
+ background: #77ff77
+}
+.info {
+ border: 1px solid goldenrod;
+ padding: 4px;
+ margin: 2px;
+ background: #ffff77
+}
+.error {
+ border: 1px solid red;
+ padding: 4px;
+ margin: 2px;
+ background: #ff7777
+}
 /* Forms/Buttons */
-.form {text-align: center}
-.form label {min-width: 6em; display: inline-block; text-align: right}
-.form input, textarea {box-sizing: border-box; width: 200px; outline: none; margin: 10px; font-family: inherit}
-.form input[type=checkbox] {width: auto}
+.form label {
+ min-width: 6em;
+ display: inline-block;
+ text-align: right
+}
+.form input, textarea {
+ box-sizing: border-box;
+ width: 250px;
+ /* For some reason Chromium-based browsers have a different default input height than FireFox. */
+ min-height: 25px;
+ outline: none;
+ margin: 10px;
+ font-family: inherit
+}
+.form textarea {
+ width: 500px;
+}
+.form input[type=checkbox] {
+ width: auto
+}
+.form input[type=submit] {
+ /* Once again, Chrome-based and FireFox have different default heights. */
+ height: 40px;
+ 
+}
 .button {width: fit-content!important; background: #666666; color: white; border: 1px solid black; font-size: 105%; padding: 6px; cursor: pointer}
 .button:hover {color: white}
 
@@ -28,7 +112,7 @@ a:hover {color: navy}
 .registerForm label {min-width: 8em}
 /* New post page */
 .newPostForm label {min-width: 4em; vertical-align: top; margin-top: 10px}
-.newPostForm textarea {resize: vertical; height: 120px}
+.newPostForm textarea {resize: vertical; height: 250px}
 /* Post tiles */
 .postTile {border: 1px solid grey; padding: 15px; margin: 14px; min-width: 160px; max-width: 160px; min-height: 200px; display: inline-block; text-align: center; vertical-align: top; overflow-wrap: break-word}
 .postTile a {color: black; font-size: 150%}
@@ -48,7 +132,7 @@ code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2p
 .posts legend {font-size: 120%}
 /* Edit post page */
 .editPostForm label {min-width: 4em; vertical-align: top; margin-top: 12px}
-.editPostForm textarea {resize: vertical; height: 120px}
+.editPostForm textarea {resize: vertical; height: 250px}
 /* Panel */
 .panelcontent {text-align: center}
 
