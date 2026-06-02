@@ -53,8 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = array();
     
     // Stop if the core directory isn't writable. We need this for the config.
-    if (!is_writable("./core/")) {
-        $errors[] = "Cannot install, core directory isn't writable.";
+    if (!is_writable("./config/")) {
+        $errors[] = "Cannot install, config directory isn't writable.";
     }
     // Stop if any of the SQL details are blank.
     if ((!isset($_POST["SQLServer"])) or ($_POST["SQLServer"] == "")) {

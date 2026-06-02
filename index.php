@@ -31,8 +31,8 @@ header("X-Frame-Options: DENY");
 
 // Get the configuration settings.
 require "core/default_config.php";
-if (file_exists("core/config.php")) {
-    require "core/config.php";
+if (file_exists("config/config.php")) {
+    require "config/config.php";
 }
 else {
     $config = array();
@@ -49,6 +49,10 @@ if (($ishttps != "on") && $config["https"])
 
 // Initialize the permissions file.
 require "core/default_permissions.php";
+// Get any admin-defined permissions.
+if (file_exists("config/permissions.php")) {
+    require "config/permissions.php";
+}
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
 
