@@ -20,7 +20,7 @@
 // Includes admin-defined custom permissions.
 
 // Example: disallow guests from viewing any blog posts. (effectively a members-only blog)
-// $permissions["guest"] ^= PERM_VIEW_POST;
-// $permissions["guest"] ^= PERM_VIEW_POSTS;
+//$permissions["Guest"] ^= PERM_VIEW_POST;
+//$permissions["Guest"] ^= PERM_VIEW_POSTS;
 
 ?>
