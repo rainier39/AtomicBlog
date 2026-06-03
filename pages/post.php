@@ -192,19 +192,19 @@ if ($displayPost) {
         $content .=
         "<div class='post'>
             <div class='postButtons'>";
-        if (checkPerm(PERM_EDIT_POST)) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_EDIT_POST)) {
             $content .= "
                 <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='button postButton'>Edit</a>";
         }
-        if (checkPerm(PERM_DELETE_POST)) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_DELETE_POST)) {
             $content .= 
                 "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
         }
-        if (checkPerm(PERM_STAR_POST)) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_STAR_POST)) {
             $content .=
                 "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
         }
-        if (checkPerm(PERM_PUBLISH_POST)) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_PUBLISH_POST)) {
             $content .=
                 "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "'></form>";
         }
