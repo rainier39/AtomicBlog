@@ -127,6 +127,7 @@ a:hover {
 code, .codeblock {border: 1px solid darkgrey; background: lightgrey; padding: 2px 2px; white-space: pre-wrap}
 .postContent {line-height: 1.5; padding: 8px; overflow-wrap: break-word}
 .postContent img {max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; border: 1px solid grey}
+.postContent blockquote {border-left: 6px solid grey; margin-left: 0; padding-left: 20px}
 /* Home page/All posts page */
 .posts {border: 1px solid grey}
 .posts legend {font-size: 120%}

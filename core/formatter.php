@@ -34,8 +34,11 @@ function format($string) {
     $string = format_bold($string);
     $string = format_italic($string);
     $string = format_inline_code($string);
-    $string = format_heading($string);
-    $string = format_subheading($string);
+    $string = format_h2($string);
+    $string = format_h3($string);
+    $string = format_h4($string);
+    $string = format_h5($string);
+    $string = format_h6($string);
     $string = format_horizontal_rule($string);
     $string = format_blockquote($string);
     $string = format_image($string);
@@ -88,12 +91,24 @@ function format_inline_code($string) {
     return preg_replace("/`(.+?)`/is", "<code>$1</code>", $string);
 }
 
-function format_heading($string) {
+function format_h2($string) {
     return preg_replace("/^#\s+(.+?)$/mis", "<h2>$1</h2>", $string);
 }
 
-function format_subheading($string) {
+function format_h3($string) {
     return preg_replace("/^##\s+(.+?)$/mis", "<h3>$1</h3>", $string);
+}
+
+function format_h4($string) {
+    return preg_replace("/^###\s+(.+?)$/mis", "<h4>$1</h4>", $string);
+}
+
+function format_h5($string) {
+    return preg_replace("/^####\s+(.+?)$/mis", "<h5>$1</h5>", $string);
+}
+
+function format_h6($string) {
+    return preg_replace("/^#####\s+(.+?)$/mis", "<h6>$1</h6>", $string);
 }
 
 function format_horizontal_rule($string) {
