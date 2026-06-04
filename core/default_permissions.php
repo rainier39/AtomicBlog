@@ -22,10 +22,12 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+/* Permissions are stored as individual bits within an integer. Every role has an entry in the $permissions array with one of these integers. The permissions are all defined here as constants, their values indicating which bit in the integer must be set for them to be given. Permissions can be granted by using the bitwise OR operator. Permissions may be revoked using the bitwise XOR operator (see the config/permissions.php file for an example of this). */
+
 define("PERM_VIEW_POST", 1);
 define("PERM_VIEW_POSTS", 2);
 define("PERM_LOGIN", 4);
-// Whether a role can create posts.
+// Whether a user with the role can create posts.
 define("PERM_NEW_POST", 8);
 // The following 4 apply only to one's OWN post.
 define("PERM_EDIT_POST", 16);
@@ -37,7 +39,8 @@ $permissions = array(
     "Owner" => PERM_VIEW_POST|PERM_VIEW_POSTS|PERM_LOGIN|PERM_NEW_POST|PERM_EDIT_POST|PERM_DELETE_POST|PERM_STAR_POST|PERM_PUBLISH_POST,
     "Moderator" => PERM_VIEW_POST|PERM_VIEW_POSTS|PERM_LOGIN|PERM_NEW_POST|PERM_EDIT_POST|PERM_DELETE_POST|PERM_PUBLISH_POST,
     "Author" => PERM_VIEW_POST|PERM_VIEW_POSTS|PERM_LOGIN|PERM_NEW_POST|PERM_EDIT_POST|PERM_DELETE_POST|PERM_PUBLISH_POST,
-    "Member" => PERM_VIEW_POST|PERM_VIEW_POSTS|PERM_LOGIN|PERM_PUBLISH_POST,
+    "Member" => PERM_VIEW_POST|PERM_VIEW_POSTS|PERM_LOGIN,
+    // 0 means no permissions at all.
     "Suspended" => 0,
     "Unapproved" => 0,
     "Guest" => PERM_VIEW_POST|PERM_VIEW_POSTS
