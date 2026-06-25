@@ -39,6 +39,8 @@ else {
 }
 $config = array_merge($default_config, $config);
 
+date_default_timezone_set($config["timezone"]);
+
 // Make sure that the page is accessed over HTTPS if applicable.
 $ishttps = $_SERVER["HTTPS"] ?? "";
 if (($ishttps != "on") && $config["https"])

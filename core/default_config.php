@@ -48,7 +48,9 @@ $default_config = array(
     // How long a user must wait (in seconds) between making blog posts. 300 seconds = 5 minutes.
     "postDelay" => 300,
     // How long a user must wait (in seconds) between editing blog posts.
-    "editDelay" => 5
+    "editDelay" => 5,
+    // Server timezone. See: https://www.php.net/manual/en/timezones.php
+    "timezone" => "America/Los_Angeles"
 );
 
 ?>
