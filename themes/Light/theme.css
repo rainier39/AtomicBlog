@@ -76,6 +76,9 @@ a:hover {
  background: #ff7777;
 }
 /* Forms/Buttons */
+.form {
+ margin-left: 32px;
+}
 .form label {
  min-width: 6em;
  display: inline-block;
