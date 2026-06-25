@@ -36,11 +36,14 @@ elseif (!isset($url[1]) or $url[1] == "") {
     $content .= "<h1>Panel</h1>";
     $content .= "<h2>User Actions</h2>";
     if (checkPerm(PERM_NEW_POST)) {
-        $content .= "<a href='" . makeURL("panel/newpost") . "'>Create a new post</a>";
+        $content .= "<p><a href='" . makeURL("panel/newpost") . "'>Create a new post</a></p>";
     }
     $content .= "<h2>Administrative Actions</h2>";
     if (checkPerm(PERM_MANAGE_BLOG)) {
-        $content .= "<a href='" . makeURL("panel/configuration") . "'>Configure blog</a>";
+        $content .= "<p><a href='" . makeURL("panel/configuration") . "'>Configure blog</a></p>";
+    }
+    if (checkPerm(PERM_MANAGE_USERS)) {
+        $content .= "<p><a href='" . makeURL("panel/users") . "'>Manage users</a></p>";
     }
     $content .= "</div>";
 }
@@ -50,6 +53,9 @@ elseif ($url[1] == "newpost") {
 }
 elseif ($url[1] == "configuration") {
     require "panel/configuration.php";
+}
+elseif ($url[1] == "users") {
+    require "panel/users.php";
 }
 // Display an error page.
 else {
