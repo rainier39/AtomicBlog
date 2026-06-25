@@ -225,9 +225,9 @@ if ($displayPost) {
             $content .= "By: Nobody";
         }
         $content .= " | ";
-        $content .= "<small>Published: <span title='" . date("h:i:s", $p["starttime"]) . "'>" . date("m-d-Y", $p["starttime"]) . "</span></small>";
+        $content .= "<small>Published: <span title='" . date("g:i:sa", $p["starttime"]) . "'>" . date("F jS Y", $p["starttime"]) . "</span></small>";
         if (!empty($p["edittime"])) {
-            $content .= " | <small>Modified: <span title='" . date("h:i:s", $p["edittime"]) . "'>" . date("m-d-Y", $p["edittime"]) . "</span></small>";
+            $content .= " | <small>Modified: <span title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS Y", $p["edittime"]) . "</span></small>";
         }
         $icon = $p["icon"];
         $id = $p["id"];
