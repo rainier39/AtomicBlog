@@ -38,11 +38,18 @@ elseif (!isset($url[1]) or $url[1] == "") {
     if (checkPerm(PERM_NEW_POST)) {
         $content .= "<a href='" . makeURL("panel/newpost") . "'>Create a new post</a>";
     }
+    $content .= "<h2>Administrative Actions</h2>";
+    if (checkPerm(PERM_MANAGE_BLOG)) {
+        $content .= "<a href='" . makeURL("panel/configuration") . "'>Configure blog</a>";
+    }
     $content .= "</div>";
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
     require "panel/newpost.php";
+}
+elseif ($url[1] == "configuration") {
+    require "panel/configuration.php";
 }
 // Display an error page.
 else {
