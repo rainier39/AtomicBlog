@@ -33,8 +33,10 @@ if (!checkPerm(PERM_VIEW_POST)) {
     exit();
 }
 
+$id = $_SESSION["id"] ?? 0;
+
 // Get the requested post.
-$post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $_SESSION["id"] . "'))");
+$post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $id . "'))");
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {

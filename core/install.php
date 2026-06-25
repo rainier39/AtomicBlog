@@ -136,6 +136,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `namevisible` tinyint(1) NOT NULL DEFAULT '0',
             `emailvisible` tinyint(1) NOT NULL DEFAULT '0',
             `bio` varchar(4096) DEFAULT NULL,
+            `cookie` char(64) DEFAULT NULL,
+            `cookietime` bigint NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`),
             UNIQUE KEY `username` (`username`),
             UNIQUE KEY `email` (`email`)

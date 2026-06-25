@@ -24,6 +24,11 @@ if (!defined('INDEX')) exit;
 
 // Log a user out.
 function logout($redirect=false) {
+    global $db;
+    // Remove any login cookies and purge the database of them too.
+    setcookie("AtomicBlog_login", "0", array("expires" => 1));
+    $id = $_SESSION["id"] ?? 0;
+    $db->query("UPDATE `accounts` SET `cookie`=NULL WHERE `id`='" . $id . "'");
     session_unset();
     session_destroy();
     if ($redirect) redirect("");

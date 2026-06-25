@@ -27,7 +27,7 @@ $success = false;
 $title = "Login";
 
 function handleLogin() {
-    global $db, $config, $content, $success;
+    global $db, $config, $content, $success, $ishttps;
     
     if (!isset($_POST["username"]) || !isset($_POST["password"]) || ($_POST["username"] == "") || ($_POST["password"] == "")) {
         $content .= error("Must supply a non-blank username and password.");
@@ -87,8 +87,24 @@ function handleLogin() {
         $content .= success("Successfully logged in. Welcome, " . $r["name"] . ".");
         $success = true;
                             
-        // Update the user's lastactive time and IP.
-        $db->query("UPDATE `accounts` SET `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', `lastactive`='" . time() . "' WHERE `id`='" . $r["id"] . "'");
+        if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on")) {
+            $cookie = hash("sha256", random_bytes(64));
+            // Also give the user their login cookie.
+            $cookieoptions = array(
+                // Expires in a week.
+                "expires" => time() + 60*60*24*7,
+                "secure" => (($ishttps == "on") ? true : false),
+                "httponly" => true,
+                "samesite" => "Strict"
+            );
+            setcookie("AtomicBlog_login", $cookie, $cookieoptions);
+        }
+        else {
+            $cookie = "NULL";
+        }
+        
+        // Update the user's lastactive time, IP, and login cookie.
+        $db->query("UPDATE `accounts` SET `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', `lastactive`='" . time() . "', `cookie`='" . $cookie . "', `cookietime`='" . time() . "' WHERE `id`='" . $r["id"] . "'");
                             
         redirect("", 2);
     }
@@ -111,9 +127,13 @@ else {
             <h1>Log in</h1>
             <form method='post'>
             <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-            <label for='username'>Username: </label><input type='text' name='username' id='username' autocomplete='username' maxlength='32' required" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></input></br>
-            <label for='password'>Password: </label><input type='password' name='password' id='password' autocomplete='current-password' required" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></input></br>
-            <input type='submit' value='Log in' class='button'></input>
+            <label for='username'>Username: </label>
+            <input type='text' name='username' id='username' autocomplete='username' maxlength='32' required" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . "></br>
+            <label for='password'>Password: </label>
+            <input type='password' name='password' id='password' autocomplete='current-password' required" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . "></br>
+            <label for='stayloggedin'>Stay Logged In: </label>
+            <input type='checkbox' name='stayloggedin' id='stayloggedin' checked><br>
+            <input type='submit' value='Log in' class='button'>
             </form>
         </div>";
     }
