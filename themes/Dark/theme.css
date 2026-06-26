@@ -17,15 +17,11 @@ a:hover {
 }
 .header {
  border-color: #d0d0d0;
- background: #181a1b;
+ background: midnightblue;
 }
 .navbar {
  border-color: #d0d0d0;
- background: #181a1b;
-}
-.navbar a {
- background: midnightblue;
- border-color: #d0d0d0;
+ background: #555;
 }
 .form input, textarea {
  color: white;
@@ -33,7 +29,7 @@ a:hover {
  border: 1px solid #d0d0d0;
 }
 .button, .form .button {
- background: midnightblue;
+ background: #2222ad;
  border-color: #d0d0d0;
 }
 
@@ -44,6 +40,9 @@ a:hover {
 }
 .postTile a {
  color: white;
+}
+.postTile a:hover {
+ color: lightgrey;
 }
 /* Home page */
 .posts {
