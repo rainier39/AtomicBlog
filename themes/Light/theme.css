@@ -1,57 +1,61 @@
 /** Global **/
+/* Global variables */
+:root {
+ --main-border-color: #666;
+ --button-border: #333;
+}
 body {
  max-width: 75%;
  margin: auto;
- font-family: 'Helvetica';
+ font-family: 'Helvetica', 'Arial', sans-serif;
+ background: #f2f2f2;
 }
 a {
  color: blue;
  text-decoration: none;
 }
 a:hover {
- color: navy;
+ color: royalblue;
 }
 .header {
- border-bottom: 1px solid grey;
- border-left: 1px solid grey;
- border-right: 1px solid grey;
+ border-bottom: 1px solid var(--main-border-color);
+ border-left: 1px solid var(--main-border-color);
+ border-right: 1px solid var(--main-border-color);
  padding: 20px;
  font-size: 160%;
- background: grey;
+ background: steelblue;
  color: white;
  text-align: center;
 }
 .navbar {
- border-left: 1px solid grey;
- border-right: 1px solid grey;
- border-bottom: 1px solid grey;
+ border-left: 1px solid var(--main-border-color);
+ border-right: 1px solid var(--main-border-color);
+ border-bottom: 1px solid var(--main-border-color);
  padding: 8px;
- background: lightgrey;
+ background: lightslategrey;
  text-align: center;
 }
 .navbar a {
  margin-right: 5%;
  margin-left: 5%;
+ font-weight: bold;
  font-size: 140%;
- border: 1px solid black;
- padding: 5px;
- background: #666666;
  margin-bottom: 5px;
  margin-top: 5px;
  display: inline-block;
  color: white;
 }
 .navbar a:hover {
- color: white;
+ color: lightgray;
 }
 .content {
- border-left: 1px solid grey;
- border-right: 1px solid grey;
+ border-left: 1px solid var(--main-border-color);
+ border-right: 1px solid var(--main-border-color);
  padding: 20px;
  background: white;
 }
 .footer {
- border: 1px solid grey;
+ border: 1px solid var(--main-border-color);
  padding: 20px;
  background: white;
  text-align: center;
@@ -107,15 +111,16 @@ a:hover {
 }
 .button {
  width: fit-content!important;
- background: #666666;
+ background: royalblue;
  color: white;
- border: 1px solid black;
+ border: 1px solid var(--button-border);
  font-size: 105%;
  padding: 6px;
  cursor: pointer;
 }
 .button:hover {
- color: white;
+ color: lightgrey;
+ background: cornflowerblue;
 }
 
 /** Pages **/
@@ -156,7 +161,7 @@ a:hover {
 }
 /* Post tiles */
 .postTile {
- border: 1px solid grey;
+ border: 1px solid var(--main-border-color);
  padding: 15px;
  margin: 14px;
  min-width: 160px;
@@ -170,6 +175,9 @@ a:hover {
 .postTile a {
  color: black;
  font-size: 150%;
+}
+.postTile a:hover {
+ color: #444;
 }
 .postTile img {
  max-width: 100%;
@@ -229,7 +237,7 @@ code, .codeblock {
 }
 /* Home page/All posts page */
 .posts {
- border: 1px solid grey;
+ border: 1px solid var(--main-border-color);
 }
 .posts legend {
  font-size: 120%;
@@ -255,8 +263,8 @@ code, .codeblock {
  padding: 8px;
 }
 .userlist thead th {
- background: #666666;
- border: 1px solid black;
+ background: cornflowerblue;
+ border: 1px solid royalblue;
  color: white;
  padding: 8px;
 }
