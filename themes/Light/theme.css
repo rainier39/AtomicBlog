@@ -92,6 +92,7 @@ a:hover {
  outline: none;
  margin: 10px;
  font-family: inherit;
+ max-width: 100%;
 }
 .form textarea {
  width: 500px;
