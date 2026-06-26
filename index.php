@@ -22,7 +22,7 @@
 // Define a constant to ensure pages are only loaded through this index file.
 define("INDEX", "1");
 // Define the software's current version.
-define("VERSION", "v2.5.0-alpha");
+define("VERSION", "v2.6.0-alpha");
 
 // Prevent clickjacking by preventing the website from loading in an iframe.
 // TODO: make it possible to disable this in the config.
