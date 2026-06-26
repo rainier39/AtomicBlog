@@ -12,7 +12,7 @@ AtomicBlog has so far been developed and (mostly) tested with Apache2. There are
 Currently, there is no live online demo for the software. However, there is a [gallery](https://github.com/rainier39/AtomicBlog/wiki) on the homepage of this repository's wiki. Screenshots of what the software looks like are hosted there, and will be updated periodically.
 
 ## Compatibility
-Aims to be compatible with Apache2 and Nginx. Will work with any MySQL compatible database software. Should work on any Linux distribution. Probably works on any recent PHP versions but only guarenteed to work on versions that have been tested.
+Aims to be compatible with Apache2 and Nginx. Will work with any MySQL compatible database software. Should work on any Linux distribution. Requires at least PHP 7. Only tested on the configurations listed below.
 
 AtomicBlog has been tested on:
 - Debian 12 (bookworm) with PHP 8.2.29, Apache/2.4.65, and MariaDB 10.11.14.
