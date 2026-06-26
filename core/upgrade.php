@@ -49,6 +49,8 @@ if ($config["version"] != VERSION) {
         // account table changes.
         $db->query("ALTER TABLE `accounts` ADD COLUMN IF NOT EXISTS `cookie` char(64) DEFAULT NULL");
         $db->query("ALTER TABLE `accounts` ADD COLUMN IF NOT EXISTS `cookietime` bigint NOT NULL DEFAULT '0'");
+        // Bump the version.
+        $config["version"] = "v2.6.0-alpha";
     }
     
     // Write the new config to a file.
