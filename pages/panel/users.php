@@ -46,7 +46,7 @@ if (!$success) {
     $users = $db->query("SELECT `id`, `name`, `username`, `role`, `email`, `joinip`, `jointime`, `ip`, `lastactive` FROM `accounts`");
     
     $content .= "<table class='userlist'>";
-    $content .= "<tr>
+    $content .= "<thead>
       <th>Username</th>
       <th>Name</th>
       <th>Role</th>
@@ -55,20 +55,21 @@ if (!$success) {
       <th>IP (last login)</th>
       <th>Joined</th>
       <th>Last Active</th>
-    </tr>";
+    </thead>
+    <tbody>";
     while ($u = $users->fetch_assoc()) {
         $content .= "<tr>"
-        . "<th>" . htmlspecialchars($u["username"]) . "</th>"
-        . "<th>" . htmlspecialchars($u["name"]) . "</th>"
-        . "<th>" . htmlspecialchars($u["role"]) . "</th>"
-        . "<th>" . htmlspecialchars($u["email"]) . "</th>"
-        . "<th>" . htmlspecialchars($u["joinip"]) . "</th>"
-        . "<th>" . htmlspecialchars($u["ip"]) . "</th>"
-        . "<th>" . date("F jS Y", $u["jointime"]) . "</th>"
-        . "<th>" . date("F jS Y", $u["lastactive"]) . "</th>"
+        . "<td data-label='Username'>" . htmlspecialchars($u["username"]) . "</td>"
+        . "<td data-label='Name'>" . htmlspecialchars($u["name"]) . "</td>"
+        . "<td data-label='Role'>" . htmlspecialchars($u["role"]) . "</td>"
+        . "<td data-label='Email'>" . htmlspecialchars($u["email"]) . "</td>"
+        . "<td data-label='Join IP'>" . htmlspecialchars($u["joinip"]) . "</td>"
+        . "<td data-label='IP (last login)'>" . htmlspecialchars($u["ip"]) . "</td>"
+        . "<td data-label='Joined'>" . date("F jS Y", $u["jointime"]) . "</td>"
+        . "<td data-label='Last Active'>" . date("F jS Y", $u["lastactive"]) . "</td>"
         . "</tr>";
     }
-    $content .= "</table>";
+    $content .= "</tbody></table>";
 }
 
 ?>

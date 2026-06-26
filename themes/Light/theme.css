@@ -247,6 +247,18 @@ code, .codeblock {
 .panelcontent {
  text-align: center;
 }
+/* Userlist (manage users page) */
+.userlist td {
+ font-weight: normal;
+ border: 1px solid grey;
+ padding: 8px;
+}
+.userlist thead th {
+ background: #666666;
+ border: 1px solid black;
+ color: white;
+ padding: 8px;
+}
 
 /** Phone/Tablet **/
 @media only screen and (max-width: 768px) {
@@ -269,5 +281,26 @@ code, .codeblock {
   border-left: 0;
   border-right: 0;
   border-bottom: 0;
+ }
+ /* Userlist becomes vertical on mobile. */
+ .userlist thead {
+  display:none
+ }
+ .userlist td {
+  display: block;
+  margin: 6px;
+  text-align: left;
+  position: relative;
+  min-width: 100%;
+  padding-left: 100%;
+ }
+ .userlist td::before {
+  content:attr(data-label);
+  position: absolute;
+  padding-right: 80px;
+  text-align: left;
+  left: 0;
+  padding-left: 2px;
+  font-weight: bold;
  }
 }
