@@ -18,14 +18,13 @@ a:hover {
  color: royalblue;
 }
 .header {
- border-bottom: 1px solid var(--main-border-color);
- border-left: 1px solid var(--main-border-color);
- border-right: 1px solid var(--main-border-color);
+ border: 1px solid var(--main-border-color);
  padding: 20px;
  font-size: 160%;
  background: steelblue;
  color: white;
  text-align: center;
+ margin-top: 4px;
 }
 .navbar {
  border-left: 1px solid var(--main-border-color);
@@ -59,6 +58,7 @@ a:hover {
  padding: 20px;
  background: white;
  text-align: center;
+ margin-bottom: 4px;
 }
 /* Messages */
 .success {
