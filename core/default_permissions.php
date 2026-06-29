@@ -34,10 +34,10 @@ define("PERM_EDIT_POST", 16);
 define("PERM_DELETE_POST", 32);
 define("PERM_STAR_POST", 64);
 define("PERM_PUBLISH_POST", 128);
-// Allows configuring blog.
-define("PERM_MANAGE_BLOG", 256);
 // Allows changing users' roles.
-define("PERM_MANAGE_USERS", 512);
+define("PERM_MANAGE_USERS", 256);
+// Allows configuring blog.
+define("PERM_MANAGE_BLOG", 4096);
 
 $permissions = array(
     "Owner" => PERM_VIEW_POST|PERM_VIEW_POSTS|PERM_LOGIN|PERM_NEW_POST|PERM_EDIT_POST|PERM_DELETE_POST|PERM_STAR_POST|PERM_PUBLISH_POST|PERM_MANAGE_BLOG|PERM_MANAGE_USERS,

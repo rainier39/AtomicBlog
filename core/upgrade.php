@@ -52,6 +52,9 @@ if ($config["version"] != VERSION) {
         // Bump the version.
         $config["version"] = "v2.6.0-alpha";
     }
+    if ($config["version"] == "v2.6.0-alpha") {
+        $db->query("ALTER TABLE `accounts` MODIFY COLUMN `role` varchar(64) NOT NULL DEFAULT 'Unapproved'");
+    }
     
     // Write the new config to a file.
     flushConfig();

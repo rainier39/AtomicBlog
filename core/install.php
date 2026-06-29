@@ -127,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `email` varchar(64) NOT NULL,
             `password` varchar(128) NOT NULL,
             `name` varchar(64) NOT NULL,
-            `role` enum('Owner', 'Moderator', 'Member', 'Suspended', 'Unapproved') NOT NULL DEFAULT 'Unapproved',
+            `role` varchar(64) NOT NULL DEFAULT 'Unapproved',
             `avatar` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
             `joinip` varchar(45) NOT NULL,
             `ip` varchar(45) NOT NULL,

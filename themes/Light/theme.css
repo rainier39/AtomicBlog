@@ -24,7 +24,7 @@ a:hover {
  background: steelblue;
  color: white;
  text-align: center;
- margin-top: 4px;
+ margin-top: 6px;
 }
 .navbar {
  border-left: 1px solid var(--main-border-color);
@@ -58,7 +58,7 @@ a:hover {
  padding: 20px;
  background: white;
  text-align: center;
- margin-bottom: 4px;
+ margin-bottom: 6px;
 }
 /* Messages */
 .success {
