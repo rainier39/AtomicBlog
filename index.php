@@ -55,6 +55,8 @@ require "core/default_permissions.php";
 if (file_exists("config/permissions.php")) {
     require "config/permissions.php";
 }
+// Make sure roles are sorted properly (for cosmetic purposes).
+arsort($permissions);
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
 
