@@ -37,24 +37,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Change a user's role.
         if (isset($_POST["changerole"]) and isset($_POST["id"])) {
+            $_POST["id"] = (int)$_POST["id"];
             $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
             $crole = $rolequery->fetch_column(0);
-            $userquery = $db->query("SELECT 1 FROM `accounts` WHERE `id`='" . $db->real_escape_string($_POST["id"]) . "'");
+            $userquery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_POST["id"]) . "'");
+            $urole = $userquery->fetch_column(0);
             // Does the user exist?
             if ($userquery->num_rows != 1) {
                 $content .= error("Specified user does not exist.");
             }
+            // Is the user us?
+            elseif ($_POST["id"] === (int)$_SESSION["id"]) {
+                $content .= error("You don't have permission to do this.");
+            }
             // Does the role exist?
             elseif (!array_key_exists($_POST["changerole"], $permissions)) {
+                $content .= error("Specified role does not exist.");
+            }
+            // Is the role Guest?
+            elseif ($_POST["changerole"] == "Guest") {
                 $content .= error("Specified role does not exist.");
             }
             // Does the role have less permissions than our own?
             elseif ($permissions[$_POST["changerole"]] >= $permissions[$crole]) {
                 $content .= error("You don't have permission to do this.");
             }
+            // Does the other user outrank or have the same role as us?
+            elseif ($permissions[$urole] >= $permissions[$crole]) {
+                $content .= error("You don't have permission to do this.");
+            }
+            // Is the role actually different from the role they already have?
+            elseif ($_POST["changerole"] == $urole) {
+                $content .= success("Successfully did nothing.");
+            }
             // Change the role.
             else {
-                $db->query("UPDATE `accounts` SET `role`='" . $db->real_escape_string($_POST["changerole"]) . "' WHERE `id`='" . (int)$_POST["id"] . "'");
+                $db->query("UPDATE `accounts` SET `role`='" . $db->real_escape_string($_POST["changerole"]) . "' WHERE `id`='" . $_POST["id"] . "'");
+                $content .= success("Successfully changed role.");
             }
         }
     }
