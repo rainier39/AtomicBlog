@@ -41,7 +41,7 @@ $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string(
 while ($p = $post->fetch_assoc()) {
     $p_id = $p["id"];
     $p_title = $p["title"];
-    $p_tags = $p["tags"]; //unused
+    $p_tags = $p["tags"];
     $p_content = $p["content"];
     $p_account = $p["account"];
     $p_starttime = $p["starttime"];
@@ -142,6 +142,10 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
                 generateCSRFToken();
 
                 $errors = validatePost(true);
+                
+                if (($_POST["title"] == $p_title) and ($_POST["tags"] == $p_tags) and ($_POST["content"] == $p_content)) {
+                    $errors[] = "Nothing has been changed.";
+                }
         	
     	        // If there are no errors, edit the post.
     	        if (count($errors) === 0) {
