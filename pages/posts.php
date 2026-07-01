@@ -34,7 +34,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $id = $_SESSION["id"] ?? 0;
 
 // Get all of the blog posts.
-$posts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "'))");
+$posts = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "'))");
 
 // Display the allPosts fieldset.
 $content .= "<fieldset class='posts'><legend>All Posts</legend>";
@@ -43,7 +43,7 @@ $content .= "<fieldset class='posts'><legend>All Posts</legend>";
 if ($posts->num_rows > 0) {
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
-        $content .= displayPost($p["id"], $p["icon"], $p["title"], $p["account"]);
+        $content .= displayPost($p["id"], $p["title"], $p["account"]);
     }
 }
 // Otherwise print a message.

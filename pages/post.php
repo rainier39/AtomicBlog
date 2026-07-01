@@ -38,81 +38,87 @@ $id = $_SESSION["id"] ?? 0;
 // Get the requested post.
 $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $id . "'))");
 
+while ($p = $post->fetch_assoc()) {
+    $p_id = $p["id"];
+    $p_title = $p["title"];
+    $p_tags = $p["tags"]; //unused
+    $p_content = $p["content"];
+    $p_account = $p["account"];
+    $p_starttime = $p["starttime"];
+    $p_editedby = $p["editedby"]; // unused, may remove later
+    $p_edittime = $p["edittime"];
+    $p_published = $p["published"];
+    $p_starred = $p["starred"];
+}
+
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
     $content .= error("The requested post doesn't exist.");
     $displayPost = false;
 }
 // Handle star toggling.
-elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["toggleStar"]))) {
-    while ($p = $post->fetch_assoc()) {
-        // Make sure the user is allowed to star/unstar the post.
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_STAR_POST)) {
-            // If the CSRF token is sent and valid.
-            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-                // Generate a new token.
-                generateCSRFToken();
-                
-                // Star.
-                if ($_POST["toggleStar"] == "Star") {
-                    $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($url[1]) . "'");
-                }
-                // Unstar.
-                else {
-                    $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
-                }
-                $updatePost = true;
+elseif (isset($_POST["toggleStar"])) {
+    // Make sure the user is allowed to star/unstar the post.
+    if (($id == $p_account) and checkPerm(PERM_STAR_POST)) {
+        // If the CSRF token is sent and valid.
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+            // Generate a new token.
+            generateCSRFToken();
+            
+            // Star.
+            if ($_POST["toggleStar"] == "Star") {
+                $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
             }
-        }
-        else {
-            $content .= error("You don't have permission to do this.");
+            // Unstar.
+            else {
+                $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
+            }
             $updatePost = true;
         }
+    }
+    else {
+        $content .= error("You don't have permission to do this.");
     }
 }
 // Handle published toggling.
-elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["togglePublished"]))) {
-    while ($p = $post->fetch_assoc()) {
-        // Make sure the user is allowed to publish/unpublish the post.
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_PUBLISH_POST)) {
-            // If the CSRF token is sent and valid.
-            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-                // Generate a new token.
-                generateCSRFToken();
+elseif (isset($_POST["togglePublished"])) {
+    // Make sure the user is allowed to publish/unpublish the post.
+    if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
+        // If the CSRF token is sent and valid.
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+            // Generate a new token.
+            generateCSRFToken();
                 
-                // Star.
-                if ($_POST["togglePublished"] == "Publish") {
-                    $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($url[1]) . "'");
-                }
-                // Unstar.
-                else {
-                    $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($url[1]) . "'");
-                }
-                $updatePost = true;
+            // Star.
+            if ($_POST["togglePublished"] == "Publish") {
+                $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
             }
-        }
-        else {
-            $content .= error("You don't have permission to do this.");
+            // Unstar.
+            else {
+                $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
+            }
             $updatePost = true;
         }
     }
+    else {
+        $content .= error("You don't have permission to do this.");
+    }
 }
 // Handle deletions.
-elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
-    while ($p = $post->fetch_assoc()) {
+elseif (isset($_POST["delete"])) {
         // Make sure the user is allowed to delete the post.
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_DELETE_POST)) {
+        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p_account) and checkPerm(PERM_DELETE_POST)) {
             // If the CSRF token is sent and valid.
             if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
                 // Generate a new token.
                 generateCSRFToken();
                 
                 // Delete the post.
-                $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
+                $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p_id) . "'");
                 // Delete all of the post's views.
-                $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
+                $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
                 // Delete all of the post's comments.
-                $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($url[1]) . "'");
+                $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
                 $content .= success("Successfully deleted the post.");
                 $displayPost = false;
                 redirect("", 2);
@@ -120,134 +126,155 @@ elseif (($_SERVER["REQUEST_METHOD"] == "POST") && (isset($_POST["delete"]))) {
         }
         else {
             $content .= error("You don't have permission to do this.");
-            $updatePost = true;
         }
-    }
 }
 // Handle editing.
 elseif (isset($url[2]) && ($url[2] == "edit")) {
-    $title = "Editing Post";
+    $title = "Edit Post";
     $displayPost = false;
     $success = false;
-    while ($p = $post->fetch_assoc()) {
-        // Make sure the user is allowed to edit the post.
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p["account"]) and checkPerm(PERM_EDIT_POST)) {
-            if (($_SERVER["REQUEST_METHOD"] == "POST") and (isset($_POST["edit"]))) {
-                // If the CSRF token is sent and valid.
-                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-                    // Generate a new token.
-                    generateCSRFToken();
+    // Make sure the user is allowed to edit the post.
+    if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p_account) and checkPerm(PERM_EDIT_POST)) {
+        if (isset($_POST["edit"])) {
+            // If the CSRF token is sent and valid.
+            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                // Generate a new token.
+                generateCSRFToken();
 
-                    $errors = validatePost(true);
+                $errors = validatePost(true);
         	
-        	        // If there are no errors, edit the post.
-        	        if (count($errors) === 0) {
-        	            $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
-        	            $success = true;
-        	            $updatePost = true;
-        	        }
-        	        // Otherwise, print the errors.
-        	        else {
-        	            foreach ($errors as $e) {
-        	                $content .= error($e);
-        	            }
-        	        }
-                }
-            }
-            // If the user pressed the cancel button, fallthrough to the redirect.
-            elseif (isset($_POST["cancel"])) {
-                $success = true;
-            }
-            if (!$success) {
-                $content .= "<div class='form editPostForm'>
-                    <h1>Edit Post</h1>
-                    <form method='post'>
-                        <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                        <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p["title"]) . "'") . "><br>
-                        <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p["tags"]) . "'") . "><br>
-                        <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p["content"])) . "</textarea><br><br>
-                        <input type='submit' value='Edit post' class='button' name='edit'>
-                        <input type='submit' value='Cancel edit' class='button' name='cancel'>
-                    </form>
-                </div>";
+    	        // If there are no errors, edit the post.
+    	        if (count($errors) === 0) {
+    	            $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($p_id) . "'");
+    	            $success = true;
+     	            $updatePost = true;
+       	        }
+       	        // Otherwise, print the errors.
+       	        else {
+       	            foreach ($errors as $e) {
+       	                $content .= error($e);
+       	            }
+       	        }
             }
         }
-        else {
-            $content .= error("You don't have permission to do this.");
-            $updatePost = true;
+        // If the user pressed the cancel button, fallthrough to the redirect.
+        elseif (isset($_POST["cancel"])) {
+            $success = true;
         }
+        if (!$success) {
+            $content .= "<div class='form editPostForm'>
+                <h1>Edit Post</h1>
+                <form method='post'>
+                    <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
+                    <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p_title) . "'") . "><br>
+                    <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p_tags) . "'") . "><br>
+                    <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p_content)) . "</textarea><br><br>
+                    <input type='submit' value='Edit post' class='button' name='edit'>
+                    <input type='submit' value='Cancel edit' class='button' name='cancel'>
+                </form>
+            </div>";
+        }
+    }
+    else {
+        $content .= error("You don't have permission to do this.");
+        $updatePost = true;
     }
     if ($success) {
         $displayPost = true;
         redirect("post/" . $url[1]);
     }
 }
+// Handle uploading.
+elseif (isset($url[2]) && ($url[2] == "uploads")) {
+    $title = "Manage Uploads";
+    $displayPost = false;
+    $success = false;
+    // Make sure the user is allowed to upload.
+    if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p_account) and checkPerm(PERM_UPLOAD)) {
+        $content .= "<h1>Manage Uploads</h1>";
+        // TODO
+    }
+    else {
+        $content .= error("You don't have permission to do this.");
+    }
+}
 // Otherwise, display the post.
 if ($displayPost) {
-    $formats = array("png", "jpg", "gif", "webp");
     // Get the requested post again if the user edited it or starred it.
     if ($updatePost) {
         $post = $db->query("SELECT * FROM `posts` WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
+        while ($p = $post->fetch_assoc()) {
+            $p_id = $p["id"];
+            $p_title = $p["title"];
+            $p_tags = $p["tags"]; //unused
+            $p_content = $p["content"];
+            $p_account = $p["account"];
+            $p_starttime = $p["starttime"];
+            $p_editedby = $p["editedby"]; // unused, may remove later
+            $p_edittime = $p["edittime"];
+            $p_published = $p["published"];
+            $p_starred = $p["starred"];
+        }
     }
-    while ($p = $post->fetch_assoc()) {
-        $title = $p["title"];
-        $content .=
-        "<div class='post'>
-            <div class='postButtons'>";
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_EDIT_POST)) {
-            $content .= "
-                <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='button postButton'>Edit</a>";
-        }
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_DELETE_POST)) {
-            $content .= 
-                "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
-        }
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_STAR_POST)) {
-            $content .=
-                "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
-        }
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p["account"]) and checkPerm(PERM_PUBLISH_POST)) {
-            $content .=
-                "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "'></form>";
-        }
-        $content .=
-            "</div>
-            <div class='postHeader'>
-                <h1>" . htmlspecialchars($p["title"]) . "</h1>";
-        // Get the account information of the post author.
-        $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p["account"]) . "'");
-        if ($acc->num_rows > 0) {
-            while ($a = $acc->fetch_assoc()) {
-                $content .= "By: " . htmlspecialchars($a["name"]);
-            }
-        }
-        else {
-            $content .= "By: Nobody";
-        }
-        $content .= " | ";
-        $content .= "<small>Published: <span title='" . date("g:i:sa", $p["starttime"]) . "'>" . date("F jS Y", $p["starttime"]) . "</span></small>";
-        if (!empty($p["edittime"])) {
-            $content .= " | <small>Modified: <span title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS Y", $p["edittime"]) . "</span></small>";
-        }
-        $icon = $p["icon"];
-        $id = $p["id"];
-        // Display the post's image if it exists.
-        if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
-            $content .= "<img src='/images/" . $id . "." . $icon . "'></br>";
-        }
-        $content .= "</div>
-            <div class='postContent'>
-            " . format($p["content"]) . "
-            </div>
-        </div>";
+    $title = $p_title;
+    $content .=
+    "<div class='post'>
+        <div class='postButtons'>";
+    if (($id == $p_account) and checkPerm(PERM_EDIT_POST)) {
+        $content .= "
+            <a href='" . makeURL("post/{$p_id}/edit") . "' class='button postButton'>Edit</a>";
     }
+    if (($id == $p_account) and checkPerm(PERM_DELETE_POST)) {
+        $content .= 
+            "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
+    }
+    if (($id == $p_account) and checkPerm(PERM_STAR_POST)) {
+        $content .=
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p_starred == "1") ? "Unstar" : "Star") . "'></form>";
+    }
+    if (($id == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
+        $content .=
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p_published == "1") ? "Unpublish" : "Publish") . "'></form>";
+    }
+    if (($id == $p_account) and checkPerm(PERM_UPLOAD)) {
+        $content .= "
+            <a href='" . makeURL("post/{$p_id}/uploads") . "' class='button postButton'>Manage Uploads</a>";
+    }
+    $content .=
+        "</div>
+        <div class='postHeader'>
+            <h1>" . htmlspecialchars($p_title) . "</h1>";
+    // Get the account information of the post author.
+    $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p_account) . "'");
+    if ($acc->num_rows > 0) {
+        while ($a = $acc->fetch_assoc()) {
+            $content .= "By: " . htmlspecialchars($a["name"]);
+        }
+    }
+    else {
+        $content .= "By: Nobody";
+    }
+    $content .= " | ";
+    $content .= "<small>Published: <span title='" . date("g:i:sa", $p_starttime) . "'>" . date("F jS Y", $p_starttime) . "</span></small>";
+    if (!empty($p_edittime)) {
+        $content .= " | <small>Modified: <span title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS Y", $p_edittime) . "</span></small>";
+    }
+    // Display the post's image if it exists.
+    //if (in_array($icon, $formats) && file_exists("images/" . $p_id . "." . $icon)) {
+    //    $content .= "<img src='/images/" . $p_id . "." . $icon . "'></br>";
+    //}
+    $content .= "</div>
+        <div class='postContent'>
+        " . format($p_content) . "
+        </div>
+    </div>";
 
     // Get views from this IP on this post, if any.
-    $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($url[1]) . "'");
+    $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($p_id) . "'");
 
     // If there are none, count this as a view.
     if ($views->num_rows < 1) {
-        $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($url[1]) . "')");
+        $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($p_id) . "')");
     }
 }
 

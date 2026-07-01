@@ -152,7 +152,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `starttime` bigint NOT NULL,
             `editedby` int unsigned DEFAULT NULL,
             `edittime` bigint DEFAULT NULL,
-            `icon` enum('none', 'gif', 'jpg', 'png', 'webp') NOT NULL DEFAULT 'none',
             `published` tinyint(1) NOT NULL DEFAULT '0',
             `starred` tinyint(1) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)

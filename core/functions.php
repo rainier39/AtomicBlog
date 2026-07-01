@@ -60,17 +60,16 @@ function flushConfig() {
 }
 
 // Display a blog post tile.
-function displayPost($id, $icon, $title, $account) {
+function displayPost($id, $title, $account) {
     global $db;
     
     $id = (int)$id;
-    $formats = array("png", "jpg", "gif", "webp");
     
     $post = "<div class='postTile'><a href='/post/" . $id . "/'>";
     // If there is an icon, display it.
-    if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
-        $post .= "<img src='/images/" . $id . "." . $icon . "'>";
-    }
+    //if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
+    //    $post .= "<img src='/images/" . $id . "." . $icon . "'>";
+    //}
     //else {
     //}
     $post .= "</a></br><a href='" . makeURL("post/" . $id) . "'>" . htmlspecialchars($title) . "</a>";

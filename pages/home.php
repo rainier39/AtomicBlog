@@ -33,7 +33,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $id = $_SESSION["id"] ?? 0;
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "'))");
+$starred = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "'))");
 
 // Display the starred posts fieldset.
 $content .= "<fieldset class='posts'><legend>Starred</legend>";
@@ -42,7 +42,7 @@ $content .= "<fieldset class='posts'><legend>Starred</legend>";
 if ($starred->num_rows > 0) {
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
-        $content .= displayPost($s["id"], $s["icon"], $s["title"], $s["account"]);
+        $content .= displayPost($s["id"], $s["title"], $s["account"]);
     }
 }
 // Otherwise print a message.
@@ -54,7 +54,7 @@ else {
 $content .= "</fieldset>";
 
 // Get the 5 most recent posts.
-$recent = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `starttime` DESC LIMIT 5");
+$recent = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `starttime` DESC LIMIT 5");
 
 // Display the most recent fieldset.
 $content .= "</br><fieldset class='posts'><legend>Most Recent</legend>";
@@ -63,7 +63,7 @@ $content .= "</br><fieldset class='posts'><legend>Most Recent</legend>";
 if ($recent->num_rows > 0) {
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        $content .= displayPost($r["id"], $r["icon"], $r["title"], $r["account"]);
+        $content .= displayPost($r["id"], $r["title"], $r["account"]);
     }
 }
 // Otherwise print a message.
@@ -123,11 +123,11 @@ $content .= "</br><fieldset class='posts'><legend>Most Viewed</legend>";
 if ($postids->num_rows > 0) {
     foreach ($mostViewed as $mv) {
         // Get the posts we wish to display.
-        $mostViewedPosts = $db->query("SELECT `id`, `icon`, `title`, `account` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
+        $mostViewedPosts = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
-            $content .= displayPost($m["id"], $m["icon"], $m["title"], $m["account"]);
+            $content .= displayPost($m["id"], $m["title"], $m["account"]);
         }
     }
 }
