@@ -33,7 +33,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $id = $_SESSION["id"] ?? 0;
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "'))");
+$starred = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `id` DESC");
 
 // Display the starred posts fieldset.
 $content .= "<fieldset class='posts'><legend>Starred</legend>";
