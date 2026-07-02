@@ -41,10 +41,30 @@ $content .= "<fieldset class='posts'><legend>All Posts</legend>";
 
 // If there are posts, display them.
 if ($posts->num_rows > 0) {
+    $content .= "<table class='postsTable'><tbody>";
+    $counter = 0;
+    $total = 0;
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
+        if ($counter == 0) {
+            $content .= "<tr>";
+        }
+        if ($counter == 5) {
+            $content .= "</tr><tr>";
+            $counter = 0;
+        }
         $content .= displayPost($p["id"], $p["title"], $p["account"]);
+        $counter++;
+        $total++;
     }
+    while (($total > 0) and ($total % 5)) {
+        $content .= "<td class='dummyTile'></td>";
+        $total++;
+        if (!$total % 5) {
+            $content .= "</tr>";
+        }
+    }
+    $content .= "</tbody></table>";
 }
 // Otherwise print a message.
 else {

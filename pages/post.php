@@ -119,6 +119,14 @@ elseif (isset($_POST["delete"])) {
                 $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
                 // Delete all of the post's comments.
                 $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+                // Delete all icons and attachments.
+                $uploads = scandir("images/");
+                foreach ($uploads as $u) {
+                    if (str_starts_with($u, $p_id . ".") or str_starts_with($u, $p_id . "_")) {
+                        unlink("images/" . $u);
+                    }
+                }
+                
                 $content .= success("Successfully deleted the post.");
                 $displayPost = false;
                 redirect("", 2);
@@ -195,8 +203,128 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
     $success = false;
     // Make sure the user is allowed to upload.
     if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p_account) and checkPerm(PERM_UPLOAD)) {
-        $content .= "<h1>Manage Uploads</h1>";
-        // TODO
+        // Handle uploading icon.
+        if (isset($_FILES["icon"])) {
+            $upload = upload("icon", $p_id);
+            if ($upload == "") {
+                $content .= success("Successfully uploaded icon.");
+            }
+            else {
+                $content .= error($upload);
+            }
+        }
+        // Handle uploading attachment.
+        elseif (isset($_FILES["attachment"])) {
+            // We will need to generate a value that isn't already being used.
+            $a_id = rand();
+            while (file_exists("images/" . $p_id . "_" . $a_id . ".webp")) {
+                $a_id = rand();
+            }
+            $upload = upload("attachment", $p_id . "_" . $a_id);
+            if ($upload === "") {
+                $content .= success("Successfully uploaded attachment.");
+            }
+            else {
+                $content .= error($upload);
+            }
+        }
+        // Handle deleting icon.
+        elseif (isset($_POST["deleteIcon"]) and isset($_POST["dicon"])) {
+            // Filepath sanitization.
+            $target = basename($_POST["dicon"]);
+            // Make sure that this icon is actually from the same post.
+            if (!str_starts_with($target, $p_id . ".")) {
+                $content .= error("Nice try.");
+            }
+            // Make sure that the target icon exists.
+            elseif (!is_file("images/" . $target)) {
+                $content .= error("Specified icon doesn't exist.");
+            }
+            else {
+                $deleted = unlink("images/" . $target);
+                if ($deleted) {
+                    $content .= success("Successfully deleted icon.");
+                }
+                else {
+                    $content .= error("Failed to delete icon.");
+                }
+            }
+        }
+        // Handle deleting attachment.
+        elseif (isset($_POST["deleteAttachment"]) and isset($_POST["dattachment"])) {
+            // Filepath sanitization.
+            $target = basename($_POST["dattachment"]);
+            // Make sure that this attachment is actually from the same post.
+            if (!str_starts_with($target, $p_id . "_")) {
+                $content .= error("Nice try.");
+            }
+            // Make sure that the target attachment exists.
+            elseif (!is_file("images/" . $target)) {
+                $content .= error("Specified attachment doesn't exist.");
+            }
+            else {
+                $deleted = unlink("images/" . $target);
+                if ($deleted) {
+                    $content .= success("Successfully deleted attachment.");
+                }
+                else {
+                    $content .= error("Failed to delete attachment.");
+                }
+            }
+        }
+        $uploads = scandir("images/");
+        $icons = array();
+        $attachments = array();
+        // Get all icons.
+        foreach ($uploads as $u) {
+            if (str_starts_with($u, $p_id . ".")) {
+                $icons[] = $u;
+            }
+        }
+        // Get all attachments.
+        foreach ($uploads as $u) {
+            if (str_starts_with($u, $p_id . "_")) {
+                $attachments[] = $u;
+            }
+        }
+        // Display forms and images.
+        $content .= "<p><a href='" . makeURL("post/{$p_id}") . "' class='button'>Back to post</a></p>
+        <div class='manageUploads'><h1>Manage Uploads</h1>";
+        
+        $content .= "<h2>Icon</h2>";
+        foreach ($icons as $icon) {
+            $content .= "<div class='uploadTile'>
+              <img src='" . makeURL("images/{$icon}") . "'>
+              <hr>
+              <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this icon?\");'>
+                <input type='hidden' value='{$icon}' name='dicon'>
+                <input type='submit' value='Delete' name='deleteIcon' class='button'>
+              </form>
+            </div>";
+        }
+        $content .= "<h3>Upload a new icon</h3>
+        <form method='post' enctype='multipart/form-data'>
+          <input type='file' name='icon'>
+          <input type='submit' value='Upload icon'>
+        </form>";
+        $content .= "<hr>
+        <h2>Attachments</h2>";
+        foreach ($attachments as $attachment) {
+            $content .= "<div class='uploadTile'>
+              <img src='" . makeURL("images/{$attachment}") . "'>
+              URL: <a href='" . makeURL("images/{$attachment}") . "'>copy me</a>
+              <hr>
+              <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
+                <input type='hidden' value='{$attachment}' name='dattachment'>
+                <input type='submit' value='Delete' name='deleteAttachment' class='button'>
+              </form>
+            </div>";
+        }
+        $content .= "<h3>Upload a new attachment</h3>
+        <form method='post' enctype='multipart/form-data'>
+          <input type='file' name='attachment'>
+          <input type='submit' value='Upload attachment'>
+        </form></div>";
     }
     else {
         $content .= error("You don't have permission to do this.");
@@ -263,10 +391,15 @@ if ($displayPost) {
     if (!empty($p_edittime)) {
         $content .= " | <small>Modified: <span title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS Y", $p_edittime) . "</span></small>";
     }
-    // Display the post's image if it exists.
-    //if (in_array($icon, $formats) && file_exists("images/" . $p_id . "." . $icon)) {
-    //    $content .= "<img src='/images/" . $p_id . "." . $icon . "'></br>";
-    //}
+    // Display the post's icon if it exists.
+    $uploads = scandir("images/");
+    foreach ($uploads as $u) {
+        if (str_starts_with($u, $p_id . ".")) {
+            $content .= "<p><img src='" . makeURL("images/{$u}") . "' class='pIcon'></p>";
+            // Just use the first icon we find.
+            break;
+        }
+    }
     $content .= "</div>
         <div class='postContent'>
         " . format($p_content) . "

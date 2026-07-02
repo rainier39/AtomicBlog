@@ -65,14 +65,18 @@ function displayPost($id, $title, $account) {
     
     $id = (int)$id;
     
-    $post = "<div class='postTile'><a href='/post/" . $id . "/'>";
-    // If there is an icon, display it.
-    //if (in_array($icon, $formats) && file_exists("images/" . $id . "." . $icon)) {
-    //    $post .= "<img src='/images/" . $id . "." . $icon . "'>";
-    //}
-    //else {
-    //}
-    $post .= "</a></br><a href='" . makeURL("post/" . $id) . "'>" . htmlspecialchars($title) . "</a>";
+    $post = "<td class='postTile'><a href='" . makeURL("post/" . $id) . "'>";
+
+    // Display the post's icon if it exists.
+    $uploads = scandir("images/");
+    foreach ($uploads as $u) {
+        if (str_starts_with($u, $id . ".")) {
+            $post .= "<img src='" . makeURL("images/{$u}") . "'>";
+            // Just use the first icon we find.
+            break;
+        }
+    }
+    $post .= "</a><a href='" . makeURL("post/" . $id) . "'>" . htmlspecialchars($title) . "</a>";
     // Get the account information of the post author.
     $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($account) . "'");
     if ($acc->num_rows > 0) {
@@ -83,7 +87,7 @@ function displayPost($id, $title, $account) {
     else {
         $post .= "</br><small>By: Nobody</small>";
     }
-    $post .= "</div>";
+    $post .= "</td>";
     
     return $post;
 }
@@ -319,6 +323,133 @@ function checkRolePerm($perm, $role) {
     }
     else {
         return false;
+    }
+}
+
+// Upload an image given its name in $_FILES, and what it should be named.
+function upload($file, $name) {
+    global $config;
+    
+    $upload_dir = "images/";
+    
+    if (!extension_loaded("gd")) {
+        return "PHP GD is not enabled.";
+    }
+    
+    if (!is_writable($upload_dir)) {
+        return "Upload failed, image directory isn't writable.";
+    }
+    elseif ($_FILES[$file]["size"] < 1) {
+        return "Upload failed, content empty (file may be too large).";
+    }
+    elseif (!file_exists($_FILES[$file]["tmp_name"])) {
+        return "Upload failed, file likely too large or non-existent.";
+    }
+    elseif ($_FILES[$file]["size"] > $config["maxUploadSize"]) {
+        return "Upload failed, file too large.";
+    }
+    // Basic sanity check, not intended as a true security measure.
+    elseif (false === getimagesize($_FILES[$file]["tmp_name"])) {
+        return "Upload failed, invalid image.";
+    }
+    
+    // Figure out what kind of image we are dealing with by reading the magic bytes.
+    $bytes = file_get_contents($_FILES[$file]["tmp_name"], false, null, 0, 12);
+    
+    if ($bytes === false) {
+        return "Upload failed, didn't recognize image type.";
+    }
+    
+    // GIFs.
+    if (str_starts_with($bytes, hex2bin("474946383761")) or str_starts_with($bytes, hex2bin("474946383961"))) {
+        $image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
+        
+        // This is safe because we never use any user-supplied value in $name.
+        $target = $upload_dir . $name . ".gif";
+        
+        if ($image === false) {
+            return "Upload failed, invalid GIF image.";
+        }
+        
+        // TODO: enforce disk quotas, rate limits.
+        
+        $success = imagegif($image, $target);
+    
+        if ($success) {
+            return "";
+        }
+        else {
+            return "Failed to write GIF image to file.";
+        }
+    }
+    // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
+    elseif (str_starts_with($bytes, hex2bin("FFD8FF"))) {
+        $image = imagecreatefromjpeg($_FILES[$file]["tmp_name"]);
+        
+        // This is safe because we never use any user-supplied value in $name.
+        $target = $upload_dir . $name . ".jpg";
+        
+        if ($image === false) {
+            return "Upload failed, invalid JPEG image.";
+        }
+        
+        // TODO: enforce disk quotas, rate limits.
+        
+        $success = imagejpeg($image, $target);
+    
+        if ($success) {
+            return "";
+        }
+        else {
+            return "Failed to write JPEG image to file.";
+        }
+    }
+    // PNGs.
+    elseif (str_starts_with($bytes, hex2bin("89504E470D0A1A0A"))) {
+        $image = imagecreatefrompng($_FILES[$file]["tmp_name"]);
+        
+        // This is safe because we never use any user-supplied value in $name.
+        $target = $upload_dir . $name . ".png";
+        
+        if ($image === false) {
+            return "Upload failed, invalid PNG image.";
+        }
+        
+        // TODO: enforce disk quotas, rate limits.
+        
+        $success = imagepng($image, $target);
+    
+        if ($success) {
+            return "";
+        }
+        else {
+            return "Failed to write PNG image to file.";
+        }
+    }
+    // WEBPs.
+    elseif (str_starts_with($bytes, hex2bin("52494646")) and str_ends_with($bytes, hex2bin("57454250"))) {
+        $image = imagecreatefromwebp($_FILES[$file]["tmp_name"]);
+        
+        // This is safe because we never use any user-supplied value in $name.
+        $target = $upload_dir . $name . ".webp";
+        
+        if ($image === false) {
+            return "Upload failed, invalid WEBP image.";
+        }
+        
+        // TODO: enforce disk quotas, rate limits.
+        
+        $success = imagewebp($image, $target);
+    
+        if ($success) {
+            return "";
+        }
+        else {
+            return "Failed to write WEBP image to file.";
+        }
+    }
+    else {
+        return "Upload failed, unsupported or unrecognized image type.";
     }
 }
 

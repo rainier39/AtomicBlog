@@ -40,10 +40,30 @@ $content .= "<fieldset class='posts'><legend>Starred</legend>";
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
+    $content .= "<table class='postsTable'><tbody>";
+    $counter = 0;
+    $total = 0;
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
+        if ($counter == 0) {
+            $content .= "<tr>";
+        }
+        if ($counter == 5) {
+            $content .= "</tr><tr>";
+            $counter = 0;
+        }
         $content .= displayPost($s["id"], $s["title"], $s["account"]);
+        $counter++;
+        $total++;
     }
+    while (($total > 0) and ($total % 5)) {
+        $content .= "<td class='dummyTile'></td>";
+        $total++;
+        if (!$total % 5) {
+            $content .= "</tr>";
+        }
+    }
+    $content .= "</tbody></table>";
 }
 // Otherwise print a message.
 else {
@@ -61,10 +81,21 @@ $content .= "</br><fieldset class='posts'><legend>Most Recent</legend>";
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
+    $content .= "<table class='postsTable'><tbody><tr>";
+    $total = 0;
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
         $content .= displayPost($r["id"], $r["title"], $r["account"]);
+        $total++;
     }
+    while (($total > 0) and ($total % 5)) {
+        $content .= "<td class='dummyTile'></td>";
+        $total++;
+        if (!$total % 5) {
+            $content .= "</tr>";
+        }
+    }
+    $content .= "</tr></tbody></table>";
 }
 // Otherwise print a message.
 else {
@@ -121,6 +152,8 @@ $content .= "</br><fieldset class='posts'><legend>Most Viewed</legend>";
 
 // Only try to display posts if there are any.
 if ($postids->num_rows > 0) {
+    $content .= "<table class='postsTable'><tbody><tr>";
+    $total = 0;
     foreach ($mostViewed as $mv) {
         // Get the posts we wish to display.
         $mostViewedPosts = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
@@ -128,8 +161,17 @@ if ($postids->num_rows > 0) {
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
             $content .= displayPost($m["id"], $m["title"], $m["account"]);
+            $total++;
         }
     }
+    while (($total > 0) and ($total % 5)) {
+        $content .= "<td class='dummyTile'></td>";
+        $total++;
+        if (!$total % 5) {
+            $content .= "</tr>";
+        }
+    }
+    $content .= "</tr></tbody></table>";
 }
 // Otherwise print a message.
 else {

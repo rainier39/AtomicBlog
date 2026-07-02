@@ -160,21 +160,20 @@ a:hover {
  vertical-align: bottom;
 }
 /* Post tiles */
+.postsTable {
+ width: 100%;
+}
 .postTile {
- border: 1px solid var(--main-border-color);
- padding: 15px;
- margin: 14px;
- min-width: 160px;
- max-width: 160px;
- min-height: 200px;
- display: inline-block;
+ padding: 14px;
+ height: 100%;
  text-align: center;
  vertical-align: top;
  overflow-wrap: break-word;
+ border: 1px solid var(--main-border-color);
 }
 .postTile a {
  color: black;
- font-size: 150%;
+ font-weight: bold;
 }
 .postTile a:hover {
  color: #444;
@@ -182,7 +181,14 @@ a:hover {
 .postTile img {
  max-width: 100%;
  height: auto;
- border: 1px solid grey;
+ max-height: 15vh;
+ display: block;
+ margin: auto;
+ border: 1px solid var(--main-border-color);
+}
+.dummyTile {
+ padding: 14px;
+ width: 20%;
 }
 /* Post page */
 .post {
@@ -198,7 +204,7 @@ a:hover {
  display: block;
  margin-left: auto;
  margin-right: auto;
- border: 1px solid grey;
+ border: 1px solid var(--main-border-color);
 }
 .postButtons {
  display: flex;
@@ -222,13 +228,18 @@ code, .codeblock {
  padding: 8px;
  overflow-wrap: break-word;
 }
-.postContent img {
+.postContent .pIcon img {
  max-width: 100%;
  height: auto;
  display: block;
  margin-left: auto;
  margin-right: auto;
- border: 1px solid grey;
+ border: 1px solid var(--main-border-color);
+}
+.postContent img {
+ max-width: 100%;
+ border: 1px solid var(--main-border-color);
+ display: block;
 }
 .postContent blockquote {
  border-left: 6px solid grey;
@@ -251,6 +262,18 @@ code, .codeblock {
 .editPostForm textarea {
  resize: vertical;
  height: 250px;
+}
+/* Manage uploads page */
+.uploadTile {
+ display: inline-block;
+ border: 1px solid var(--main-border-color);
+ padding: 8px;
+ margin: 4px;
+ max-width: 200px;
+}
+.manageUploads img {
+ max-width: 100%;
+ border: 1px solid var(--main-border-color);
 }
 /* Panel */
 .panelcontent {

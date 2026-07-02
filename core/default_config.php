@@ -49,6 +49,14 @@ $default_config = array(
     "postDelay" => 300,
     // How long a user must wait (in seconds) between editing blog posts.
     "editDelay" => 5,
+    // Max amount of images that may be uploaded per hour.
+    "uploadsPerHour" => 15,
+    // Max upload size, in bytes. (default 25MB)
+    "maxUploadSize" => 25000000,
+    // Maximum amount of space (in bytes) that can be used by all uploads.
+    "totalDiskQuota" => "5000000000",
+    // Maximum amount of space (in bytes) that can be used by each user's uploads.
+    "perUserDiskQuota" => "1000000000",
     // Server timezone. See: https://www.php.net/manual/en/timezones.php
     "timezone" => "America/Los_Angeles"
 );
