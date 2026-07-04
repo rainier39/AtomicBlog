@@ -180,6 +180,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
                     <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                     <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p_title) . "'") . "><br>
                     <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p_tags) . "'") . "><br>
+                    " . markdownButtons() . "
                     <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p_content)) . "</textarea><br><br>
                     <input type='submit' value='Edit post' class='button' name='edit'>
                     <input type='submit' value='Cancel edit' class='button' name='cancel'>
