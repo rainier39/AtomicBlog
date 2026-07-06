@@ -23,6 +23,7 @@
 if (!defined('INDEX')) exit;
 
 // Header content.
+// If some header content was already set before this, save it and append it back on later.
 $hcontentend = $hcontent ?? "";
 $hcontent = "";
 
@@ -51,7 +52,8 @@ if ($config["installed"]) {
     $hcontent .= "</div>";
 }
 
-$hcontent .= "<div class='content'>";
+$hcontent .= "<div id='toasts'></div>
+<div class='content'>";
 
 $hcontent .= $hcontentend;
 

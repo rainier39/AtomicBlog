@@ -79,6 +79,19 @@ a:hover {
  margin: 2px;
  background: #ff7777;
 }
+#toasts {
+ position: fixed;
+ top: 5px;
+ left: 5px;
+}
+.toast {
+ animation: seconds 5.0s forwards;
+ animation-iteration-count: 1;
+ animation-delay: 5s;
+}
+@keyframes seconds {
+ 0% {opacity: 1} 100% {opacity: 0; zindex: -10}
+}
 /* Forms/Buttons */
 .form {
  margin-left: 32px;
@@ -200,6 +213,7 @@ a:hover {
 }
 .postHeader img {
  max-width: 100%;
+ max-height: 60vh;
  height: auto;
  display: block;
  margin-left: auto;
@@ -228,16 +242,9 @@ code, .codeblock {
  padding: 8px;
  overflow-wrap: break-word;
 }
-.postContent .pIcon img {
- max-width: 100%;
- height: auto;
- display: block;
- margin-left: auto;
- margin-right: auto;
- border: 1px solid var(--main-border-color);
-}
 .postContent img {
  max-width: 100%;
+ max-height: 60vh;
  border: 1px solid var(--main-border-color);
  display: block;
 }
@@ -300,6 +307,8 @@ code, .codeblock {
  .header {
   border-left: 0;
   border-right: 0;
+  margin-top: 0;
+  border-top: 0;
  }
  .navbar {
   border-left: 0;
@@ -313,6 +322,7 @@ code, .codeblock {
   border-left: 0;
   border-right: 0;
   border-bottom: 0;
+  margin-bottom: 0;
  }
  /* Userlist becomes vertical on mobile. */
  .userlist thead {

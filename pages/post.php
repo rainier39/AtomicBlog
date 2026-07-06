@@ -309,11 +309,12 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
           <input type='submit' value='Upload icon'>
         </form>";
         $content .= "<hr>
-        <h2>Attachments</h2>";
+        <h2>Attachments</h2>
+        <script src='" . makeURL("javascript/uploads.js") . "'></script>";
         foreach ($attachments as $attachment) {
             $content .= "<div class='uploadTile'>
               <img src='" . makeURL("images/{$attachment}") . "'>
-              URL: <a href='" . makeURL("images/{$attachment}") . "'>copy me</a>
+              URL: <a onclick='copy(\"" . (($ishttps == "on") ? "https://" : "http://") . $_SERVER["SERVER_NAME"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
                 <input type='hidden' value='{$attachment}' name='dattachment'>
