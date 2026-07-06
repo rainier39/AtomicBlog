@@ -28,12 +28,14 @@ $hcontentend = $hcontent ?? "";
 $hcontent = "";
 
 $hcontent .= "<!DOCTYPE html>
-<html lang='en'>
-<meta charset='UTF-8'>
-<title>" . htmlspecialchars($htitle) . "</title>
-<meta name='viewport' content='width=device-width,initial-scale=1'>
-<link rel='stylesheet' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true) . "'>
-<link rel='icon' type='image/x-icon' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true) . "'>
+<html lang='en-US'>
+<head>
+ <meta charset='UTF-8'>
+ <title>" . htmlspecialchars($htitle) . "</title>
+ <meta name='viewport' content='width=device-width,initial-scale=1'>
+ <link rel='stylesheet' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true) . "'>
+ <link rel='icon' type='image/x-icon' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true) . "'>
+</head>
 <body>";
 
 $hcontent .= "<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b><br><small>" . htmlspecialchars($config["description"]) . "</small></div>";
