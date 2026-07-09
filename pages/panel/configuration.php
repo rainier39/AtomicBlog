@@ -43,6 +43,24 @@ foreach ($timezones as $t) {
     $timezonesHTML .= "<option value='$t'$s>$t</option>";
 }
 
+$languageHTML = "";
+if (isset($_POST["clanguage"])) {
+    // Use the user-supplied language if it's valid, otherwise default to the config.
+    $currentLanguage = (in_array($_POST["clanguage"], $languages) ? $_POST["clanguage"] : null) ?? $language;
+}
+else {
+    $currentLanguage = $language;
+}
+foreach ($languages as $l) {
+    if ($l == $currentLanguage) {
+        $s = " selected";
+    }
+    else {
+        $s = "";
+    }
+    $languageHTML .= "<option value='$l'$s>$l</option>";
+}
+
 if (!checkPerm(PERM_MANAGE_BLOG)) {
     $content .= error("You don't have permission to do this.");
     render($content, $title);
@@ -105,6 +123,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Only write to the config if the value is actually being changed.
             elseif ($_POST["timezone"] != $config["timezone"]) {
                 $config["timezone"] = $_POST["timezone"];
+                $changes++;
+            }
+        }
+        if (isset($_POST["clanguage"])) {
+            if (!in_array($_POST["clanguage"], $languages)) {
+                $errors[] = "Invalid language.";
+            }
+            // Only write to the config if the value is actually being changed.
+            elseif ($_POST["clanguage"] != $config["language"]) {
+                $config["language"] = $_POST["clanguage"];
+                $language = $_POST["clanguage"];
+                updateLang();
                 $changes++;
             }
         }
@@ -222,6 +252,11 @@ $content .=
             <label for='timezone'>Server Timezone:</label>
             <select name='timezone' id='timezone'>
             " . $timezonesHTML . "
+            </select>
+            <br>
+            <label for='clanguage'>Language:</label>
+            <select name='clanguage' id='clanguage'>
+            " . $languageHTML . "
             </select>
             <h2>User Management</h2>
             <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>

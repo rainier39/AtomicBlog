@@ -29,6 +29,8 @@ define("VERSION", "v2.6.0-alpha");
 header("Content-Security-Policy: frame-ancestors 'none';");
 header("X-Frame-Options: DENY");
 
+$messages = array();
+
 // Get the configuration settings.
 require "core/default_config.php";
 if (file_exists("config/config.php")) {
@@ -70,7 +72,7 @@ if ($config["installed"])
 }
 
 // Initialize the language file.
-// TODO: implement languages, loader function to read a JSON file for languages.
+require "core/language.php";
 
 // Initialize the formatter.
 require "core/formatter.php";
@@ -115,8 +117,6 @@ if ((!isset($_SESSION["logged_in"]) or !$_SESSION["logged_in"]) and isset($_COOK
 if (isset($_SESSION["logged_in"]) and $_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
     logout(true);
 }
-
-$messages = array();
 
 // If the software hasn't been installed yet, direct all requests to the install page.
 if ($config["installed"] == false)

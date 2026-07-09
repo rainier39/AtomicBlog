@@ -1,0 +1,13 @@
+{
+ "code": "en-US",
+ "author": "rainier39",
+ "version": "v1.0.0-alpha",
+ 
+ "global.posts": "Posts",
+ "global.panel": "Panel",
+ "global.login": "Login",
+ "global.register": "Register",
+
+ "navbar.home": "Home",
+ "navbar.logout": "Logout"
+}

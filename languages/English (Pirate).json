@@ -1,0 +1,13 @@
+{
+ "code": "en",
+ "author": "rainier39",
+ "version": "v1.0.0-alpha",
+ 
+ "global.posts": "Posts",
+ "global.panel": "Bridge",
+ "global.login": "Board Ship",
+ "global.register": "Join Crew",
+
+ "navbar.home": "Main Deck",
+ "navbar.logout": "Walk Plank"
+}

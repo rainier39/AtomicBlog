@@ -35,7 +35,7 @@ $default_config = array(
     "description" => "A lightweight, easy to use, and easy to administrate blogging software.",
     "footer" => "Powered by [AtomicBlog](https://github.com/rainier39/AtomicBlog)",
     "theme" => "Light",
-    "language" => "english",
+    "language" => "English (US)",
     // Whether to redirect all HTTP requests to HTTPS.
     "https" => false,
     "prettyURLs" => false,
