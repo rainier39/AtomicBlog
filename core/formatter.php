@@ -135,13 +135,20 @@ function format_linebreaks($string) {
     return preg_replace("/\s\s$/mis", "</br>", $string);
 }
 
-// Define the formatter functions for any supported coding/markup languages.
+// -- Define the formatter functions for any supported coding/markup languages. --
+
+// PHP (Hypertext Preprocessor).
 function format_lang_php($string) {
-    // WIP code, will be replaced with regex later. TODO
-    $keywords = array("break", "function", "return");
+    // WIP code, will be replaced with regex or full on lexer/parser later. TODO
+    $keywords = array("or", "__halt_compiler", "abstract", "and", "array", "as", "break", "callable", "case", "catch", "class", "clone", "const", "continue", "declare", "default", "die", "do", "echo", "else", "elseif", "empty", "enddeclare", "endfor", "endforeach", "endif", "endswitch", "endwhile", "eval", "exit", "extends", "final", "finally", "fn", "for", "foreach", "function", "global", "goto", "if", "implements", "include", "include_once", "instanceof", "insteadof", "interface", "isset", "list", "match", "namespace", "new", "print", "private", "protected", "public", "readonly", "require", "require_once", "return", "static", "switch", "throw", "trait", "try", "unset", "use", "var", "while", "xor", "yield", "yield from");
     foreach ($keywords as $k) {
         $string = str_replace($k, "<font color=red>" . $k . "</font>", $string);
     }
+    
+    // PHP opening and closing tags.
+    $string = str_replace("&lt;?php", "<font color=green>&lt;?php</font>", $string);
+    $string = str_replace("?&gt;", "<font color=green>?&gt;</font>", $string);
+    
     return $string;
 }
 
