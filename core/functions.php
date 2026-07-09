@@ -464,5 +464,26 @@ function markdownButtons() {
     <br>";
 }
 
+function parseTags($tagstring) {
+    $tags = explode(",", $tagstring);
+    
+    // Remove whitespace from start and end of each tag, and convert tags to lowercase.
+    for ($t = 0; $t < count($tags); $t++) {
+        $tags[$t] = strtolower(trim($tags[$t]));
+    }
+    
+    // Remove empty tags.
+    $index = array_search("", $tags);
+    while ($index !== false) {
+        array_splice($tags, $index, 1);
+        $index = array_search("", $tags);
+    }
+    
+    // Remove any duplicate tags.
+    $tags = array_unique($tags);
+    
+    return $tags;
+}
+
 ?>
 

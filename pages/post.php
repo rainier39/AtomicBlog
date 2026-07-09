@@ -402,6 +402,12 @@ if ($displayPost) {
             break;
         }
     }
+    $tags = parseTags($p_tags);
+    $content .= "<p><div class='tagslabel'>Tags:</div>";
+    foreach ($tags as $tag) {
+        $content .= "<div class='tag'>" . htmlspecialchars($tag) . "</div>";
+    }
+    $content .= "</p>";
     $content .= "</div>
         <div class='postContent'>
         " . format($p_content) . "

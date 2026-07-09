@@ -253,6 +253,21 @@ code, .codeblock {
  margin-left: 0;
  padding-left: 20px;
 }
+/* Tags */
+.tag {
+ display: inline;
+ margin: 3px;
+ background: #99f;
+ border: 1px solid var(--main-border-color);
+ padding: 1px;
+}
+.tag:hover {
+ background: #ccf;
+}
+.tagslabel {
+ display: inline;
+ margin-right: 4px;
+}
 /* Home page/All posts page */
 .posts {
  border: 1px solid var(--main-border-color);
