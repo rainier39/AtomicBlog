@@ -116,6 +116,8 @@ if (isset($_SESSION["logged_in"]) and $_SESSION["logged_in"] and (!checkPerm(PER
     logout(true);
 }
 
+$messages = array();
+
 // If the software hasn't been installed yet, direct all requests to the install page.
 if ($config["installed"] == false)
 {

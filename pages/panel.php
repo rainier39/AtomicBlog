@@ -27,25 +27,23 @@ $title = "";
 
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
-    $content .= error("You must be logged in to access this page.");
+    $messages[] = error("You must be logged in to access this page.");
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
     $title = "Panel";
-    $content .= "<div class='panelcontent'>";
-    $content .= "<h1>Panel</h1>";
-    $content .= "<h2>User Actions</h2>";
+    $panelvars = array("useractions" => "",
+    "adminactions" => "");
     if (checkPerm(PERM_NEW_POST)) {
-        $content .= "<p><a href='" . makeURL("panel/newpost") . "'>Create a new post</a></p>";
+        $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>Create a new post</a></p>";
     }
-    $content .= "<h2>Administrative Actions</h2>";
     if (checkPerm(PERM_MANAGE_BLOG)) {
-        $content .= "<p><a href='" . makeURL("panel/configuration") . "'>Configure blog</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>Configure blog</a></p>";
     }
     if (checkPerm(PERM_MANAGE_USERS)) {
-        $content .= "<p><a href='" . makeURL("panel/users") . "'>Manage users</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/users") . "'>Manage users</a></p>";
     }
-    $content .= "</div>";
+    $content .= render_template("panel.html", $panelvars, false);
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
@@ -59,7 +57,7 @@ elseif ($url[1] == "users") {
 }
 // Display an error page.
 else {
-    $content .= error("The page you requested doesn't exist.");
+    $messages[] = error("The page you requested doesn't exist.");
 }
 
 render($content, $title);

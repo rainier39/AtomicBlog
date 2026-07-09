@@ -22,37 +22,31 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$hcontent = "<!DOCTYPE html>
-<html lang='en-US'>
-<head>
- <meta charset='UTF-8'>
- <title>" . htmlspecialchars($htitle) . "</title>
- <meta name='viewport' content='width=device-width,initial-scale=1'>
- <link rel='stylesheet' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true) . "'>
- <link rel='icon' type='image/x-icon' href='" . makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true) . "'>
-</head>
-<body>";
+$headervars = array("pagetitle" => $htitle,
+"theme" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true),
+"icon" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true),
+"blogtitle" => $config["title"],
+"description" => $config["description"],
+"navbar" => "",
+"messages" => implode($messages));
 
-$hcontent .= "<div class='header'><b>" . htmlspecialchars($config["title"]) . "</b><br><small>" . htmlspecialchars($config["description"]) . "</small></div>";
-
+// Generate the navbar appropriately.
 if ($config["installed"]) {
-    $hcontent .= "<div class='navbar'><a href='" . makeURL("") . "'>Home</a> <a href='" . makeURL("posts") . "'>Posts</a>";
+    $headervars["navbar"] .= "<div class='navbar'><a href='" . makeURL("") . "'>Home</a> <a href='" . makeURL("posts") . "'>Posts</a>";
     if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
-        $hcontent .= " <a href='" . makeURL("panel") . "'>Panel</a> <a href='" . makeURL("logout") . "'>Logout</a>";
+        $headervars["navbar"] .= " <a href='" . makeURL("panel") . "'>Panel</a> <a href='" . makeURL("logout") . "'>Logout</a>";
     }
     else {
-        $hcontent .= " <a href='" . makeURL("login") . "'>Login</a>";
+        $headervars["navbar"] .= " <a href='" . makeURL("login") . "'>Login</a>";
         if ($config["allowRegistration"]) {
-            $hcontent .= " <a href='" . makeURL("register") . "'>Register</a>";
+            $headervars["navbar"] .= " <a href='" . makeURL("register") . "'>Register</a>";
         }
     }
-    $hcontent .= "</div>";
+    $headervars["navbar"] .= "</div>";
 }
 
-$hcontent .= "<div id='toasts'></div>
-<div class='content'>";
 
-echo($hcontent);
+render_template("header.html", $headervars);
 
 ?>
 

@@ -36,7 +36,7 @@ function logout($redirect=false) {
 
 // Render a page, placing the header and footer accordingly.
 function render(string $content, string $htitle="") {
-    global $config, $hcontent;
+    global $config, $hcontent, $messages;
     if ($htitle == "") {
         $htitle = $config["title"];
     }

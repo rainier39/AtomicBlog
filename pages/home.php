@@ -25,7 +25,7 @@ if (!defined('INDEX')) exit;
 $content = "";
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
-    $content .= error("You don't have permission to view posts.");
+    $messages[] = error("You don't have permission to view posts.");
     render($content);
     exit();
 }

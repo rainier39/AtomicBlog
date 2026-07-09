@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang='en-US'>
+<head>
+ <meta charset='UTF-8'>
+ <title>{{{ pagetitle }}}</title>
+ <meta name='viewport' content='width=device-width,initial-scale=1'>
+ <link rel='stylesheet' href='{{ theme }}'>
+ <link rel='icon' type='image/x-icon' href='{{ icon }}'>
+</head>
+<body>
+ <div class='header'>
+  <b>{{{ blogtitle }}}</b><br>
+  <small>{{{ description }}}</small>
+ </div>
+ {{ navbar }}
+ <div id='toasts'></div>
+ <div class='content'>
+  <div class='messages'>
+   {{ messages }}
+  </div>

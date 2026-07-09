@@ -23,7 +23,7 @@
 if (!defined('INDEX')) exit;
 
 // Render a given template.
-function render_template($filename, $variables) {
+function render_template($filename, $variables, $echo=true) {
     if (!is_file("templates/{$filename}")) {
         return false;
     }
@@ -34,26 +34,21 @@ function render_template($filename, $variables) {
         return false;
     }
     
-    // I'm intentionally running this loop 3 times to avoid bugs.
-    
-    // Formatter case.
     foreach ($variables as $k=>$v) {
         $template = preg_replace("/{{{{ ({$k}) }}}}/", format($v), $template);
-    }
-    
-    // HTML special chars case.
-    foreach ($variables as $k=>$v) {
         $template = preg_replace("/{{{ ({$k}) }}}/", htmlspecialchars($v), $template);
-    }
-    
-    // Typical case.
-    foreach ($variables as $k=>$v) {
         $template = preg_replace("/{{ ({$k}) }}/", $v, $template);
     }
     
-    echo($template);
-    
-    return true;
+    // We may only want to return the result as a string if this is something like a post tile.
+    // I.E. not a final result, full page, whatever else.
+    if ($echo) {
+        echo($template);
+        return true;
+    }
+    else {
+        return $template;
+    }
 }
 
 ?>
