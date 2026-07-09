@@ -22,12 +22,9 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-echo("</div>
+$footervars = array("footercontent" => $config["footer"]);
 
-<div class='footer'>" . format($config["footer"]) . "</div>
-
-</body>
-</html>");
+render_template("footer.html", $footervars);
 
 ?>
 

@@ -75,6 +75,9 @@ if ($config["installed"])
 // Initialize the formatter.
 require "core/formatter.php";
 
+// Initialize the template engine.
+require "core/template.php";
+
 // Break up the URL for easy use throughout the software.
 $url = explode('/', ($_GET['url'] ?? ""));
 
