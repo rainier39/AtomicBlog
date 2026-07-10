@@ -22,11 +22,9 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$success = false;
-
 if (!checkPerm(PERM_NEW_POST)) {
-    $content .= error("You don't have permission to do this.");
-    render($content, $title);
+    $messages[] = error("You don't have permission to do this.");
+    render_page("", array(), $title);
     exit();
 }
 $title = "New Post";
@@ -51,34 +49,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Add the new post to the database.
             $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
             // Print a message.
-            // Temporarily leaving this as-is due to htmlspecialchars() call in success().
-            $content .= "<div class='success'>Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.</div>";
-            $success = true;
+            $messages[] = unsafe_success("Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.");
             redirect("post/{$db->insert_id}", 2);
+            render_page("", array(), $title);
+            exit();
         }
         // Otherwise, print the errors.
         else {
             foreach ($errors as $e) {
-                $content .= error($e);
+                $messages[] = error($e);
             }
         }
     }
 }
-// Display the new post form.
-if (!$success) {
-    $content .=
-    "<div class='form newPostForm'>
-        <h1>New Post</h1>
-        <form method='post'>
-            <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-            <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . "></input></br>
-            <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "") . "></input></br>
-            " . markdownButtons() . "
-            <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : "") . "</textarea></br>
-            <label for='unpublished'>Unpublished: </label><input type='checkbox' name='unpublished' id='unpublished'" . (isset($_POST["unpublished"]) ? " checked" : "") . "><br>
-            <br><input type='submit' value='Submit post' class='button'></input>
-        </form>
-    </div>";
-}
+
+$newpostvars = array("token" => $_SESSION["csrf_token"],
+"title" => $_POST["title"] ?? "",
+"tags" => $_POST["tags"] ?? "",
+"markdownbuttons" => markdownButtons(),
+"content" => $_POST["content"] ?? "",
+"unpublished" => (isset($_POST["unpublished"]) ? " checked" : ""));
+
+render_page("panel/newpost.html", $newpostvars, $title);
 
 ?>

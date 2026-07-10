@@ -22,7 +22,6 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
 $title = "";
 
 // If the user isn't logged in, don't let them into the panel.
@@ -43,7 +42,7 @@ elseif (!isset($url[1]) or $url[1] == "") {
     if (checkPerm(PERM_MANAGE_USERS)) {
         $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/users") . "'>Manage users</a></p>";
     }
-    $content .= render_template("panel.html", $panelvars, false);
+    render_page("panel.html", $panelvars, $title);
 }
 // Direct the user to the "create a new post" page.
 elseif ($url[1] == "newpost") {
@@ -58,9 +57,8 @@ elseif ($url[1] == "users") {
 // Display an error page.
 else {
     $messages[] = error("The page you requested doesn't exist.");
+    render_page("", array(), $title);
 }
-
-render($content, $title);
 
 ?>
 

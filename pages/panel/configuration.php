@@ -22,6 +22,7 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+$content = "";
 $success = false;
 
 $timezones = array("America/Anchorage", "America/Los_Angeles", "America/Phoenix", "America/Denver", "America/Chicago", "America/New_York");
@@ -275,5 +276,7 @@ $content .=
             <br><input type='submit' value='Save changes' class='button'>
         </form>
     </div>";
+
+render($content, $title);
 
 ?>

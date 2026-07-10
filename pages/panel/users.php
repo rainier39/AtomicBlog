@@ -22,6 +22,8 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+$content = "";
+
 if (!checkPerm(PERM_MANAGE_USERS)) {
     $content .= error("You don't have permission to do this.");
     render($content, $title);
@@ -135,5 +137,7 @@ while ($u = $users->fetch_assoc()) {
     . "</tr>";
 }
 $content .= "</tbody></table>";
+
+render($content, $title);
 
 ?>
