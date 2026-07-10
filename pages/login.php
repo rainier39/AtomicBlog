@@ -22,9 +22,10 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
 $success = false;
 $title = lang("global.login");
+$loginvars = array("username" => "",
+"password" => "");
 
 function handleLogin() {
     global $db, $config, $success, $ishttps, $messages;
@@ -113,6 +114,7 @@ function handleLogin() {
 // If the user is already logged in, don't let them into the page.
 if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
    $messages[] = error("You're already logged in.");
+   render_page("", $loginvars, $title);
 }
 // Otherwise, proceed as normal.
 else {
@@ -125,11 +127,12 @@ else {
         $loginvars = array("token" => $_SESSION["csrf_token"],
         "username" => (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : ""),
         "password" => (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : ""));
-        $content = render_template("login.html", $loginvars, false);
+        render_page("login.html", $loginvars, $title);
+    }
+    else {
+        render_page("", $loginvars, $title);
     }
 }
-
-render($content, $title);
 
 ?>
 

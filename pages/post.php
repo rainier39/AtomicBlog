@@ -28,7 +28,7 @@ $updatePost = false;
 $title = "";
 
 if (!checkPerm(PERM_VIEW_POST)) {
-    $content .= error("You don't have permission to view this post.");
+    $messages[] = error("You don't have permission to view this post.");
     render($content, $title);
     exit();
 }
@@ -77,7 +77,7 @@ elseif (isset($_POST["toggleStar"])) {
         }
     }
     else {
-        $content .= error("You don't have permission to do this.");
+        $messages[] = error("You don't have permission to do this.");
     }
 }
 // Handle published toggling.
@@ -101,7 +101,7 @@ elseif (isset($_POST["togglePublished"])) {
         }
     }
     else {
-        $content .= error("You don't have permission to do this.");
+        $messages[] = error("You don't have permission to do this.");
     }
 }
 // Handle deletions.
@@ -127,13 +127,13 @@ elseif (isset($_POST["delete"])) {
                     }
                 }
                 
-                $content .= success("Successfully deleted the post.");
+                $messages[] = success("Successfully deleted the post.");
                 $displayPost = false;
                 redirect("", 2);
             }
         }
         else {
-            $content .= error("You don't have permission to do this.");
+            $messages[] = error("You don't have permission to do this.");
         }
 }
 // Handle editing.
@@ -164,7 +164,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
        	        // Otherwise, print the errors.
        	        else {
        	            foreach ($errors as $e) {
-       	                $content .= error($e);
+       	                $messages[] = error($e);
        	            }
        	        }
             }
@@ -189,7 +189,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
         }
     }
     else {
-        $content .= error("You don't have permission to do this.");
+        $messages[] = error("You don't have permission to do this.");
         $updatePost = true;
     }
     if ($success) {
@@ -208,10 +208,10 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
         if (isset($_FILES["icon"])) {
             $upload = upload("icon", $p_id);
             if ($upload == "") {
-                $content .= success("Successfully uploaded icon.");
+                $messages[] = success("Successfully uploaded icon.");
             }
             else {
-                $content .= error($upload);
+                $messages[] = error($upload);
             }
         }
         // Handle uploading attachment.
@@ -223,10 +223,10 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
             }
             $upload = upload("attachment", $p_id . "_" . $a_id);
             if ($upload === "") {
-                $content .= success("Successfully uploaded attachment.");
+                $messages[] = success("Successfully uploaded attachment.");
             }
             else {
-                $content .= error($upload);
+                $messages[] = error($upload);
             }
         }
         // Handle deleting icon.
@@ -235,19 +235,19 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
             $target = basename($_POST["dicon"]);
             // Make sure that this icon is actually from the same post.
             if (!str_starts_with($target, $p_id . ".")) {
-                $content .= error("Nice try.");
+                $messages[] = error("Nice try.");
             }
             // Make sure that the target icon exists.
             elseif (!is_file("images/" . $target)) {
-                $content .= error("Specified icon doesn't exist.");
+                $messages[] = error("Specified icon doesn't exist.");
             }
             else {
                 $deleted = unlink("images/" . $target);
                 if ($deleted) {
-                    $content .= success("Successfully deleted icon.");
+                    $messages[] = success("Successfully deleted icon.");
                 }
                 else {
-                    $content .= error("Failed to delete icon.");
+                    $messages[] = error("Failed to delete icon.");
                 }
             }
         }
@@ -257,19 +257,19 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
             $target = basename($_POST["dattachment"]);
             // Make sure that this attachment is actually from the same post.
             if (!str_starts_with($target, $p_id . "_")) {
-                $content .= error("Nice try.");
+                $messages[] = error("Nice try.");
             }
             // Make sure that the target attachment exists.
             elseif (!is_file("images/" . $target)) {
-                $content .= error("Specified attachment doesn't exist.");
+                $messages[] = error("Specified attachment doesn't exist.");
             }
             else {
                 $deleted = unlink("images/" . $target);
                 if ($deleted) {
-                    $content .= success("Successfully deleted attachment.");
+                    $messages[] = success("Successfully deleted attachment.");
                 }
                 else {
-                    $content .= error("Failed to delete attachment.");
+                    $messages[] = error("Failed to delete attachment.");
                 }
             }
         }
@@ -329,7 +329,7 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
         </form></div>";
     }
     else {
-        $content .= error("You don't have permission to do this.");
+        $messages[] = error("You don't have permission to do this.");
     }
 }
 // Otherwise, display the post.
