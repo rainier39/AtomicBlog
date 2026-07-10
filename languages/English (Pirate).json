@@ -7,7 +7,13 @@
  "global.panel": "Bridge",
  "global.login": "Board Ship",
  "global.register": "Join Crew",
+ "global.username:": "Username: ",
+ "global.password:": "Password: ",
 
  "navbar.home": "Main Deck",
- "navbar.logout": "Walk Plank"
+ "navbar.logout": "Walk Plank",
+ 
+ "postTile.by": "By: ",
+ 
+ "login.stayloggedin": "Stay Logged In: "
 }

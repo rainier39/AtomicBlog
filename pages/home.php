@@ -22,7 +22,9 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
+$homevars = array("starred" => "",
+"recent" => "",
+"viewed" => "");
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
     $messages[] = error("You don't have permission to view posts.");
@@ -35,75 +37,63 @@ $id = $_SESSION["id"] ?? 0;
 // Get all of the starred blog posts.
 $starred = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `id` DESC");
 
-// Display the starred posts fieldset.
-$content .= "<fieldset class='posts'><legend>Starred</legend>";
-
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
-    $content .= "<table class='postsTable'><tbody>";
+    $homevars["starred"] .= "<table class='postsTable'><tbody>";
     $counter = 0;
     $total = 0;
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
         if ($counter == 0) {
-            $content .= "<tr>";
+            $homevars["starred"] .= "<tr>";
         }
         if ($counter == 5) {
-            $content .= "</tr><tr>";
+            $homevars["starred"] .= "</tr><tr>";
             $counter = 0;
         }
-        $content .= displayPost($s["id"], $s["title"], $s["account"]);
+        $homevars["starred"] .= displayPost($s["id"], $s["title"], $s["account"]);
         $counter++;
         $total++;
     }
     while (($total > 0) and ($total % 5)) {
-        $content .= "<td class='dummyTile'></td>";
+        $homevars["starred"] .= "<td class='dummyTile'></td>";
         $total++;
         if (!$total % 5) {
-            $content .= "</tr>";
+            $homevars["starred"] .= "</tr>";
         }
     }
-    $content .= "</tbody></table>";
+    $homevars["starred"] .= "</tbody></table>";
 }
 // Otherwise print a message.
 else {
-    $content .= info("No starred posts yet.");
+    $homevars["starred"] .= info("No starred posts yet.");
 }
-
-// End the starred posts fieldset.
-$content .= "</fieldset>";
 
 // Get the 5 most recent posts.
 $recent = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `starttime` DESC LIMIT 5");
 
-// Display the most recent fieldset.
-$content .= "</br><fieldset class='posts'><legend>Most Recent</legend>";
-
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
-    $content .= "<table class='postsTable'><tbody><tr>";
+    $homevars["recent"] .= "<table class='postsTable'><tbody><tr>";
     $total = 0;
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        $content .= displayPost($r["id"], $r["title"], $r["account"]);
+        $homevars["recent"] .= displayPost($r["id"], $r["title"], $r["account"]);
         $total++;
     }
     while (($total > 0) and ($total % 5)) {
-        $content .= "<td class='dummyTile'></td>";
+        $homevars["recent"] .= "<td class='dummyTile'></td>";
         $total++;
         if (!$total % 5) {
-            $content .= "</tr>";
+            $homevars["recent"] .= "</tr>";
         }
     }
-    $content .= "</tr></tbody></table>";
+    $homevars["recent"] .= "</tr></tbody></table>";
 }
 // Otherwise print a message.
 else {
-    $content .= info("No posts yet.");
+    $homevars["recent"] .= info("No posts yet.");
 }
-
-// End the fieldset.
-$content .= "</fieldset>";
 
 // Create an array to store every postid and later how many views each one has.
 $views = array();
@@ -147,12 +137,9 @@ if ($postids->num_rows > 0) {
     }
 }
 
-// Display the most viewed fieldset.
-$content .= "</br><fieldset class='posts'><legend>Most Viewed</legend>";
-
 // Only try to display posts if there are any.
 if ($postids->num_rows > 0) {
-    $content .= "<table class='postsTable'><tbody><tr>";
+    $homevars["viewed"] .= "<table class='postsTable'><tbody><tr>";
     $total = 0;
     foreach ($mostViewed as $mv) {
         // Get the posts we wish to display.
@@ -160,28 +147,25 @@ if ($postids->num_rows > 0) {
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
-            $content .= displayPost($m["id"], $m["title"], $m["account"]);
+            $homevars["viewed"] .= displayPost($m["id"], $m["title"], $m["account"]);
             $total++;
         }
     }
     while (($total > 0) and ($total % 5)) {
-        $content .= "<td class='dummyTile'></td>";
+        $homevars["viewed"] .= "<td class='dummyTile'></td>";
         $total++;
         if (!$total % 5) {
-            $content .= "</tr>";
+            $homevars["viewed"] .= "</tr>";
         }
     }
-    $content .= "</tr></tbody></table>";
+    $homevars["viewed"] .= "</tr></tbody></table>";
 }
 // Otherwise print a message.
 else {
-    $content .= info("No posts yet.");
+    $homevars["viewed"] .= info("No posts yet.");
 }
 
-// End the fieldset.
-$content .= "</fieldset>";
-
 // Finally, render the page.
-render($content);
+render_page("home.html", $homevars);
 
 ?>

@@ -1,13 +1,13 @@
   <div class='form'>
-   <h1>Log in</h1>
+   <h1>[[ global.login ]]</h1>
    <form method='post'>
     <input type='hidden' name='csrf_token' value='{{ token }}'>
-    <label for='username'>Username: </label>
+    <label for='username'>[[ global.username: ]]</label>
     <input type='text' name='username' id='username' autocomplete='username' maxlength='32' required{{ username }}></br>
-    <label for='password'>Password: </label>
+    <label for='password'>[[ global.password: ]]</label>
     <input type='password' name='password' id='password' autocomplete='current-password' required{{ password }}></br>
-    <label for='stayloggedin'>Stay Logged In: </label>
+    <label for='stayloggedin'>[[ login.stayloggedin ]]</label>
     <input type='checkbox' name='stayloggedin' id='stayloggedin' checked><br>
-    <input type='submit' value='Log in' class='button'>
+    <input type='submit' value='[[ global.login ]]' class='button'>
    </form>
   </div>

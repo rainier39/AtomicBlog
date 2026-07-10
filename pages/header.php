@@ -22,8 +22,7 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$headervars = array("lang" => "code",
-"pagetitle" => $htitle,
+$headervars = array("pagetitle" => $htitle,
 "theme" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true),
 "icon" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true),
 "blogtitle" => $config["title"],

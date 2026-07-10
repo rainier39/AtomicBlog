@@ -24,6 +24,8 @@ if (!defined('INDEX')) exit;
 
 // Render a given template.
 function render_template($filename, $variables, $echo=true) {
+    global $lang;
+
     if (!is_file("templates/{$filename}")) {
         return false;
     }
@@ -38,8 +40,10 @@ function render_template($filename, $variables, $echo=true) {
         $template = preg_replace("/{{{{ ({$k}) }}}}/", format($v), $template);
         $template = preg_replace("/{{{ ({$k}) }}}/", htmlspecialchars($v), $template);
         $template = preg_replace("/{{ ({$k}) }}/", $v, $template);
+    }
+    foreach ($lang as $k=>$v) {
         // Double square brackets for language strings.
-        $template = preg_replace("/\[\[ ({$k}) \]\]/", lang($v), $template);
+        $template = preg_replace("/\[\[ ({$k}) \]\]/", $v, $template);
     }
     
     // We may only want to return the result as a string if this is something like a post tile.

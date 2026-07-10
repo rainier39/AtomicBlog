@@ -35,6 +35,7 @@ function logout($redirect=false) {
 }
 
 // Render a page, placing the header and footer accordingly.
+// DEPRECATED
 function render(string $content, string $htitle="") {
     global $config, $hcontent, $messages;
     if ($htitle == "") {
@@ -45,6 +46,20 @@ function render(string $content, string $htitle="") {
     }
     require "pages/header.php";
     echo($content);
+    require "pages/footer.php";
+}
+
+// Render a page, placing the header and footer accordingly.
+function render_page($templatename, $templatevars, string $htitle="") {
+    global $config, $hcontent, $messages;
+    if ($htitle == "") {
+        $htitle = $config["title"];
+    }
+    else {
+        $htitle = $htitle . " - " . $config["title"];
+    }
+    require "pages/header.php";
+    render_template($templatename, $templatevars);
     require "pages/footer.php";
 }
 
@@ -65,31 +80,30 @@ function displayPost($id, $title, $account) {
     
     $id = (int)$id;
     
-    $post = "<td class='postTile'><a href='" . makeURL("post/" . $id) . "'>";
+    $postTilevars = array("url" => makeURL("post/" . $id),
+    "image" => "",
+    "title" => htmlspecialchars($title),
+    "author" => "Nobody");
 
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
         if (str_starts_with($u, $id . ".")) {
-            $post .= "<img src='" . makeURL("images/{$u}") . "'>";
+            $postTilevars["image"] = "<img src='" . makeURL("images/{$u}") . "'>";
             // Just use the first icon we find.
             break;
         }
     }
-    $post .= "</a><a href='" . makeURL("post/" . $id) . "'>" . htmlspecialchars($title) . "</a>";
+
     // Get the account information of the post author.
     $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($account) . "'");
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
-            $post .= "</br><small>By: " . htmlspecialchars($a["name"]) . "</small>";
+            $postTilevars["author"] = htmlspecialchars($a["name"]);
         }
     }
-    else {
-        $post .= "</br><small>By: Nobody</small>";
-    }
-    $post .= "</td>";
     
-    return $post;
+    return render_template("postTile.html", $postTilevars, false);
 }
 
 function success($message) {

@@ -24,7 +24,7 @@ if (!defined('INDEX')) exit;
 
 $content = "";
 $success = false;
-$title = "Login";
+$title = lang("global.login");
 
 function handleLogin() {
     global $db, $config, $success, $ishttps, $messages;

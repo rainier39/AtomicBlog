@@ -7,7 +7,13 @@
  "global.panel": "Panel",
  "global.login": "Login",
  "global.register": "Register",
+ "global.username:": "Username: ",
+ "global.password:": "Password: ",
 
  "navbar.home": "Home",
- "navbar.logout": "Logout"
+ "navbar.logout": "Logout",
+ 
+ "postTile.by": "By: ",
+ 
+ "login.stayloggedin": "Stay Logged In: "
 }
