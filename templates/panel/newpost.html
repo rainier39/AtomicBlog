@@ -3,10 +3,10 @@
    <form method='post'>
     <input type='hidden' name='csrf_token' value='{{ token }}'>
     <label for='title'>Title: </label>
-    <input type='text' name='title' id='title' maxlength='32'{{{ title }}}>
+    <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}'>
     <br>
     <label for='tags'>Tags: </label>
-    <input type='text' name='tags' id='tags' maxlength='128'{{{ tags }}}>
+    <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
     <br>
     {{ markdownbuttons }}
     <label for='content'>Content: </label>
