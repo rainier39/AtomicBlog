@@ -125,8 +125,8 @@ else {
     // Display the login form.
     if (!$success) {
         $loginvars = array("token" => $_SESSION["csrf_token"],
-        "username" => (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : ""),
-        "password" => (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : ""));
+        "username" => $_POST["username"] ?? "",
+        "password" => $_POST["password"] ?? "");
         render_page("login.html", $loginvars, $title);
     }
     else {
