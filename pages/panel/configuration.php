@@ -22,8 +22,13 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
-$success = false;
+if (!checkPerm(PERM_MANAGE_BLOG)) {
+    $messages[] = error("You don't have permission to do this.");
+    render_page("", array(), $title);
+    exit();
+}
+
+$title = "Blog Configuration";
 
 // Timezone stuff.
 $timezones = array("America/Anchorage", "America/Los_Angeles", "America/Phoenix", "America/Denver", "America/Chicago", "America/New_York");
@@ -84,12 +89,6 @@ foreach ($modes as $m) {
     $registerHTML .= "<option value='$m'$s>$m</option>";
 }
 
-if (!checkPerm(PERM_MANAGE_BLOG)) {
-    $content .= error("You don't have permission to do this.");
-    render($content, $title);
-    exit();
-}
-$title = "Blog Configuration";
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If the CSRF token is sent and valid.
@@ -256,64 +255,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // If there are errors, display them.
         if (count($errors) > 0) {
             foreach ($errors as $e) {
-                $content .= error($e);
+                $messages[] = error($e);
             }
         }
         // Display a message if we changed the config.
         if ($changes > 0) {
             flushConfig();
-            $content .= success("Successfully updated the blog configuration.");
+            $messages[] = success("Successfully updated the blog configuration.");
         }
         else {
-            $content .= success("Successfully did nothing.");
+            $messages[] = success("Successfully did nothing.");
         }
     }
 }
 
 // Display the config form.
-$content .=
-    "<div class='form configForm'>
-        <h1>Blog Configuration</h1>
-        <form method='post'>
-            <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-            <label for='ctitle'>Blog Title:</label>
-            <input type='text' name='ctitle' id='ctitle' value='" . htmlspecialchars($_POST["ctitle"] ?? $config["title"]) . "'><br>
-            <label for='cdescription'>Blog Description:</label>
-            <textarea id='cdescription' name='cdescription'>" . htmlspecialchars($_POST["cdescription"] ?? $config["description"]) . "</textarea><br>
-            <label for='cfooter'>Footer:</label>
-            <textarea id='cfooter' name='cfooter'>" . htmlspecialchars($_POST["cfooter"] ?? $config["footer"]) . "</textarea><br>
-            <label for='timezone'>Server Timezone:</label>
-            <select name='timezone' id='timezone'>
-            " . $timezonesHTML . "
-            </select>
-            <br>
-            <label for='clanguage'>Language:</label>
-            <select name='clanguage' id='clanguage'>
-            " . $languageHTML . "
-            </select>
-            <h2>User Management</h2>
-            <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>
-            <input type='checkbox' id='registration' name='registration'" . ($config["allowRegistration"] ? "checked" : "") . ">
-            <br>
-            <label for='registrationMode'>Registration Mode:</label>
-            <select name='registrationMode' id='registrationMode'>
-            " . $registerHTML . "
-            </select>
-            <h2>Rate Limits</h2>
-            <label for='logins' title='Allowed logins/login attempts per hour from an IP.'>Logins Per Hour:</label>
-            <input type='text' id='logins' name='logins' value='" . htmlspecialchars($_POST["logins"] ?? $config["loginsPerHour"]) . "'></br>
-            <label for='accounts' title='Maximum number of accounts that can be created per IP.'>Accounts Per IP:</label>
-            <input type='text' id='accounts' name='accounts' value='" . htmlspecialchars($_POST["accounts"] ?? $config["accountsPerIP"]) . "'></br>
-            <label for='accountcooldown' title='Time (in seconds) one must wait in between creating accounts.'>Registration Cooldown:</label>
-            <input type='text' id='accountcooldown' name='accountcooldown' value='" . htmlspecialchars($_POST["accountcooldown"] ?? $config["accountCooldown"]) . "'></br>
-            <label for='postdelay' title='Time (in seconds) one must wait in between making blog posts.'>Post Delay:</label>
-            <input type='text' id='postdelay' name='postdelay' value='" . htmlspecialchars($_POST["postdelay"] ?? $config["postDelay"]) . "'></br>
-            <label for='editdelay' title='Time (in seconds) one must wait in between making edits to blog posts.'>Edit Delay:</label>
-            <input type='text' id='editdelay' name='editdelay' value='" . htmlspecialchars($_POST["editdelay"] ?? $config["editDelay"]) . "'></br>
-            <br><input type='submit' value='Save changes' class='button'>
-        </form>
-    </div>";
+$configvars = array("token" => $_SESSION["csrf_token"],
+"title" => $_POST["ctitle"] ?? $config["title"],
+"description" => $_POST["cdescription"] ?? $config["description"],
+"footer" => $_POST["cfooter"] ?? $config["footer"],
+"timezone" => $timezonesHTML,
+"language" => $languageHTML,
+"allowregistration" => $config["allowRegistration"] ? " checked" : "",
+"registrationmode" => $registerHTML,
+"loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],
+"accountsperip" => $_POST["accounts"] ?? $config["accountsPerIP"],
+"accountcooldown" => $_POST["accountcooldown"] ?? $config["accountCooldown"],
+"postdelay" => $_POST["postdelay"] ?? $config["postDelay"],
+"editdelay" => $_POST["editdelay"] ?? $config["editDelay"]);
 
-render($content, $title);
+render_page("panel/configuration.html", $configvars, $title);
 
 ?>

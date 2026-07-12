@@ -27,6 +27,8 @@ $title = "";
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
     $messages[] = error("You must be logged in to access this page.");
+    render_page("", array(), $title);
+    exit();
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
