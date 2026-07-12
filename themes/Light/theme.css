@@ -302,6 +302,9 @@ code, .codeblock {
  text-align: center;
 }
 /* Userlist (manage users page) */
+.userlist {
+ width: 100%;
+}
 .userlist td {
  font-weight: normal;
  border: 1px solid grey;
@@ -340,6 +343,9 @@ code, .codeblock {
   margin-bottom: 0;
  }
  /* Userlist becomes vertical on mobile. */
+ .userlist {
+  width: 46vw;
+ }
  .userlist thead {
   display:none
  }

@@ -22,14 +22,14 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
-
 if (!checkPerm(PERM_MANAGE_USERS)) {
-    $content .= error("You don't have permission to do this.");
-    render($content, $title);
+    $messages[] = error("You don't have permission to do this.");
+    render_page("", array(), $title);
     exit();
 }
+
 $title = "Manage Users";
+
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If the CSRF token is sent and valid.
@@ -46,58 +46,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $urole = $userquery->fetch_column(0);
             // Does the user exist?
             if ($userquery->num_rows != 1) {
-                $content .= error("Specified user does not exist.");
+                $messages[] = error("Specified user does not exist.");
             }
             // Is the user us?
             elseif ($_POST["id"] === (int)$_SESSION["id"]) {
-                $content .= error("You don't have permission to do this.");
+                $messages[] = error("You don't have permission to do this.");
             }
             // Does the role exist?
             elseif (!array_key_exists($_POST["changerole"], $permissions)) {
-                $content .= error("Specified role does not exist.");
+                $messages[] = error("Specified role does not exist.");
             }
             // Is the role Guest?
             elseif ($_POST["changerole"] == "Guest") {
-                $content .= error("Specified role does not exist.");
+                $messages[] = error("Specified role does not exist.");
             }
             // Does the role have less permissions than our own?
             elseif ($permissions[$_POST["changerole"]] >= $permissions[$crole]) {
-                $content .= error("You don't have permission to do this.");
+                $messages[] = error("You don't have permission to do this.");
             }
             // Does the other user outrank or have the same role as us?
             elseif ($permissions[$urole] >= $permissions[$crole]) {
-                $content .= error("You don't have permission to do this.");
+                $messages[] = error("You don't have permission to do this.");
             }
             // Is the role actually different from the role they already have?
             elseif ($_POST["changerole"] == $urole) {
-                $content .= success("Successfully did nothing.");
+                $messages[] = success("Successfully did nothing.");
             }
             // Change the role.
             else {
                 $db->query("UPDATE `accounts` SET `role`='" . $db->real_escape_string($_POST["changerole"]) . "' WHERE `id`='" . $_POST["id"] . "'");
-                $content .= success("Successfully changed role.");
+                $messages[] = success("Successfully changed role.");
             }
         }
     }
 }
 
-// Display the userlist.
-$content .= "<h1>Manage Users</h1>";
-    
 $users = $db->query("SELECT `id`, `name`, `username`, `role`, `email`, `joinip`, `jointime`, `ip`, `lastactive` FROM `accounts`");
+
+$usersvars = array("tbody" => "");
     
-$content .= "<table class='userlist'>";
-$content .= "<thead>
-  <th>Username</th>
-  <th>Name</th>
-  <th>Role</th>
-  <th>Email</th>
-  <th>Join IP</th>
-  <th>IP (last login)</th>
-  <th>Joined</th>
-  <th>Last Active</th>
-</thead>
-<tbody>";
 while ($u = $users->fetch_assoc()) {
     // If this user's role is below the current user's role, allow it to be changed.
     $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
@@ -125,7 +112,7 @@ while ($u = $users->fetch_assoc()) {
     else {
         $roleform = htmlspecialchars($u["role"]);
     }
-    $content .= "<tr>"
+    $usersvars["tbody"] .= "<tr>"
     . "<td data-label='Username'>" . htmlspecialchars($u["username"]) . "</td>"
     . "<td data-label='Name'>" . htmlspecialchars($u["name"]) . "</td>"
     . "<td data-label='Role'>" . $roleform . "</td>"
@@ -136,8 +123,7 @@ while ($u = $users->fetch_assoc()) {
     . "<td data-label='Last Active'>" . date("F jS Y", $u["lastactive"]) . "</td>"
     . "</tr>";
 }
-$content .= "</tbody></table>";
 
-render($content, $title);
+render_page("panel/users.html", $usersvars, $title);
 
 ?>
