@@ -98,50 +98,42 @@ else {
 // Create an array to store every postid and later how many views each one has.
 $views = array();
 
-// Get all the postids.
-$postids = $db->query("SELECT `id` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "'))");
+// Get all of the views, and just get their post ids.
+$posts = $db->query("SELECT `post` FROM `views` ORDER BY `post` DESC");
 
-// If there are any posts...
-if ($postids->num_rows > 0) {
-    // Populate the array.
-    while ($p = $postids->fetch_assoc()) {
-        $views[$p["id"]] = 0;
+// Fill the array with the proper amount of views per post.
+while ($p = $posts->fetch_assoc()) {
+    if (array_key_exists($p["post"], $views)) {
+        $views[$p["post"]] += 1;
     }
-
-    // Get all of the views, and just get their post ids.
-    $posts = $db->query("SELECT `post` FROM `views`");
-
-    // Fill the array with the proper amount of views per post.
-    while ($p = $posts->fetch_assoc()) {
-        if (array_key_exists($p["post"], $views)) {
-            $views[$p["post"]] += 1;
-        }
-    }
-
-    // Make a second array consisting of the 5 highest viewed posts, namely their ids.
-    $mostViewed = array();
-
-    // Populate the array.
-    for ($i = 0; (($i < 5) and (count($views) !== 0)); $i++) {
-        // Find the highest viewed post.
-        $value = max($views);
-
-        // Get its key.
-        $key = array_search($value, $views);
-
-        // Remove it from the array.
-        unset($views[$key]);
-
-        // Add the postid to the new array.
-        $mostViewed[$i] = $key;
+    else {
+        $views[$p["post"]] = 1;
     }
 }
 
+// Make a second array consisting of the 5 highest viewed posts, namely their ids.
+$mostViewed = array();
+
+// Populate the array.
+for ($i = 0; (($i < 5) and (count($views) != 0)); $i++) {
+    // Find the highest viewed post.
+    $value = max($views);
+
+    // Get its key.
+    $key = array_search($value, $views);
+
+    // Remove it from the array.
+    unset($views[$key]);
+
+    // Add the postid to the new array.
+    $mostViewed[$key] = $value;
+}
+
 // Only try to display posts if there are any.
-if ($postids->num_rows > 0) {
+if (count($mostViewed) > 0) {
     $homevars["viewed"] .= "<table class='postsTable'><tbody><tr>";
     $total = 0;
-    foreach ($mostViewed as $mv) {
+    foreach ($mostViewed as $mv=>$views) {
         // Get the posts we wish to display.
         $mostViewedPosts = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
 
