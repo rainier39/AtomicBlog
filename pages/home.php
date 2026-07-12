@@ -28,7 +28,7 @@ $homevars = array("starred" => "",
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
     $messages[] = error("You don't have permission to view posts.");
-    render($content);
+    render_page("", array());
     exit();
 }
 
