@@ -25,11 +25,12 @@ if (!defined('INDEX')) exit;
 $content = "";
 $success = false;
 
+// Timezone stuff.
 $timezones = array("America/Anchorage", "America/Los_Angeles", "America/Phoenix", "America/Denver", "America/Chicago", "America/New_York");
 $timezonesHTML = "";
-if (isset($_POST["timezone"])) {
-    // Use the user-supplied timezone if it's valid, otherwise default to the config.
-    $currentTimezone = (in_array($_POST["timezone"], $timezones) ? $_POST["timezone"] : null) ?? $config["timezone"];
+// Use the user-supplied timezone if it's valid, otherwise default to the config.
+if (isset($_POST["timezone"]) and in_array($_POST["timezone"], $timezones)) {
+    $currentTimezone = $_POST["timezone"];
 }
 else {
     $currentTimezone = $config["timezone"];
@@ -44,10 +45,11 @@ foreach ($timezones as $t) {
     $timezonesHTML .= "<option value='$t'$s>$t</option>";
 }
 
+// Language stuff.
 $languageHTML = "";
-if (isset($_POST["clanguage"])) {
-    // Use the user-supplied language if it's valid, otherwise default to the config.
-    $currentLanguage = (in_array($_POST["clanguage"], $languages) ? $_POST["clanguage"] : null) ?? $language;
+// Use the user-supplied language if it's valid, otherwise default to the config.
+if (isset($_POST["clanguage"]) and in_array($_POST["clanguage"], $languages)) {
+    $currentLanguage = $_POST["clanguage"];
 }
 else {
     $currentLanguage = $language;
@@ -60,6 +62,26 @@ foreach ($languages as $l) {
         $s = "";
     }
     $languageHTML .= "<option value='$l'$s>$l</option>";
+}
+
+// Registration mode stuff.
+$registerHTML = "";
+$modes = array("approval", "open");
+// Use the user-supplied mode if it's valid, otherwise default to the config.
+if (isset($_POST["registrationMode"]) and in_array($_POST["registrationMode"], $modes)) {
+    $currentMode = $_POST["registrationMode"];
+}
+else {
+    $currentMode = $config["registrationMode"];
+}
+foreach ($modes as $m) {
+    if ($m == $currentMode) {
+        $s = " selected";
+    }
+    else {
+        $s = "";
+    }
+    $registerHTML .= "<option value='$m'$s>$m</option>";
 }
 
 if (!checkPerm(PERM_MANAGE_BLOG)) {
@@ -149,6 +171,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($tz != $config["allowRegistration"]) {
             $config["allowRegistration"] = $tz;
             $changes++;
+        }
+        if (isset($_POST["registrationMode"])) {
+            if (!in_array($_POST["registrationMode"], $modes)) {
+                $errors[] = "Invalid registration mode.";
+            }
+            // Only write to the config if the value is actually being changed.
+            elseif ($_POST["registrationMode"] != $config["registrationMode"]) {
+                $config["registrationMode"] = $_POST["registrationMode"];
+                $changes++;
+            }
         }
         if (isset($_POST["logins"])) {
             $logins = (int)$_POST["logins"];
@@ -261,7 +293,12 @@ $content .=
             </select>
             <h2>User Management</h2>
             <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>
-            <input type='checkbox' id='registration' name='registration'" . ($config["allowRegistration"] ? "checked" : "") . "><br>
+            <input type='checkbox' id='registration' name='registration'" . ($config["allowRegistration"] ? "checked" : "") . ">
+            <br>
+            <label for='registrationMode'>Registration Mode:</label>
+            <select name='registrationMode' id='registrationMode'>
+            " . $registerHTML . "
+            </select>
             <h2>Rate Limits</h2>
             <label for='logins' title='Allowed logins/login attempts per hour from an IP.'>Logins Per Hour:</label>
             <input type='text' id='logins' name='logins' value='" . htmlspecialchars($_POST["logins"] ?? $config["loginsPerHour"]) . "'></br>

@@ -84,12 +84,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
         // If everything checks out, make the account.
         if (count($errors) === 0) {
-            // Insert the account into the database.
+            // Decide what role to assign.
+            switch ($config["registrationMode"]) {
+                case "approval":
+                    $role = "Unapproved";
+                    break;
+                case "open":
+                    $role = "Member";
+                    break;
+                // Default to approval.
+                default:
+                    $role = "Unapproved";
+            }
             $now = time();
-            $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Unapproved', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
+            $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
 
             // Inform the user that they've successfully registered.
-            $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
+            if ($role == "Unapproved") {
+                $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
+            }
+            elseif ($role == "Member") {
+                $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
+            }
             $registerSuccess = true;
         }
         // Otherwise, display the errors.

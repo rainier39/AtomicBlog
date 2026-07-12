@@ -41,6 +41,8 @@ $default_config = array(
     "prettyURLs" => false,
     // Whether to allow people to create accounts.
     "allowRegistration" => true,
+    // "approval", "open"
+    "registrationMode" => "approval",
     "loginsPerHour" => 5,
     "accountsPerIP" => 3,
     // How long a user must wait (in seconds) between creating accounts. 600 seconds = 10 minutes.
