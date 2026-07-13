@@ -28,7 +28,10 @@ function logout($redirect=false) {
     // Remove any login cookies and purge the database of them too.
     setcookie("AtomicBlog_login", "0", array("expires" => 1));
     $id = $_SESSION["id"] ?? 0;
-    $db->query("UPDATE `accounts` SET `cookie`=NULL WHERE `id`='" . $id . "'");
+    // For the weird case of a user being logged in, but no database connection.
+    if ($db) {
+        $db->query("UPDATE `accounts` SET `cookie`=NULL WHERE `id`='" . $id . "'");
+    }
     session_unset();
     session_destroy();
     if ($redirect) redirect("");
@@ -292,6 +295,11 @@ function redirect($loc, int $delay=0) {
 // Check whether a user is permitted to perform a given action or not.
 function checkPerm($perm) {
     global $permissions, $db;
+    
+    // In the weird case of a user being logged in, but no database connection.
+    if (!$db) {
+        return false;
+    }
     
     // If a user is signed in.
     if (isset($_SESSION["logged_in"]) and ($_SESSION["logged_in"] == true)) {

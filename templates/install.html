@@ -1,0 +1,54 @@
+  <div class='form installForm'>
+   <h1>Installer</h1>
+   <form method='post'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <b>SQL Details</b>
+    <br>
+    <label for='sqlserver'>SQL Server: </label>
+    <input type='text' placeholder='localhost' name='SQLServer' id='sqlserver' value='{{{ sqlserver }}}' required>
+    <br>
+    <label for='sqldatabase'>SQL Database: </label>
+    <input type='text' placeholder='AtomicBlog' name='SQLDatabase' id='sqldatabase' value='{{{ sqldb }}}' required>
+    <br>
+    <label for='sqlusername'>SQL Username: </label>
+    <input type='text' name='SQLUsername' id='sqlusername' value='{{{ sqluser }}}' required>
+    <br>
+    <label for='sqlpassword'>SQL Password: </label>
+    <input type='text' name='SQLPassword' id='sqlpassword' value='{{{ sqlpass }}}' required>
+    <br>
+    <br>
+    <b>Blog Configuration</b>
+    <br>
+    <label for='title'>Blog Title: </label>
+    <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}' required>
+    <br>
+    <label for='description'>Blog Description: </label>
+    <textarea name='description' id='description' maxlength='128' required>{{{ description }}}</textarea>
+    <br>
+    <br>
+    <b>Administrator Account Details</b>
+    <br>
+    <label for='name'>Name: </label>
+    <input type='text' name='name' autocomplete='name' maxlength='64' id='name' value='{{{ name }}}' required>
+    <br>
+    <label for='username'>Username: </label>
+    <input type='text' name='username' autocomplete='username' maxlength='32' id='username' value='{{{ username }}}' required>
+    <br>
+    <label for='email'>Email Address: </label>
+    <input type='email' name='email' id='email' maxlength='64' value='{{{ email }}}' required>
+    <br>
+    <label for='password'>Password: </label>
+    <input type='password' name='password' id='password' value='{{{ password }}}' required>
+    <br>
+    <label for='repeatpassword'>Repeat password: </label>
+    <input type='password' name='repeatpassword' id='repeatpassword' value='{{{ repeatpassword }}}' required>
+    <br>
+    <br>
+    <b>Settings</b>
+    <br>
+    <label for='overwrite'>Overwrite old database: </label>
+    <input type='checkbox' name='overwrite' id='overwrite'{{ overwrite }}>        
+    <br>
+    <input type='submit' value='Install' class='button'>
+   </form>
+  </div>

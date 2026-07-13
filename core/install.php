@@ -22,7 +22,6 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
 $title = "Installer";
 
 // If the blog is being installed in a folder, take note of that fact.
@@ -107,8 +106,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors[] = "Database Connection Error: " . $e->getMessage();
     }
     
-    // If there are no errors, install.
-    if (count($errors) === 0) {
+    // If there are errors, display them.
+    if (count($errors) !== 0) {
+        foreach ($errors as $e) {
+            $messages[] = error($e);
+        }
+    }
+    // Otherwise, install.
+    else {
         if (isset($_POST["overwrite"]) && ($_POST["overwrite"] == "on")) {
             $db->query("DROP TABLE IF EXISTS `accounts`");
             $db->query("DROP TABLE IF EXISTS `posts`");
@@ -192,52 +197,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         flushConfig();
 
         // Print a message that the software has been installed.
-        $content .= success("Software successfully installed!");
+        $messages[] = success("Software successfully installed!");
+        
+        render_page("", array(), $config["title"]);
 
         // We will want to take the user to their newly installed blog.
         redirect("", 2);
-    }
-    // Otherwise, display the errors.
-    else {
-        foreach ($errors as $e) {
-            $content .= error($e);
-        }
     }
 }
 
 // Display the install page form.
 if (!$config["installed"]) {
-$content .= 
-    "<div class='form installForm'>
-        <h1>Installer</h1>
-        <form method='post'>
-            <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-            <b>SQL Details</b></br>
-            <label for='sqlserver'>SQL Server: </label><input type='text' placeholder='localhost' name='SQLServer' id='sqlserver'" . (isset($_POST["SQLServer"]) ? " value='" . htmlspecialchars($_POST["SQLServer"]) . "'" : "") . " required></input></br>
-            <label for='sqldatabase'>SQL Database: </label><input type='text' placeholder='AtomicBlog' name='SQLDatabase' id='sqldatabase'" . (isset($_POST["SQLDatabase"]) ? " value='" . htmlspecialchars($_POST["SQLDatabase"]) . "'" : "") . " required></input></br>
-            <label for='sqlusername'>SQL Username: </label><input type='text' name='SQLUsername' id='sqlusername'" . (isset($_POST["SQLUsername"]) ? " value='" . htmlspecialchars($_POST["SQLUsername"]) . "'" : "") . " required></input></br>
-            <label for='sqlpassword'>SQL Password: </label><input type='text' name='SQLPassword' id='sqlpassword'" . (isset($_POST["SQLPassword"]) ? " value='" . htmlspecialchars($_POST["SQLPassword"]) . "'" : "") . " required></input></br>
-
-            <br><b>Blog Configuration</b></br>
-            <label for='title'>Blog Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "") . " required></input></br>
-            <label for='description'>Blog Description: </label><textarea name='description' id='description' maxlength='128' required>" . (isset($_POST["description"]) ? htmlspecialchars($_POST["description"]) : "") . "</textarea></br>
-
-            <br><b>Administrator Account Details</b></br>
-            <label for='name'>Name: </label><input type='text' name='name' autocomplete='name' maxlength='64' id='name'" . (isset($_POST["name"]) ? " value='" . htmlspecialchars($_POST["name"]) . "'" : "") . " required></input></br>
-            <label for='username'>Username: </label><input type='text' name='username' autocomplete='username' maxlength='32' id='username'" . (isset($_POST["username"]) ? " value='" . htmlspecialchars($_POST["username"]) . "'" : "") . " required></input></br>
-            <label for='email'>Email Address: </label><input type='email' name='email' id='email' maxlength='64'" . (isset($_POST["email"]) ? " value='" . htmlspecialchars($_POST["email"]) . "'" : "") . " required></input></br>
-            <label for='password'>Password: </label><input type='password' name='password' id='password'" . (isset($_POST["password"]) ? " value='" . htmlspecialchars($_POST["password"]) . "'" : "") . " required></input></br>
-            <label for='repeatpassword'>Repeat password: </label><input type='password' name='repeatpassword' id='repeatpassword'" . (isset($_POST["repeatpassword"]) ? " value='" . htmlspecialchars($_POST["repeatpassword"]) . "'" : "") . " required></input></br>
-            
-            <br><b>Settings</b></br>
-            <label for='overwrite'>Overwrite old database: </label><input type='checkbox' name='overwrite' id='overwrite'" . (isset($_POST["overwrite"]) ? " checked" : "") . ">
-            
-            <br><input type='submit' value='Install' class='button'></input>
-        </form>
-    </div>
-";
+    $installvars = array("token" => $_SESSION["csrf_token"],
+    "sqlserver" => $_POST["SQLServer"] ?? "",
+    "sqldb" => $_POST["SQLDatabase"] ?? "",
+    "sqluser" => $_POST["SQLUsername"] ?? "",
+    "sqlpass" => $_POST["SQLPassword"] ?? "",
+    "title" => $_POST["title"] ?? "",
+    "description" => $_POST["description"] ?? "",
+    "name" => $_POST["name"] ?? "",
+    "username" => $_POST["username"] ?? "",
+    "email" => $_POST["email"] ?? "",
+    "password" => $_POST["password"] ?? "",
+    "repeatpassword" => $_POST["repeatpassword"] ?? "",
+    "overwrite" => (isset($_POST["overwrite"]) ? " checked" : ""));
+    
+    render_page("install.html", $installvars, $title);
 }
-
-render($content, $title);
 
 ?>
