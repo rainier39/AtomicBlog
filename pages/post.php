@@ -22,14 +22,13 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$content = "";
 $displayPost = true;
 $updatePost = false;
 $title = "";
 
 if (!checkPerm(PERM_VIEW_POST)) {
     $messages[] = error("You don't have permission to view this post.");
-    render($content, $title);
+    render_page("", array());
     exit();
 }
 
@@ -53,7 +52,7 @@ while ($p = $post->fetch_assoc()) {
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
-    $content .= error("The requested post doesn't exist.");
+    $messages[] = error("The requested post doesn't exist.");
     $displayPost = false;
 }
 // Handle star toggling.
@@ -174,18 +173,13 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
             $success = true;
         }
         if (!$success) {
-            $content .= "<div class='form editPostForm'>
-                <h1>Edit Post</h1>
-                <form method='post'>
-                    <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                    <label for='title'>Title: </label><input type='text' name='title' id='title' maxlength='32'" . (isset($_POST["title"]) ? " value='" . htmlspecialchars($_POST["title"]) . "'" : "value='" . htmlspecialchars($p_title) . "'") . "><br>
-                    <label for='tags'>Tags: </label><input type='text' name='tags' id='tags' maxlength='128'" . (isset($_POST["tags"]) ? " value='" . htmlspecialchars($_POST["tags"]) . "'" : "value='" . htmlspecialchars($p_tags) . "'") . "><br>
-                    " . markdownButtons() . "
-                    <label for='content'>Content: </label><textarea name='content' id='content' maxlength='65500'>" . (isset($_POST["content"]) ? htmlspecialchars($_POST["content"]) : htmlspecialchars($p_content)) . "</textarea><br><br>
-                    <input type='submit' value='Edit post' class='button' name='edit'>
-                    <input type='submit' value='Cancel edit' class='button' name='cancel'>
-                </form>
-            </div>";
+            $posteditvars = array("token" => $_SESSION["csrf_token"],
+            "title" => $_POST["title"] ?? $p_title,
+            "tags" => $_POST["tags"] ?? $p_tags,
+            "buttons" => markdownButtons(),
+            "content" => $_POST["content"] ?? $p_content);
+            
+            render_page("postEdit.html", $posteditvars, $title);
         }
     }
     else {
@@ -289,12 +283,13 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
             }
         }
         // Display forms and images.
-        $content .= "<p><a href='" . makeURL("post/{$p_id}") . "' class='button'>Back to post</a></p>
-        <div class='manageUploads'><h1>Manage Uploads</h1>";
+        $postuploadsvars = array("back" => makeURL("post/{$p_id}"),
+        "icons" => "",
+        "script" => makeURL("javascript/uploads.js"),
+        "attachments" => "");
         
-        $content .= "<h2>Icon</h2>";
         foreach ($icons as $icon) {
-            $content .= "<div class='uploadTile'>
+            $postuploadsvars["icons"] .= "<div class='uploadTile'>
               <img src='" . makeURL("images/{$icon}") . "'>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this icon?\");'>
@@ -303,16 +298,8 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
               </form>
             </div>";
         }
-        $content .= "<h3>Upload a new icon</h3>
-        <form method='post' enctype='multipart/form-data'>
-          <input type='file' name='icon'>
-          <input type='submit' value='Upload icon'>
-        </form>";
-        $content .= "<hr>
-        <h2>Attachments</h2>
-        <script src='" . makeURL("javascript/uploads.js") . "'></script>";
         foreach ($attachments as $attachment) {
-            $content .= "<div class='uploadTile'>
+            $postuploadsvars["attachments"] .= "<div class='uploadTile'>
               <img src='" . makeURL("images/{$attachment}") . "'>
               URL: <a onclick='copy(\"" . (($ishttps == "on") ? "https://" : "http://") . $_SERVER["SERVER_NAME"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
               <hr>
@@ -322,11 +309,8 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
               </form>
             </div>";
         }
-        $content .= "<h3>Upload a new attachment</h3>
-        <form method='post' enctype='multipart/form-data'>
-          <input type='file' name='attachment'>
-          <input type='submit' value='Upload attachment'>
-        </form></div>";
+        
+        render_page("postUploads.html", $postuploadsvars, $title);
     }
     else {
         $messages[] = error("You don't have permission to do this.");
@@ -350,69 +334,62 @@ if ($displayPost) {
             $p_starred = $p["starred"];
         }
     }
+    
+    $postvars = array("postbuttons" => "",
+    "title" => $p_title,
+    "author" => "Nobody",
+    "ptime" => date("g:i:sa", $p_starttime),
+    "pdate" => date("F jS Y", $p_starttime),
+    "edited" => "",
+    "icon" => "",
+    "tags" => "",
+    "content" => $p_content);
+    
     $title = $p_title;
-    $content .=
-    "<div class='post'>
-        <div class='postButtons'>";
+    
     if (($id == $p_account) and checkPerm(PERM_EDIT_POST)) {
-        $content .= "
+        $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/edit") . "' class='button postButton'>Edit</a>";
     }
     if (($id == $p_account) and checkPerm(PERM_DELETE_POST)) {
-        $content .= 
+        $postvars["postbuttons"] .= 
             "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
     }
     if (($id == $p_account) and checkPerm(PERM_STAR_POST)) {
-        $content .=
+        $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p_starred == "1") ? "Unstar" : "Star") . "'></form>";
     }
     if (($id == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
-        $content .=
+        $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p_published == "1") ? "Unpublish" : "Publish") . "'></form>";
     }
     if (($id == $p_account) and checkPerm(PERM_UPLOAD)) {
-        $content .= "
+        $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/uploads") . "' class='button postButton'>Manage Uploads</a>";
     }
-    $content .=
-        "</div>
-        <div class='postHeader'>
-            <h1>" . htmlspecialchars($p_title) . "</h1>";
     // Get the account information of the post author.
     $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p_account) . "'");
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
-            $content .= "By: " . htmlspecialchars($a["name"]);
+            $postvars["author"] = $a["name"];
         }
     }
-    else {
-        $content .= "By: Nobody";
-    }
-    $content .= " | ";
-    $content .= "<small>Published: <span title='" . date("g:i:sa", $p_starttime) . "'>" . date("F jS Y", $p_starttime) . "</span></small>";
     if (!empty($p_edittime)) {
-        $content .= " | <small>Modified: <span title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS Y", $p_edittime) . "</span></small>";
+        $postvars["edited"] .= " | <small>Modified: <span title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS Y", $p_edittime) . "</span></small>";
     }
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
         if (str_starts_with($u, $p_id . ".")) {
-            $content .= "<p><img src='" . makeURL("images/{$u}") . "' class='pIcon'></p>";
+            $postvars["icon"] = "<p><img src='" . makeURL("images/{$u}") . "' class='pIcon'></p>";
             // Just use the first icon we find.
             break;
         }
     }
     $tags = parseTags($p_tags);
-    $content .= "<p><div class='tagslabel'>Tags:</div>";
     foreach ($tags as $tag) {
-        $content .= "<div class='tag'>" . htmlspecialchars($tag) . "</div>";
+        $postvars["tags"] .= "<div class='tag'>" . htmlspecialchars($tag) . "</div>";
     }
-    $content .= "</p>";
-    $content .= "</div>
-        <div class='postContent'>
-        " . format($p_content) . "
-        </div>
-    </div>";
 
     // Get views from this IP on this post, if any.
     $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($p_id) . "'");
@@ -421,9 +398,9 @@ if ($displayPost) {
     if ($views->num_rows < 1) {
         $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($p_id) . "')");
     }
+    
+    render_page("post.html", $postvars, $title);
 }
-
-render($content, $title);
 
 ?>
 

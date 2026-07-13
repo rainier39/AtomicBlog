@@ -1,0 +1,19 @@
+  <div class='form editPostForm'>
+   <h1>Edit Post</h1>
+   <form method='post'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <label for='title'>Title: </label>
+    <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}'>
+    <br>
+    <label for='tags'>Tags: </label>
+    <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
+    <br>
+    {{ buttons }}
+    <label for='content'>Content: </label>
+    <textarea name='content' id='content' maxlength='65500'>{{{ content }}}</textarea>
+    <br>
+    <br>
+    <input type='submit' value='Edit post' class='button' name='edit'>
+    <input type='submit' value='Cancel edit' class='button' name='cancel'>
+   </form>
+  </div>
