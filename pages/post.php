@@ -403,4 +403,3 @@ if ($displayPost) {
 }
 
 ?>
-

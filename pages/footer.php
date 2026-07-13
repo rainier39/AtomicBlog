@@ -27,4 +27,3 @@ $footervars = array("footercontent" => $config["footer"]);
 render_template("footer.html", $footervars);
 
 ?>
-

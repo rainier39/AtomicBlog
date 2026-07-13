@@ -36,6 +36,10 @@ function render_template($filename, $variables, $echo=true) {
         return false;
     }
     
+    // Don't display HTML comments.
+    $template = preg_replace("/<!-- .+ -->/", "", $template);
+    
+    // Template variables.
     foreach ($variables as $k=>$v) {
         $template = preg_replace("/{{{{ ({$k}) }}}}/", format($v), $template);
         $template = preg_replace("/{{{ ({$k}) }}}/", htmlspecialchars($v), $template);
@@ -45,6 +49,9 @@ function render_template($filename, $variables, $echo=true) {
         // Double square brackets for language strings.
         $template = preg_replace("/\[\[ ({$k}) \]\]/", $v, $template);
     }
+    
+    // Remove any extra whitespace.
+    $template = trim($template);
     
     // We may only want to return the result as a string if this is something like a post tile.
     // I.E. not a final result, full page, whatever else.

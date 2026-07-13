@@ -49,4 +49,3 @@ if ($config["installed"]) {
 render_template("header.html", $headervars);
 
 ?>
-

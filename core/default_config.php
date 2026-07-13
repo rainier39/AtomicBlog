@@ -64,4 +64,3 @@ $default_config = array(
 );
 
 ?>
-

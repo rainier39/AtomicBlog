@@ -133,4 +133,3 @@ else {
 render_page("register.html", $registervars, $title);
 
 ?>
-

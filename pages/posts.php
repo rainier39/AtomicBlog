@@ -72,4 +72,3 @@ else {
 render_page("posts.html", $postsvars, $title);
 
 ?>
-
