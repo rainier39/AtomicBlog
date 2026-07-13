@@ -38,21 +38,6 @@ function logout($redirect=false) {
 }
 
 // Render a page, placing the header and footer accordingly.
-// DEPRECATED
-function render(string $content, string $htitle="") {
-    global $config, $hcontent, $messages;
-    if ($htitle == "") {
-        $htitle = $config["title"];
-    }
-    else {
-        $htitle = $htitle . " - " . $config["title"];
-    }
-    require "pages/header.php";
-    echo($content);
-    require "pages/footer.php";
-}
-
-// Render a page, placing the header and footer accordingly.
 function render_page($templatename, $templatevars, string $htitle="") {
     global $config, $hcontent, $messages;
     if ($htitle == "") {
