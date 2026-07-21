@@ -155,8 +155,9 @@ elseif ($url[0] == "")
 // Default everything else to the homepage, and show an error message.
 else
 {
-    $hcontent = error("Page not found.");
-    require "pages/home.php";
+    http_response_code(404);
+    $messages[] = error("Page not found.");
+    render_page("", array(), $config["title"]);
 }
 
 ?>

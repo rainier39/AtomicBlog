@@ -63,19 +63,19 @@ a:hover {
 /* Messages */
 .success {
  border: 1px solid green;
- padding: 4px;
+ padding: 4px 8px;
  margin: 2px;
  background: #77ff77;
 }
 .info {
  border: 1px solid goldenrod;
- padding: 4px;
+ padding: 4px 8px;
  margin: 2px;
  background: #ffff77;
 }
 .error {
  border: 1px solid red;
- padding: 4px;
+ padding: 4px 8px;
  margin: 2px;
  background: #ff7777;
 }
@@ -175,6 +175,8 @@ a:hover {
 /* Post tiles */
 .postsTable {
  width: 100%;
+ table-layout: fixed;
+ border-spacing: 12px;
 }
 .postTile {
  padding: 14px;
@@ -267,13 +269,6 @@ code, .codeblock {
 .tagslabel {
  display: inline-block;
  margin-right: 4px;
-}
-/* Home page/All posts page */
-.posts {
- border: 1px solid var(--main-border-color);
-}
-.posts legend {
- font-size: 120%;
 }
 /* Edit post page */
 .editPostForm label {

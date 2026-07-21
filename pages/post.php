@@ -52,8 +52,10 @@ while ($p = $post->fetch_assoc()) {
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
+    http_response_code(404);
     $messages[] = error("The requested post doesn't exist.");
-    $displayPost = false;
+    render_page("", array());
+    exit();
 }
 // Handle star toggling.
 elseif (isset($_POST["toggleStar"])) {
@@ -129,6 +131,7 @@ elseif (isset($_POST["delete"])) {
                 $messages[] = success("Successfully deleted the post.");
                 $displayPost = false;
                 redirect("", 2);
+                render_page("", array(), $title);
             }
         }
         else {
