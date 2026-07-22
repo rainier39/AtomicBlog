@@ -95,20 +95,20 @@ function displayPost($id, $title, $account) {
 }
 
 function success($message) {
-    return "<div class='success'>" . htmlspecialchars($message) . "</div>";
+    return "<div class='message success'>" . htmlspecialchars($message) . "</div>";
 }
 
 // This function does not htmlspecialchars() its content, so user supplied input needs to be escaped by the caller beforehand.
 function unsafe_success($message) {
-    return "<div class='success'>" . $message . "</div>";
+    return "<div class='message success'>" . $message . "</div>";
 }
 
 function info($message) {
-    return "<div class='info'>" . htmlspecialchars($message) . "</div>";
+    return "<div class='message info'>" . htmlspecialchars($message) . "</div>";
 }
 
 function error($message) {
-    return "<div class='error'>" . htmlspecialchars($message) . "</div>";
+    return "<div class='message error'>" . htmlspecialchars($message) . "</div>";
 }
 
 // Make a valid (relative) URL for a given page.

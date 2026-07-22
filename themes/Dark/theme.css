@@ -32,6 +32,19 @@ a:hover {
  background: #2222ad;
  border-color: #d0d0d0;
 }
+.success {
+ color: white;
+ background: darkgreen;
+}
+.info {
+ color: white;
+ background: darkgoldenrod;
+ border: 1px solid goldenrod;
+}
+.error {
+ color: white;
+ background: tomato;
+}
 
 /** Pages **/
 /* Post tiles */

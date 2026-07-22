@@ -80,6 +80,15 @@ require "core/formatter.php";
 // Initialize the template engine.
 require "core/template.php";
 
+// Get all of the themes.
+$themes = array();
+foreach (scandir("themes") as $theme) {
+    // Check for theme.css files.
+    if (is_file("themes/" . $theme . "/theme.css")) {
+        $themes[] = $theme;
+    }
+}
+
 // Break up the URL for easy use throughout the software.
 $url = explode('/', ($_GET['url'] ?? ""));
 

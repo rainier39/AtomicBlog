@@ -69,6 +69,25 @@ foreach ($languages as $l) {
     $languageHTML .= "<option value='$l'$s>$l</option>";
 }
 
+// Theme stuff.
+$themeHTML = "";
+// Use the user-supplied language if it's valid, otherwise default to the config.
+if (isset($_POST["theme"]) and in_array($_POST["theme"], $themes)) {
+    $currentTheme = $_POST["theme"];
+}
+else {
+    $currentTheme = $config["theme"];
+}
+foreach ($themes as $t) {
+    if ($t == $currentTheme) {
+        $s = " selected";
+    }
+    else {
+        $s = "";
+    }
+    $themeHTML .= "<option value='$t'$s>$t</option>";
+}
+
 // Registration mode stuff.
 $registerHTML = "";
 $modes = array("approval", "open");
@@ -157,6 +176,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $config["language"] = $_POST["clanguage"];
                 $language = $_POST["clanguage"];
                 updateLang();
+                $changes++;
+            }
+        }
+        if (isset($_POST["theme"])) {
+            if (!in_array($_POST["theme"], $themes)) {
+                $errors[] = "Invalid theme.";
+            }
+            // Only write to the config if the value is actually being changed.
+            elseif ($_POST["theme"] != $config["theme"]) {
+                $config["theme"] = $_POST["theme"];
                 $changes++;
             }
         }
@@ -276,6 +305,7 @@ $configvars = array("token" => $_SESSION["csrf_token"],
 "footer" => $_POST["cfooter"] ?? $config["footer"],
 "timezone" => $timezonesHTML,
 "language" => $languageHTML,
+"theme" => $themeHTML,
 "allowregistration" => $config["allowRegistration"] ? " checked" : "",
 "registrationmode" => $registerHTML,
 "loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],

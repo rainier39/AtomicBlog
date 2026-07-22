@@ -24,7 +24,7 @@ a:hover {
  background: steelblue;
  color: white;
  text-align: center;
- margin-top: 6px;
+ margin-top: 12px;
 }
 .navbar {
  border-left: 1px solid var(--main-border-color);
@@ -58,25 +58,23 @@ a:hover {
  padding: 20px;
  background: white;
  text-align: center;
- margin-bottom: 6px;
+ margin-bottom: 12px;
 }
 /* Messages */
-.success {
- border: 1px solid green;
+.message {
  padding: 4px 8px;
  margin: 2px;
+}
+.success {
+ border: 1px solid green;
  background: #77ff77;
 }
 .info {
  border: 1px solid goldenrod;
- padding: 4px 8px;
- margin: 2px;
  background: #ffff77;
 }
 .error {
  border: 1px solid red;
- padding: 4px 8px;
- margin: 2px;
  background: #ff7777;
 }
 #toasts {
@@ -120,7 +118,6 @@ a:hover {
 .form input[type=submit] {
  /* Once again, Chrome-based and FireFox have different default heights. */
  height: 40px;
- 
 }
 .button {
  width: fit-content!important;

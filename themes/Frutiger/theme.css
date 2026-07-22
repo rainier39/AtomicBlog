@@ -1,0 +1,38 @@
+@import url("../Light/theme.css");
+
+/** Global **/
+/* Global variables */
+.header {
+ background: linear-gradient(white 0, #888 15%, #777 20%, #666 25%, #555 30%, #444 35%, #333 40%, #222 50%, #111 100%);
+ border-radius: 12px;
+ margin-bottom: 4px;
+}
+.navbar {
+ border: 1px solid var(--main-border-color);
+ background: linear-gradient(white 0, lightslategrey 55%, lightslategrey 100%);
+ border-radius: 12px;
+ margin-bottom: 4px;
+}
+.content {
+ border: 1px solid var(--main-border-color);
+ border-radius: 12px;
+ margin-bottom: 4px;
+}
+.footer {
+ border-radius: 12px;
+}
+/* Messages */
+.message {
+ border-radius: 8px;
+}
+
+/* Forms/Buttons */
+.button {
+ background: linear-gradient(lightblue 1%, cornflowerblue 10%, cornflowerblue 40%, cornflowerblue 50%, royalblue 50%, royalblue 40%, royalblue 10%, lightskyblue 100%);
+ border-radius: 12px;
+}
+
+/** Pages **/
+
+/** Phone/Tablet **/
+
