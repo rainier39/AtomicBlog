@@ -1,22 +1,16 @@
 <!-- pages/panel/newpost.php -->
-  <div class='form newPostForm'>
-   <h1>New Post</h1>
-   <form method='post'>
-    <input type='hidden' name='csrf_token' value='{{ token }}'>
-    <label for='title'>Title: </label>
-    <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}'>
-    <br>
-    <label for='tags'>Tags: </label>
-    <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
-    <br>
-    {{ markdownbuttons }}
-    <label for='content'>Content: </label>
-    <textarea name='content' id='content' maxlength='65500'>{{{ content }}}</textarea>
-    <br>
-    <label for='unpublished'>Unpublished: </label>
-    <input type='checkbox' name='unpublished' id='unpublished'{{ unpublished }}>
-    <br>
-    <br>
-    <input type='submit' value='Submit post' class='button'>
-   </form>
-  </div>
+  <h1>New Post</h1>
+  <form method='post' class='form newPostForm'>
+   <input type='hidden' name='csrf_token' value='{{ token }}'>
+   <label for='title'>Title: </label>
+   <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}'>
+   <label for='tags'>Tags: </label>
+   <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
+   {{ markdownbuttons }}
+   <label for='content'>Content: </label>
+   <textarea name='content' id='content' maxlength='65500'>{{{ content }}}</textarea>
+   <label for='unpublished'>Unpublished: </label>
+   <input type='checkbox' name='unpublished' id='unpublished'{{ unpublished }}>
+   <br>
+   <input type='submit' value='Submit post' class='button'>
+  </form>

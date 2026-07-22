@@ -466,14 +466,14 @@ function upload($file, $name) {
 }
 
 function markdownButtons() {
-    return "<script src='" . makeURL("javascript/markdownbuttons.js") . "'></script>
+    return "<div></div><div class='markdownbuttons'><script src='" . makeURL("javascript/markdownbuttons.js") . "'></script>
     <label></label>
     <a class='button' onclick='format(\"bold\")'><b>B</b></a>
     <a class='button' onclick='format(\"italic\")'><i>i</i></a>
     <a class='button' onclick='format(\"codeblock\")'>&lt;/&gt;</a>
     <a class='button' onclick='format(\"link\")'>link</a>
     <a class='button' onclick='format(\"image\")'>img</a>
-    <br>";
+    </div>";
 }
 
 function parseTags($tagstring) {

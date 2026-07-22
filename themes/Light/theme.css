@@ -21,10 +21,17 @@ a:hover {
  border: 1px solid var(--main-border-color);
  padding: 20px;
  font-size: 160%;
- background: steelblue;
+ background: #046791;
  color: white;
  text-align: center;
  margin-top: 12px;
+}
+#blogtitle {
+ display: block;
+ font-weight: bold;
+}
+#blogdesc {
+ font-size: 18px;
 }
 .navbar {
  border-left: 1px solid var(--main-border-color);
@@ -92,32 +99,27 @@ a:hover {
 }
 /* Forms/Buttons */
 .form {
- margin-left: 32px;
+ display: grid;
+ grid-template-columns: auto 1fr;
+ max-width: 55%;
+ gap: 12px;
 }
 .form label {
- min-width: 6em;
- display: inline-block;
  text-align: right;
 }
 .form input, textarea {
- box-sizing: border-box;
- width: 250px;
- /* For some reason Chromium-based browsers have a different default input height than FireFox. */
- min-height: 25px;
  outline: none;
- margin: 10px;
  font-family: inherit;
  max-width: 100%;
 }
 .form textarea {
- width: 500px;
+ resize: vertical;
 }
 .form input[type=checkbox] {
- width: auto;
+ width: 17px;
+ height: 17px;
 }
-.form input[type=submit] {
- /* Once again, Chrome-based and FireFox have different default heights. */
- height: 40px;
+.markdownbuttons {
 }
 .button {
  width: fit-content!important;
@@ -148,26 +150,11 @@ a:hover {
  min-width: 8em;
 }
 /* New post page */
-.newPostForm label {
- min-width: 4em;
- vertical-align: top;
- margin-top: 10px;
-}
 .newPostForm textarea {
- resize: vertical;
- height: 250px;
-}
-.configForm label {
- min-width: 4em;
- vertical-align: top;
- margin-top: 10px;
+ min-height: 250px;
 }
 .configForm textarea {
- resize: vertical;
- height: 120px;
-}
-.configForm select {
- vertical-align: bottom;
+ min-height: 120px;
 }
 /* Post tiles */
 .postsTable {
@@ -268,13 +255,7 @@ code, .codeblock {
  margin-right: 4px;
 }
 /* Edit post page */
-.editPostForm label {
- min-width: 4em;
- vertical-align: top;
- margin-top: 12px;
-}
 .editPostForm textarea {
- resize: vertical;
  height: 250px;
 }
 /* Manage uploads page */

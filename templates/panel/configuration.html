@@ -1,56 +1,43 @@
 <!-- pages/panel/configuration.php -->
-  <div class='form configForm'>
-   <h1>Blog Configuration</h1>
-   <form method='post'>
-    <input type='hidden' name='csrf_token' value='{{ token }}'>
-    <label for='ctitle'>Blog Title:</label>
-    <input type='text' name='ctitle' id='ctitle' value='{{{ title }}}'>
-    <br>
-    <label for='cdescription'>Blog Description:</label>
-    <textarea id='cdescription' name='cdescription'>{{{ description }}}</textarea>
-    <br>
-    <label for='cfooter'>Footer:</label>
-    <textarea id='cfooter' name='cfooter'>{{{ footer }}}</textarea>
-    <br>
-    <label for='timezone'>Server Timezone:</label>
-    <select name='timezone' id='timezone'>
-    {{ timezone }}
-    </select>
-    <br>
-    <label for='clanguage'>Language:</label>
-    <select name='clanguage' id='clanguage'>
-    {{ language }}
-    </select>
-    <br>
-    <label for='theme'>Theme:</label>
-    <select name='theme' id='theme'>
-    {{ theme }}
-    </select>
-    <h2>User Management</h2>
-    <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>
-    <input type='checkbox' id='registration' name='registration'{{ allowregistration }}>
-    <br>
-    <label for='registrationMode'>Registration Mode:</label>
-    <select name='registrationMode' id='registrationMode'>
-    {{ registrationmode }}
-    </select>
-    <h2>Rate Limits</h2>
-    <label for='logins' title='Allowed logins/login attempts per hour from an IP.'>Logins Per Hour:</label>
-    <input type='text' id='logins' name='logins' value='{{{ loginsperhour }}}'>
-    <br>
-    <label for='accounts' title='Maximum number of accounts that can be created per IP.'>Accounts Per IP:</label>
-    <input type='text' id='accounts' name='accounts' value='{{{ accountsperip }}}'>
-    <br>
-    <label for='accountcooldown' title='Time (in seconds) one must wait in between creating accounts.'>Registration Cooldown:</label>
-    <input type='text' id='accountcooldown' name='accountcooldown' value='{{{ accountcooldown }}}'>
-    <br>
-    <label for='postdelay' title='Time (in seconds) one must wait in between making blog posts.'>Post Delay:</label>
-    <input type='text' id='postdelay' name='postdelay' value='{{{ postdelay }}}'>
-    <br>
-    <label for='editdelay' title='Time (in seconds) one must wait in between making edits to blog posts.'>Edit Delay:</label>
-    <input type='text' id='editdelay' name='editdelay' value='{{{ editdelay }}}'>
-    <br>
-    <br>
-    <input type='submit' value='Save changes' class='button'>
-   </form>
-  </div>
+  <h1>Blog Configuration</h1>
+  <form method='post' class='form configForm'>
+   <input type='hidden' name='csrf_token' value='{{ token }}'>
+   <label for='ctitle'>Blog Title:</label>
+   <input type='text' name='ctitle' id='ctitle' value='{{{ title }}}'>
+   <label for='cdescription'>Blog Description:</label>
+   <textarea id='cdescription' name='cdescription'>{{{ description }}}</textarea>
+   <label for='cfooter'>Footer:</label>
+   <textarea id='cfooter' name='cfooter'>{{{ footer }}}</textarea>
+   <label for='timezone'>Server Timezone:</label>
+   <select name='timezone' id='timezone'>
+   {{ timezone }}
+   </select>
+   <label for='clanguage'>Language:</label>
+   <select name='clanguage' id='clanguage'>
+   {{ language }}
+   </select>
+   <label for='theme'>Theme:</label>
+   <select name='theme' id='theme'>
+   {{ theme }}
+   </select>
+   <h2>User Management</h2><div></div>
+   <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>
+   <input type='checkbox' id='registration' name='registration'{{ allowregistration }}>
+   <label for='registrationMode'>Registration Mode:</label>
+   <select name='registrationMode' id='registrationMode'>
+   {{ registrationmode }}
+   </select>
+   <h2>Rate Limits</h2><div></div>
+   <label for='logins' title='Allowed logins/login attempts per hour from an IP.'>Logins Per Hour:</label>
+   <input type='text' id='logins' name='logins' value='{{{ loginsperhour }}}'>
+   <label for='accounts' title='Maximum number of accounts that can be created per IP.'>Accounts Per IP:</label>
+   <input type='text' id='accounts' name='accounts' value='{{{ accountsperip }}}'>
+   <label for='accountcooldown' title='Time (in seconds) one must wait in between creating accounts.'>Registration Cooldown:</label>
+   <input type='text' id='accountcooldown' name='accountcooldown' value='{{{ accountcooldown }}}'>
+   <label for='postdelay' title='Time (in seconds) one must wait in between making blog posts.'>Post Delay:</label>
+   <input type='text' id='postdelay' name='postdelay' value='{{{ postdelay }}}'>
+   <label for='editdelay' title='Time (in seconds) one must wait in between making edits to blog posts.'>Edit Delay:</label>
+   <input type='text' id='editdelay' name='editdelay' value='{{{ editdelay }}}'>
+   <br>
+   <input type='submit' value='Save changes' class='button'>
+  </form>

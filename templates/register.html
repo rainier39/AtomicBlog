@@ -1,24 +1,17 @@
 <!-- pages/register.php -->
-  <div class='form registerForm'>
-   <h1>[[ global.register ]]</h1>
-   <form method='post'>
-    <input type='hidden' name='csrf_token' value='{{ token }}'>
-    <label for='name'>[[ global.name: ]]</label>
-    <input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='{{{ name }}}' required>
-    <br>
-    <label for='username'>[[ global.username: ]]</label>
-    <input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='{{{ username }}}' required>
-    <br>
-    <label for='email'>[[ global.email: ]]</label>
-    <input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='{{{ email }}}' required>
-    <br>
-    <label for='password'>[[ global.password: ]]</label>
-    <input type='password' name='password' id='password' autocomplete='new-password' value='{{{ password }}}' required>
-    <br>
-    <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
-    <input type='password' name='repeatpassword' id='repeatpassword' value='{{{ repeatpassword }}}' required>
-    <br>
-    <br>
-    <input type='submit' value='[[ global.register ]]' class='button'>
-   </form>
-  </div>
+  <h1>[[ global.register ]]</h1>
+  <form method='post' class='form'>
+   <input type='hidden' name='csrf_token' value='{{ token }}'>
+   <label for='name'>[[ global.name: ]]</label>
+   <input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='{{{ name }}}' required>
+   <label for='username'>[[ global.username: ]]</label>
+   <input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='{{{ username }}}' required>
+   <label for='email'>[[ global.email: ]]</label>
+   <input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='{{{ email }}}' required>
+   <label for='password'>[[ global.password: ]]</label>
+   <input type='password' name='password' id='password' autocomplete='new-password' value='{{{ password }}}' required>
+   <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
+   <input type='password' name='repeatpassword' id='repeatpassword' value='{{{ repeatpassword }}}' required>
+   <br>
+   <input type='submit' value='[[ global.register ]]' class='button'>
+  </form>
