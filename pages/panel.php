@@ -23,6 +23,7 @@
 if (!defined('INDEX')) exit;
 
 $title = "";
+$panelActions = array("settings", "newpost", "configuration", "users");
 
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
@@ -35,6 +36,7 @@ elseif (!isset($url[1]) or $url[1] == "") {
     $title = "Panel";
     $panelvars = array("useractions" => "",
     "adminactions" => "");
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/settings") . "'>Account settings</a></p>";
     if (checkPerm(PERM_NEW_POST)) {
         $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>Create a new post</a></p>";
     }
@@ -46,15 +48,9 @@ elseif (!isset($url[1]) or $url[1] == "") {
     }
     render_page("panel.html", $panelvars, $title);
 }
-// Direct the user to the "create a new post" page.
-elseif ($url[1] == "newpost") {
-    require "panel/newpost.php";
-}
-elseif ($url[1] == "configuration") {
-    require "panel/configuration.php";
-}
-elseif ($url[1] == "users") {
-    require "panel/users.php";
+// Direct the user to one of the panel pages if applicable.
+elseif (in_array($url[1], $panelActions)) {
+    require "panel/{$url[1]}.php";
 }
 // Display an error page.
 else {

@@ -1,0 +1,33 @@
+  <!-- pages/panel/settings.php -->
+  <h1>Account Settings</h1>
+  <div class='form'>
+   <form method='post'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <label for='name'>[[ global.name: ]]</label>
+    <input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='{{{ name }}}' required>
+    <br>
+    <label for='username'>[[ global.username: ]]</label>
+    <input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='{{{ username }}}' required>
+    <br>
+    <label for='email'>[[ global.email: ]]</label>
+    <input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='{{{ email }}}' required>
+    <br>
+    <br>
+    <input type='submit' value='Change settings' class='button'>
+   </form>
+   <h2>Change Password</h2>
+   <form method='post'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <label for='password'>[[ global.password: ]]</label>
+    <input type='password' name='password' id='password' autocomplete='password' value='{{{ password }}}' required>
+    <br>
+    <label for='password'>New Password: </label>
+    <input type='password' name='newpassword' id='newpassword' autocomplete='new-password' value='{{{ newpassword }}}' required>
+    <br>
+    <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
+    <input type='password' name='repeatpassword' id='repeatpassword' value='{{{ repeatpassword }}}' required>
+    <br>
+    <br>
+    <input type='submit' value='Change password' class='button'>
+   </form>
+  </div>
