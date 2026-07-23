@@ -60,7 +60,7 @@ if ($post->num_rows < 1) {
 // Handle star toggling.
 elseif (isset($_POST["toggleStar"])) {
     // Make sure the user is allowed to star/unstar the post.
-    if (($id == $p_account) and checkPerm(PERM_STAR_POST)) {
+    if ((($id == $p_account) and checkPerm(PERM_STAR_POST)) or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
         // If the CSRF token is sent and valid.
         if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
             // Generate a new token.
@@ -84,7 +84,7 @@ elseif (isset($_POST["toggleStar"])) {
 // Handle published toggling.
 elseif (isset($_POST["togglePublished"])) {
     // Make sure the user is allowed to publish/unpublish the post.
-    if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
+    if (($id == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
         // If the CSRF token is sent and valid.
         if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
             // Generate a new token.
@@ -108,7 +108,7 @@ elseif (isset($_POST["togglePublished"])) {
 // Handle deletions.
 elseif (isset($_POST["delete"])) {
         // Make sure the user is allowed to delete the post.
-        if (isset($_SESSION["id"]) and ($_SESSION["id"] == $p_account) and checkPerm(PERM_DELETE_POST)) {
+        if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
             // If the CSRF token is sent and valid.
             if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
                 // Generate a new token.
@@ -144,7 +144,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to edit the post.
-    if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p_account) and checkPerm(PERM_EDIT_POST)) {
+    if ((($id === $p_account) and checkPerm(PERM_EDIT_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
         if (isset($_POST["edit"])) {
             // If the CSRF token is sent and valid.
             if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
@@ -187,7 +187,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     }
     else {
         $messages[] = error("You don't have permission to do this.");
-        $updatePost = true;
+        $displayPost = true;
     }
     if ($success) {
         $displayPost = true;
@@ -200,7 +200,7 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to upload.
-    if (isset($_SESSION["id"]) and ($_SESSION["id"] === $p_account) and checkPerm(PERM_UPLOAD)) {
+    if ((($id === $p_account) and checkPerm(PERM_UPLOAD)) or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
         // Handle uploading icon.
         if (isset($_FILES["icon"])) {
             $upload = upload("icon", $p_id);
@@ -317,6 +317,7 @@ elseif (isset($url[2]) && ($url[2] == "uploads")) {
     }
     else {
         $messages[] = error("You don't have permission to do this.");
+        $displayPost = true;
     }
 }
 // Otherwise, display the post.
@@ -350,15 +351,15 @@ if ($displayPost) {
     
     $title = $p_title;
     
-    if (($id == $p_account) and checkPerm(PERM_EDIT_POST)) {
+    if ((($id == $p_account) and checkPerm(PERM_EDIT_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/edit") . "' class='button postButton'>Edit</a>";
     }
-    if (($id == $p_account) and checkPerm(PERM_DELETE_POST)) {
+    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= 
             "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
     }
-    if (($id == $p_account) and checkPerm(PERM_STAR_POST)) {
+    if ((($id == $p_account) and checkPerm(PERM_STAR_POST)) or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p_starred == "1") ? "Unstar" : "Star") . "'></form>";
     }
@@ -366,7 +367,7 @@ if ($displayPost) {
         $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p_published == "1") ? "Unpublish" : "Publish") . "'></form>";
     }
-    if (($id == $p_account) and checkPerm(PERM_UPLOAD)) {
+    if ((($id == $p_account) and checkPerm(PERM_UPLOAD)) or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/uploads") . "' class='button postButton'>Manage Uploads</a>";
     }

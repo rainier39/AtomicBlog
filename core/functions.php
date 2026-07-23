@@ -338,6 +338,32 @@ function checkRolePerm($perm, $role) {
     }
 }
 
+// Whether or not one user outranks the other.
+function checkOutrank($actinguserid, $targetuserid) {
+    global $db, $permissions;
+    
+    // Default to Guest, since deleted accounts should have no rights.
+    $actinguserrole = "Guest";
+    $targetuserrole = "Guest";
+    
+    $actinguser = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($actinguserid) . "'");
+    $targetuser = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($targetuserid) . "'");
+    
+    while ($a = $actinguser->fetch_assoc()) {
+        $actinguserrole = $a["role"];
+    }
+    while ($t = $targetuser->fetch_assoc()) {
+        $targetuserrole = $t["role"];
+    }
+    
+    if ($permissions[$actinguserrole] > $permissions[$targetuserrole]) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 // Upload an image given its name in $_FILES, and what it should be named.
 function upload($file, $name) {
     global $config;
