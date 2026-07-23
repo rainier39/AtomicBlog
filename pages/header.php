@@ -32,14 +32,14 @@ $headervars = array("pagetitle" => $htitle,
 
 // Generate the navbar appropriately.
 if ($config["installed"]) {
-    $headervars["navbar"] .= "<div class='navbar'><a href='" . makeURL("") . "'>" . lang("navbar.home") . "</a> <a href='" . makeURL("posts") . "'>" . lang("global.posts") . "</a>";
+    $headervars["navbar"] .= "<div class='navbar'><a href='" . makeURL("") . "'>" . lang("navbar.home") . "</a><a href='" . makeURL("posts") . "'>" . lang("global.posts") . "</a>";
     if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
-        $headervars["navbar"] .= " <a href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a> <a href='" . makeURL("logout") . "'>" . lang("navbar.logout") . "</a>";
+        $headervars["navbar"] .= "<a href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a><a href='" . makeURL("logout") . "'>" . lang("navbar.logout") . "</a>";
     }
     else {
-        $headervars["navbar"] .= " <a href='" . makeURL("login") . "'>" . lang("global.login") . "</a>";
+        $headervars["navbar"] .= "<a href='" . makeURL("login") . "'>" . lang("global.login") . "</a>";
         if ($config["allowRegistration"]) {
-            $headervars["navbar"] .= " <a href='" . makeURL("register") . "'>" . lang("global.register") . "</a>";
+            $headervars["navbar"] .= "<a href='" . makeURL("register") . "'>" . lang("global.register") . "</a>";
         }
     }
     $headervars["navbar"] .= "</div>";
