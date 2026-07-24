@@ -16,6 +16,7 @@ a {
 }
 a:hover {
  color: royalblue;
+ text-decoration: underline;
 }
 .header {
  border: 1px solid var(--main-border-color);
@@ -133,6 +134,7 @@ a:hover {
 .button:hover {
  color: lightgrey;
  background: cornflowerblue;
+ text-decoration: none;
 }
 
 /** Pages **/
