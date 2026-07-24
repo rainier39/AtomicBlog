@@ -84,7 +84,7 @@ elseif (isset($_POST["toggleStar"])) {
 // Handle published toggling.
 elseif (isset($_POST["togglePublished"])) {
     // Make sure the user is allowed to publish/unpublish the post.
-    if (($id == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
+    if (($id == $p_account) and checkPerm(PERM_NEW_POST)) {
         // If the CSRF token is sent and valid.
         if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
             // Generate a new token.
@@ -107,36 +107,119 @@ elseif (isset($_POST["togglePublished"])) {
 }
 // Handle deletions.
 elseif (isset($_POST["delete"])) {
-        // Make sure the user is allowed to delete the post.
-        if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
-            // If the CSRF token is sent and valid.
-            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-                // Generate a new token.
-                generateCSRFToken();
+    // Make sure the user is allowed to delete the post.
+    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
+        // If the CSRF token is sent and valid.
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+            // Generate a new token.
+            generateCSRFToken();
                 
-                // Delete the post.
-                $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p_id) . "'");
-                // Delete all of the post's views.
-                $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
-                // Delete all of the post's comments.
-                $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
-                // Delete all icons and attachments.
-                $uploads = scandir("images/");
-                foreach ($uploads as $u) {
-                    if (str_starts_with($u, $p_id . ".") or str_starts_with($u, $p_id . "_")) {
-                        unlink("images/" . $u);
-                    }
+            // Delete the post.
+            $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p_id) . "'");
+            // Delete all of the post's views.
+            $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+            // Delete all of the post's comments.
+            $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+            // Delete all icons and attachments.
+            $uploads = scandir("images/");
+            foreach ($uploads as $u) {
+                if (str_starts_with($u, $p_id . ".") or str_starts_with($u, $p_id . "_")) {
+                    unlink("images/" . $u);
+                }
+            }
+                
+            $messages[] = success("Successfully deleted the post.");
+            $displayPost = false;
+            redirect("", 2);
+            render_page("", array(), $title);
+        }
+    }
+    else {
+        $messages[] = error("You don't have permission to do this.");
+    }
+}
+// Handle new comments.
+elseif (isset($_POST["newcomment"])) {
+    // Make sure the user is allowed to comment.
+    if (checkPerm(PERM_COMMENT)) {
+        // If the CSRF token is sent and valid.
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+            // Generate a new token.
+            generateCSRFToken();
+            
+            $rateLimited = false;
+            
+            // Get comments from this IP.
+            $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . time()-$config["commentDelay"]);
+            
+            if ($ipCheck->num_rows > 0) {
+                $rateLimited = true;
+            }
+            
+            // If it's a user with an account.
+            if (isset($_SESSION["logged_in"]) and $_SESSION["logged_in"]) {
+                $emailquery = $db->query("SELECT `email` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+                
+                while ($e = $emailquery->fetch_assoc()) {
+                    $email = $e["email"];
                 }
                 
-                $messages[] = success("Successfully deleted the post.");
-                $displayPost = false;
-                redirect("", 2);
-                render_page("", array(), $title);
+                $commentid = $id;
+                
+                // Get comments from this account too.
+                $accCheck = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $id . "' AND `timestamp`>" . time()-$config["commentDelay"]);
+            
+                if ($accCheck->num_rows > 0) {
+                    $rateLimited = true;
+                }
+            }
+            // Guests.
+            else {
+                $commentid = 0;
+                $email = $_POST["email"] ?? "";
+            }
+            
+            $content = $_POST["content"] ?? "";
+            
+            $errors = array();
+            
+            if ($rateLimited) {
+                $errors[] = "You must wait a little bit before making another comment.";
+            }
+            
+            if (strlen($email) < 1) {
+                $errors[] = "Email cannot be blank.";
+            }
+            elseif (strlen($email) > 64) {
+                $errors[] = "Email too long.";
+            }
+            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = "Your email address is invalid. Please try entering a valid email address.";
+            }
+            
+            if (strlen($content) < 1) {
+                $errors[] = "Comment cannot be blank.";
+            }
+            elseif (strlen($content) > $config["commentMaxLength"]) {
+                $errors[] = "Comment is too long.";
+            }
+            
+            if (count($errors) != 0) {
+                foreach ($errors as $e) {
+                    $messages[] = error($e);
+                }
+            }
+            else {
+                // Make the commment.
+                $db->query("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES ('" . $commentid . "', '" . $p_id . "', '" . $db->real_escape_string($email) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($content) . "')");
+                $messages[] = success("Successfully made comment.");
+                $_POST["content"] = "";
             }
         }
-        else {
-            $messages[] = error("You don't have permission to do this.");
-        }
+    }
+    else {
+        $messages[] = error("You don't have permission to do this.");
+    }
 }
 // Handle editing.
 elseif (isset($url[2]) && ($url[2] == "edit")) {
@@ -144,7 +227,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to edit the post.
-    if ((($id === $p_account) and checkPerm(PERM_EDIT_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
+    if ((($id === $p_account) and checkPerm(PERM_NEW_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
         if (isset($_POST["edit"])) {
             // If the CSRF token is sent and valid.
             if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
@@ -347,11 +430,12 @@ if ($displayPost) {
     "edited" => "",
     "icon" => "",
     "tags" => "",
-    "content" => $p_content);
+    "content" => $p_content,
+    "comments" => "");
     
     $title = $p_title;
     
-    if ((($id == $p_account) and checkPerm(PERM_EDIT_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p_account) and checkPerm(PERM_NEW_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/edit") . "' class='button postButton'>Edit</a>";
     }
@@ -363,7 +447,7 @@ if ($displayPost) {
         $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p_starred == "1") ? "Unstar" : "Star") . "'></form>";
     }
-    if (($id == $p_account) and checkPerm(PERM_PUBLISH_POST)) {
+    if (($id == $p_account) and checkPerm(PERM_NEW_POST)) {
         $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p_published == "1") ? "Unpublish" : "Publish") . "'></form>";
     }
@@ -393,6 +477,50 @@ if ($displayPost) {
     $tags = parseTags($p_tags);
     foreach ($tags as $tag) {
         $postvars["tags"] .= "<div class='tag'>" . htmlspecialchars($tag) . "</div>";
+    }
+    
+    if ($config["enableComments"]) {
+        // First, display the comments form if we have permission to comment.
+        if (checkPerm(PERM_COMMENT)) {
+            $commentformvars = array("token" => $_SESSION["csrf_token"],
+            "email" => $_POST["email"] ?? "",
+            "emailRequired" => ($_SESSION["logged_in"] ?? false) ? "disabled" : "",
+            "max" => $config["commentMaxLength"],
+            "content" => $_POST["content"] ?? "");
+            $postvars["comments"] .= render_template("postCommentForm.html", $commentformvars, false);
+        }
+        else {
+            $postvars["comments"] .= error("You don't have permission to comment.");
+        }
+        // Next, display the existing comments.
+        $comments = $db->query("SELECT * FROM `comments` WHERE `post`='" . $p_id . "' ORDER BY `id` DESC");
+        
+        if ($comments->num_rows < 1) {
+            $postvars["comments"] .= "<br>" . info("No comments to display yet.");
+        }
+        
+        while ($c = $comments->fetch_assoc()) {
+            $postvars["comments"] .= "<div class='comment'>";
+            
+            // Get author name.
+            if ($c["account"] === "0") {
+                $authorname = "Guest";
+            }
+            else {
+                $an = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $c["account"] . "'");
+                while ($a = $an->fetch_assoc()) {
+                    $authorname = $a["name"];
+                }
+            }
+            
+            $postvars["comments"] .= "By: " . htmlspecialchars($authorname);
+            
+            $postvars["comments"] .= " | " . "<span title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS Y", $c["timestamp"]) . "</span>";
+            
+            $postvars["comments"] .= "<hr>
+            " . htmlspecialchars($c["content"]) . "
+            </div>";
+        }
     }
 
     // Get views from this IP on this post, if any.

@@ -256,6 +256,16 @@ code, .codeblock {
  display: inline-block;
  margin-right: 4px;
 }
+/* Comments */
+.comment {
+ border: 1px solid var(--main-border-color);
+ margin-top: 8px;
+ padding: 6px 12px;
+}
+.comment hr {
+ margin-left: 0;
+ margin-right: 0;
+}
 /* Edit post page */
 .editPostForm textarea {
  height: 250px;

@@ -49,7 +49,7 @@ $default_config = array(
     "accountCooldown" => 600,
     // How long a user must wait (in seconds) between making blog posts. 300 seconds = 5 minutes.
     "postDelay" => 300,
-    // How long a user must wait (in seconds) between editing blog posts.
+    // How long a user must wait (in seconds) between editing blog posts or comments.
     "editDelay" => 5,
     // Max amount of images that may be uploaded per hour.
     "uploadsPerHour" => 15,
@@ -60,7 +60,13 @@ $default_config = array(
     // Maximum amount of space (in bytes) that can be used by each user's uploads.
     "perUserDiskQuota" => "1000000000",
     // Server timezone. See: https://www.php.net/manual/en/timezones.php
-    "timezone" => "America/Los_Angeles"
+    "timezone" => "America/Los_Angeles",
+    // true/false, whether or not comments are enabled (globally).
+    "enableComments" => true,
+    // The longest (in characters) a comment may be.
+    "commentMaxLength" => 2048,
+    // Amount of time (in seconds) one must wait in between making a comment.
+    "commentDelay" => 30
 );
 
 ?>

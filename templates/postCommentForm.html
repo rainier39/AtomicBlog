@@ -1,0 +1,10 @@
+   <h3>New Comment</h3>
+   <form method='post' class='form'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <label for='email'>Email: </label>
+    <input type='text' name='email' id='email' maxlength='64' value='{{{ email }}}'{{ emailRequired }}>
+    <label for='content'>Content: </label>
+    <textarea name='content' id='content' maxlength='{{{ max }}}'>{{{ content }}}</textarea>
+    <br>
+    <input type='submit' value='Post comment' class='button' name='newcomment'>
+   </form>
