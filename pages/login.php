@@ -85,7 +85,7 @@ function handleLogin() {
         $_SESSION["logged_in"] = true;
         $_SESSION["id"] = $r["id"];
 
-        $messages[] = success("Successfully logged in. Welcome, " . $r["name"] . ".");
+        $_SESSION["messages"][] = success("Successfully logged in. Welcome, " . $r["name"] . ".");
         $success = true;
                             
         if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on")) {
@@ -94,7 +94,7 @@ function handleLogin() {
             $cookieoptions = array(
                 // Expires in a week.
                 "expires" => time() + 60*60*24*7,
-                "secure" => (($ishttps == "on") ? true : false),
+                "secure" => (($ishttps == "on") ? true : false), // TODO force secure always
                 "httponly" => true,
                 "samesite" => "Strict"
             );
@@ -106,8 +106,6 @@ function handleLogin() {
         
         // Update the user's lastactive time, IP, and login cookie.
         $db->query("UPDATE `accounts` SET `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', `lastactive`='" . time() . "', `cookie`='" . $cookie . "', `cookietime`='" . time() . "' WHERE `id`='" . $r["id"] . "'");
-                            
-        redirect("", 2);
     }
 }
 
@@ -129,8 +127,9 @@ else {
         "password" => $_POST["password"] ?? "");
         render_page("login.html", $loginvars, $title);
     }
+    // Otherwise redirect the successfully logged-in user.
     else {
-        render_page("", $loginvars, $title);
+        redirect(makeURL("panel"));
     }
 }
 
