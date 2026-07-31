@@ -537,7 +537,7 @@ if ($displayPost) {
     "title" => $p_title,
     "author" => "Nobody",
     "ptime" => date("g:i:sa", $p_starttime),
-    "pdate" => date("F jS Y", $p_starttime),
+    "pdate" => date("F jS, Y", $p_starttime),
     "edited" => "",
     "icon" => "",
     "tags" => "",
@@ -574,7 +574,7 @@ if ($displayPost) {
         }
     }
     if (!empty($p_edittime)) {
-        $postvars["edited"] .= " | <small>Modified: <span class='date' title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS Y", $p_edittime) . "</span></small>";
+        $postvars["edited"] .= " | <small>Modified: <span class='date' title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS, Y", $p_edittime) . "</span></small>";
     }
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
@@ -634,7 +634,7 @@ if ($displayPost) {
             
             $postvars["comments"] .= "<div class='commentHeader'>By: " . htmlspecialchars($authorname);
             
-            $postvars["comments"] .= "<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS Y", $c["timestamp"]) . "</span></small>";
+            $postvars["comments"] .= "<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>";
             
             if (((checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id)
             // Guest with same IP.
