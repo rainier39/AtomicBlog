@@ -127,8 +127,8 @@ a:hover {
  background: royalblue;
  color: white;
  border: 1px solid var(--button-border);
- font-size: 105%;
- padding: 6px;
+ font-size: 16px;
+ padding: 5px 10px;
  cursor: pointer;
  font-family: inherit;
 }
@@ -214,10 +214,12 @@ a:hover {
  flex-flow: row wrap;
  align-items: center;
  justify-content: center;
+ gap: 6px;
 }
 .postButton {
- margin: 2px 5px;
- min-width: 0;
+}
+.date:hover {
+ color: #444;
 }
 /* Post content formatting */
 code, .codeblock {

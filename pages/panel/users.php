@@ -119,8 +119,8 @@ while ($u = $users->fetch_assoc()) {
     . "<td data-label='Email'>" . htmlspecialchars($u["email"]) . "</td>"
     . "<td data-label='Join IP'>" . htmlspecialchars($u["joinip"]) . "</td>"
     . "<td data-label='IP (last login)'>" . htmlspecialchars($u["ip"]) . "</td>"
-    . "<td data-label='Joined'>" . date("F jS Y", $u["jointime"]) . "</td>"
-    . "<td data-label='Last Active'>" . date("F jS Y", $u["lastactive"]) . "</td>"
+    . "<td data-label='Joined' class='date' title='" . date("g:i:sa", $u["jointime"]) . "'>" . date("F jS Y", $u["jointime"]) . "</td>"
+    . "<td data-label='Last Active' class='date' title='" . date("g:i:sa", $u["lastactive"]) . "'>" . date("F jS Y", $u["lastactive"]) . "</td>"
     . "</tr>";
 }
 
