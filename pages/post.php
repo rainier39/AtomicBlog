@@ -221,6 +221,117 @@ elseif (isset($_POST["newcomment"])) {
         $messages[] = error("You don't have permission to do this.");
     }
 }
+// Handle deleting a comment.
+elseif (isset($_POST["deletecomment"])) {
+    if (isset($_POST["commentid"])) {
+        $commentinfo = $db->query("SELECT `id`, `account`, `ip` FROM `comments` WHERE `id`='" . $db->real_escape_string($_POST["commentid"]) . "'");
+        
+        if ($commentinfo->num_rows < 1) {
+            $messages[] = error("You don't have permission to do this.");
+        }
+        else {
+            while ($c = $commentinfo->fetch_assoc()) {
+                $c_account = $c["account"];
+                $c_id = $c["id"];
+                $c_ip = $c["ip"];
+            }
+            // Permission check.
+            if ((checkPerm(PERM_DELETE_COMMENT) and (($c_account === $id)
+            // Guest with same IP.
+            or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
+            or checkPerm(PERM_MOD_COMMENTS)) {
+                // If the CSRF token is sent and valid.
+                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                    // Generate a new token.
+                    generateCSRFToken();
+                    
+                    // Delete the comment.
+                    $db->query("DELETE FROM `comments` WHERE `id`='" . $c_id . "'");
+                    
+                    $messages[] = success("Successfully deleted comment.");
+                }
+            }
+        }
+    }
+    else {
+        $messages[] = error("You don't have permission to do this.");
+    }
+}
+// Handle editing a comment.
+elseif (isset($_POST["editcomment"])) {
+    if (isset($_POST["commentid"])) {
+        $commentinfo = $db->query("SELECT `id`, `account`, `ip`, `content` FROM `comments` WHERE `id`='" . $db->real_escape_string($_POST["commentid"]) . "'");
+        
+        if ($commentinfo->num_rows < 1) {
+            $messages[] = error("You don't have permission to do this.");
+        }
+        else {
+            while ($c = $commentinfo->fetch_assoc()) {
+                $c_account = $c["account"];
+                $c_id = $c["id"];
+                $c_ip = $c["ip"];
+                $c_content = $c["content"];
+            }
+            // Permission check.
+            if ((checkPerm(PERM_EDIT_COMMENT) and (($c_account === $id)
+            // Guest with same IP.
+            or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
+            or checkPerm(PERM_MOD_COMMENTS)) {
+                // If the CSRF token is sent and valid.
+                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                    // Generate a new token.
+                    generateCSRFToken();
+                    
+                    $content = $_POST["newcontent"] ?? "";
+                    
+                    $errors = array();
+                    
+                    $rateLimited = false;
+                    
+                    $rlcheck = $db->query("SELECT 1 FROM `comments` WHERE (`account`='" . $id . "' OR `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "') AND `timestamp`>" . time()-$config["editDelay"]);
+                    
+                    if ($rlcheck->num_rows > 0) {
+                        $rateLimited = true;
+                    }
+            
+                    if ($rateLimited) {
+                        $errors[] = "You must wait a few seconds before making another edit.";
+                    }
+                    
+                    if (strlen($content) < 1) {
+                        $errors[] = "Comment cannot be blank.";
+                    }
+                    elseif (strlen($content) > $config["commentMaxLength"]) {
+                        $errors[] = "Comment is too long.";
+                    }
+                    elseif ($content == $c_content) {
+                        $errors[] = "Nothing to change.";
+                    }
+            
+                    if (count($errors) != 0) {
+                        foreach ($errors as $e) {
+                            $messages[] = error($e);
+                        }
+                    }
+                    else {
+                        // Edit the comment.
+                        $db->query("UPDATE `comments` SET `content`='" . $db->real_escape_string($content) . "', `timestamp`='" . time() . "' WHERE `id`='" . $c_id . "'");
+                    
+                        $_SESSION["messages"][] = success("Successfully edited comment.");
+                        redirect(makeURL("post/" . $p_id));
+                    }
+                }
+            }
+        }
+    }
+    else {
+        $messages[] = error("You don't have permission to do this.");
+    }
+}
+// Handle cancelling editing a comment.
+elseif (isset($_POST["canceleditcomment"])) {
+    redirect(makeURL("post/" . $p_id));
+}
 // Handle editing.
 elseif (isset($url[2]) && ($url[2] == "edit")) {
     $title = "Edit Post";
@@ -513,15 +624,30 @@ if ($displayPost) {
                 }
             }
             
+            $url2 = $url[2] ?? "";
+            $url3 = explode("#", $url[3] ?? "");
+            $editing = false;
+            
+            if (($url2 == "editcomment") and ($url3[0] == $c["id"])) {
+                $editing = true;
+            }
+            
             $postvars["comments"] .= "<div class='commentHeader'>By: " . htmlspecialchars($authorname);
             
             $postvars["comments"] .= "<small><span title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS Y", $c["timestamp"]) . "</span></small>";
             
-            if (checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id) or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"])))) {
+            if (((checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id)
+            // Guest with same IP.
+            or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
+            or checkPerm(PERM_MOD_COMMENTS))
+            and (!$editing)) {
                 $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
             }
             
-            if (checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id) or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"])))) {
+            if ((checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id)
+            // Guest with same IP.
+            or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
+            or checkPerm(PERM_MOD_COMMENTS)) {
                 $postvars["comments"] .= "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this comment?\");'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <input type='hidden' name='commentid' value='" . $c["id"] . "'>
@@ -529,11 +655,28 @@ if ($displayPost) {
                 </form>";
             }
             
-            $postvars["comments"] .= "</div>
-            <div class='commentContent'>
-            " . htmlspecialchars($c["content"]) . "
-            </div>
-            </div>";
+            if (!$editing) {
+                $postvars["comments"] .= "</div>
+                <div class='commentContent'>
+                " . htmlspecialchars($c["content"]) . "
+                </div>
+                </div>";
+            }
+            else {
+                $postvars["comments"] .= "</div>
+                <div class='commentContent'>
+                <form method='post' class='form'>
+                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
+                 <input type='hidden' name='commentid' value='" . $c["id"] . "'>
+                 <textarea name='newcontent'>" . htmlspecialchars($_POST["newcontent"] ?? $c["content"]) . "</textarea>
+                 <div></div>
+                 <input class='button' type='submit' name='editcomment' value='Edit'>
+                 <div></div>
+                 <input class='button' type='submit' name='canceleditcomment' value='Cancel Edit'>
+                </form>
+                </div>
+                </div>";
+            }
         }
     }
 

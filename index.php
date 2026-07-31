@@ -106,6 +106,13 @@ if (!isset($_SESSION["csrf_token"])) {
     generateCSRFToken();
 }
 
+if (isset($_SESSION["messages"])) {
+    foreach ($_SESSION["messages"] as $message) {
+        $messages[] = $message;
+    }
+    unset($_SESSION["messages"]);
+}
+
 // If a user is logged out, but has a login cookie, try to log them in.
 if ((!isset($_SESSION["logged_in"]) or !$_SESSION["logged_in"]) and isset($_COOKIE["AtomicBlog_login"])) {
     $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE["AtomicBlog_login"]) . "' AND `cookietime`>=" . time()-60*60*24*7);
