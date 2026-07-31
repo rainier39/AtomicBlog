@@ -49,10 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Add the new post to the database.
             $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
             // Print a message.
-            $messages[] = unsafe_success("Successfully made <a href='" . makeURL("post/{$db->insert_id}") . "'>post</a>.");
-            redirect("post/{$db->insert_id}", 2);
-            render_page("", array(), $title);
-            exit();
+            $_SESSION["messages"][] = unsafe_success("Successfully made new post.");
+            redirect("post/{$db->insert_id}");
         }
         // Otherwise, print the errors.
         else {
