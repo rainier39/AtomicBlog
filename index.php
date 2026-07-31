@@ -23,6 +23,9 @@
 define("INDEX", "1");
 // Define the software's current version.
 define("VERSION", "v2.6.0-alpha");
+// Generally this should not change, and so is not in the config.
+// Updates to the software may raise this depending on relevant advances in computing hardware.
+define("MIN_PASSWORD_LENGTH", 12);
 
 // Prevent clickjacking by preventing the website from loading in an iframe.
 // TODO: make it possible to disable this in the config.

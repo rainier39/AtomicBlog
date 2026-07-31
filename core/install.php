@@ -89,8 +89,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Stop if the email is invalid.
     $errors = array_merge($errors, validateEmail($_POST["email"] ?? ""));
     // Stop if the password(s) is/are too short.
-    if ((!isset($_POST["password"])) or (strlen($_POST["password"]) < 8)) {
-        $errors[] = "Cannot install, password must be at least 8 characters long.";
+    if ((!isset($_POST["password"])) or (strlen($_POST["password"]) < MIN_PASSWORD_LENGTH)) {
+        $errors[] = "Cannot install, password must be at least " . MIN_PASSWORD_LENGTH . " characters long.";
     }
     // Stop if the password(s) don't match.
     if ((!isset($_POST["repeatpassword"])) or ($_POST["password"] !== $_POST["repeatpassword"])) {

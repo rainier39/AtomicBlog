@@ -74,8 +74,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
            
         // Make sure their password is long enough.
-        if (strlen($_POST["password"]) < 8) {
-            $errors[] = "Your password isn't long enough. Make sure your password is at least 8 characters in length.";
+        if (strlen($_POST["password"]) < MIN_PASSWORD_LENGTH) {
+            $errors[] = "Your password isn't long enough. Make sure your password is at least " . MIN_PASSWORD_LENGTH . " characters in length.";
         }
         // Make sure their password entries match.
         if ($_POST["password"] != $_POST["repeatpassword"]) {
