@@ -130,6 +130,7 @@ a:hover {
  font-size: 105%;
  padding: 6px;
  cursor: pointer;
+ font-family: inherit;
 }
 .button:hover {
  color: lightgrey;
@@ -260,11 +261,22 @@ code, .codeblock {
 .comment {
  border: 1px solid var(--main-border-color);
  margin-top: 8px;
- padding: 6px 12px;
 }
 .comment hr {
  margin-left: 0;
  margin-right: 0;
+}
+.commentHeader {
+ display: flex;
+ flex-flow: row wrap;
+ align-items: center;
+ gap: 10px;
+ padding: 6px 12px;
+ border-bottom: 1px solid var(--main-border-color);
+ background: #e0e0e0;
+}
+.commentContent {
+ padding: 6px 12px;
 }
 /* Edit post page */
 .editPostForm textarea {

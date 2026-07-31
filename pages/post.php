@@ -500,7 +500,7 @@ if ($displayPost) {
         }
         
         while ($c = $comments->fetch_assoc()) {
-            $postvars["comments"] .= "<div class='comment'>";
+            $postvars["comments"] .= "<div class='comment' id='comment_{$c["id"]}'>";
             
             // Get author name.
             if ($c["account"] === "0") {
@@ -513,12 +513,26 @@ if ($displayPost) {
                 }
             }
             
-            $postvars["comments"] .= "By: " . htmlspecialchars($authorname);
+            $postvars["comments"] .= "<div class='commentHeader'>By: " . htmlspecialchars($authorname);
             
-            $postvars["comments"] .= " | " . "<span title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS Y", $c["timestamp"]) . "</span>";
+            $postvars["comments"] .= "<small><span title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS Y", $c["timestamp"]) . "</span></small>";
             
-            $postvars["comments"] .= "<hr>
+            if (checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id) or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"])))) {
+                $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
+            }
+            
+            if (checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id) or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"])))) {
+                $postvars["comments"] .= "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this comment?\");'>
+                <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
+                <input type='hidden' name='commentid' value='" . $c["id"] . "'>
+                <input class='button' type='submit' name='deletecomment' value='Delete'>
+                </form>";
+            }
+            
+            $postvars["comments"] .= "</div>
+            <div class='commentContent'>
             " . htmlspecialchars($c["content"]) . "
+            </div>
             </div>";
         }
     }
