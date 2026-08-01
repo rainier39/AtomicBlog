@@ -23,7 +23,7 @@
 if (!defined('INDEX')) exit;
 
 $title = "";
-$panelActions = array("settings", "newpost", "configuration", "users");
+$panelActions = array("settings", "newpost", "configuration", "stats", "users");
 
 // If the user isn't logged in, don't let them into the panel.
 if (!isset($_SESSION["logged_in"]) or ($_SESSION["logged_in"] !== true)) {
@@ -41,6 +41,7 @@ elseif (!isset($url[1]) or $url[1] == "") {
         $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>Create a new post</a></p>";
     }
     if (checkPerm(PERM_MANAGE_BLOG)) {
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/stats") . "'>Blog statistics</a></p>";
         $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>Configure blog</a></p>";
     }
     if (checkPerm(PERM_MANAGE_USERS)) {
