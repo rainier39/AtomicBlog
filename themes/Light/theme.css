@@ -135,6 +135,9 @@ input, select {
 .button:focus {
  outline: 1px solid blue;
 }
+.buttonSmall {
+ padding: 3px 6px;
+}
 
 /** Pages **/
 /* Install page */

@@ -128,10 +128,9 @@ elseif (isset($_POST["delete"])) {
                 }
             }
                 
-            $messages[] = success("Successfully deleted the post.");
+            $_SESSION["messages"][] = success("Successfully deleted the post.");
             $displayPost = false;
-            redirect("", 2);
-            render_page("", array(), $title);
+            redirect("");
         }
     }
     else {

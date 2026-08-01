@@ -112,7 +112,7 @@ function format_h6($string) {
 }
 
 function format_horizontal_rule($string) {
-    return preg_replace("/---$/is", "<hr>", $string);
+    return preg_replace("/---\s/is", "<hr>", $string);
 }
 
 function format_blockquote($string) {
