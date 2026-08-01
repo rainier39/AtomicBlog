@@ -55,6 +55,8 @@ if ($config["version"] != VERSION) {
     if ($config["version"] == "v2.6.0-alpha") {
         $db->query("ALTER TABLE `accounts` MODIFY COLUMN `role` varchar(64) NOT NULL DEFAULT 'Unapproved'");
         $db->query("ALTER TABLE `posts` DROP COLUMN IF EXISTS `icon`");
+        // Bump the version.
+        $config["version"] = "v1.0.0-beta";
     }
     
     // Write the new config to a file.
