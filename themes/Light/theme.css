@@ -222,6 +222,7 @@ code, .codeblock {
  background: lightgrey;
  padding: 3px 6px;
  white-space: pre-wrap;
+ margin: 4px 0 4px 0;
 }
 .postContent {
  line-height: 1.5;
@@ -237,6 +238,9 @@ code, .codeblock {
  border-left: 6px solid grey;
  margin-left: 0;
  padding-left: 20px;
+}
+.postContent li {
+ margin-left: 20px;
 }
 /* Tags */
 .tag {
