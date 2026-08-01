@@ -56,7 +56,7 @@ if ($starred->num_rows > 0) {
         $total++;
     }
     while (($total > 0) and ($total % 5)) {
-        $homevars["starred"] .= "<td class='dummyTile'></td>";
+        $homevars["starred"] .= "<td></td>";
         $total++;
         if (!$total % 5) {
             $homevars["starred"] .= "</tr>";
@@ -82,7 +82,7 @@ if ($recent->num_rows > 0) {
         $total++;
     }
     while (($total > 0) and ($total % 5)) {
-        $homevars["recent"] .= "<td class='dummyTile'></td>";
+        $homevars["recent"] .= "<td></td>";
         $total++;
         if (!$total % 5) {
             $homevars["recent"] .= "</tr>";
@@ -144,7 +144,7 @@ if (count($mostViewed) > 0) {
         }
     }
     while (($total > 0) and ($total % 5)) {
-        $homevars["viewed"] .= "<td class='dummyTile'></td>";
+        $homevars["viewed"] .= "<td></td>";
         $total++;
         if (!$total % 5) {
             $homevars["viewed"] .= "</tr>";

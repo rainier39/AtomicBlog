@@ -5,34 +5,62 @@
 .header {
  background: linear-gradient(white 0, #888 15%, #777 20%, #666 25%, #555 30%, #444 35%, #333 40%, #222 50%, #111 100%);
  border-radius: 12px;
- margin-bottom: 4px;
+ margin: 8px 4px 4px 4px;
+ box-shadow: none;
+ border: 1px solid var(--main-border-color);
 }
 .navbar {
  border: 1px solid var(--main-border-color);
  background: linear-gradient(white 0, lightslategrey 55%, lightslategrey 100%);
  border-radius: 12px;
- margin-bottom: 4px;
+ margin: 4px;
+ box-shadow: none;
 }
 .content {
  border: 1px solid var(--main-border-color);
  border-radius: 12px;
- margin-bottom: 4px;
+ margin: 4px;
+ box-shadow: none;
 }
 .footer {
  border-radius: 12px;
+ box-shadow: none;
+ border: 1px solid var(--main-border-color);
+ margin: 4px 4px 8px 4px;
 }
 /* Messages */
 .message {
- border-radius: 8px;
+ border-radius: 6px;
+}
+.info {
+ border: 1px solid goldenrod;
+}
+.error {
+ border: 1px solid #751a1a;
+}
+.success {
+ border: 1px solid #136c14;
 }
 
 /* Forms/Buttons */
-.button {
+.button, .button:hover {
  background: linear-gradient(lightblue 1%, cornflowerblue 10%, cornflowerblue 40%, cornflowerblue 50%, royalblue 50%, royalblue 40%, royalblue 10%, lightskyblue 100%);
- border-radius: 12px;
+ border-radius: 6px;
+ border: 1px solid blue;
 }
 
 /** Pages **/
+/* Post Tiles */
+.postTile {
+ border: 1px solid var(--main-border-color);
+ box-shadow: none;
+ border-radius: 3px;
+}
+/* Post page */
+.tag {
+ border: 1px solid var(--main-border-color);
+ border-radius: 3px;
+}
 
 /** Phone/Tablet **/
 

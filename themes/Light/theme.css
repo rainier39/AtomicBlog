@@ -22,13 +22,12 @@ input, select {
  font-family: inherit;
 }
 .header {
- border: 1px solid var(--main-border-color);
- padding: 20px;
+ padding: 20px 40px;
  font-size: 160%;
  background: #046791;
  color: white;
  text-align: center;
- margin-top: 12px;
+ box-shadow: 0px 0px 5px #0006;
 }
 #blogtitle {
  display: block;
@@ -38,18 +37,16 @@ input, select {
  font-size: 18px;
 }
 .navbar {
- border-left: 1px solid var(--main-border-color);
- border-right: 1px solid var(--main-border-color);
- border-bottom: 1px solid var(--main-border-color);
- padding: 8px;
+ padding: 6px 12px;
  background: lightslategrey;
  text-align: center;
+ box-shadow: 0px 1px 5px #0006;
 }
 .navbar a {
  margin-right: 5%;
  margin-left: 5%;
  font-weight: bold;
- font-size: 140%;
+ font-size: 20px;
  margin-bottom: 5px;
  margin-top: 5px;
  display: inline-block;
@@ -59,33 +56,28 @@ input, select {
  color: lightgray;
 }
 .content {
- border-left: 1px solid var(--main-border-color);
- border-right: 1px solid var(--main-border-color);
- padding: 20px;
+ padding: 10px 20px;
  background: white;
+ box-shadow: 0px 3px 5px #0006;
 }
 .footer {
- border: 1px solid var(--main-border-color);
  padding: 20px;
  background: white;
- text-align: center;
  margin-bottom: 12px;
+ box-shadow: 0px 1px 5px #0006;
 }
 /* Messages */
 .message {
- padding: 4px 8px;
+ padding: 5px 10px;
  margin: 2px;
 }
 .success {
- border: 1px solid green;
- background: #77ff77;
+ background: #67ef67;
 }
 .info {
- border: 1px solid goldenrod;
- background: #ffff77;
+ background: #e9e961;
 }
 .error {
- border: 1px solid red;
  background: #ff7777;
 }
 #toasts {
@@ -129,11 +121,11 @@ input, select {
  width: fit-content!important;
  background: royalblue;
  color: white;
- border: 1px solid var(--button-border);
  font-size: 17px;
- padding: 4px 8px;
+ padding: 6px 12px;
  cursor: pointer;
  font-family: inherit;
+ border: none;
 }
 .button:hover {
  color: lightgrey;
@@ -174,7 +166,7 @@ input, select {
  text-align: center;
  vertical-align: top;
  overflow-wrap: break-word;
- border: 1px solid var(--main-border-color);
+ box-shadow: 0px 0px 4px #0006;
 }
 .postTile a {
  color: black;
@@ -189,11 +181,6 @@ input, select {
  max-height: 15vh;
  display: block;
  margin: auto;
- border: 1px solid var(--main-border-color);
-}
-.dummyTile {
- padding: 14px;
- width: 20%;
 }
 /* Post page */
 .post {
@@ -210,7 +197,6 @@ input, select {
  display: block;
  margin-left: auto;
  margin-right: auto;
- border: 1px solid var(--main-border-color);
 }
 .postButtons {
  display: flex;
@@ -226,9 +212,8 @@ input, select {
 }
 /* Post content formatting */
 code, .codeblock {
- border: 1px solid darkgrey;
  background: lightgrey;
- padding: 2px 2px;
+ padding: 3px 6px;
  white-space: pre-wrap;
 }
 .postContent {
@@ -239,7 +224,6 @@ code, .codeblock {
 .postContent img {
  max-width: 100%;
  max-height: 60vh;
- border: 1px solid var(--main-border-color);
  display: block;
 }
 .postContent blockquote {
@@ -252,8 +236,7 @@ code, .codeblock {
  display: inline-block;
  margin: 3px;
  background: #99f;
- border: 1px solid var(--main-border-color);
- padding: 1px;
+ padding: 2px 4px;
 }
 .tag:hover {
  background: #ccf;
@@ -264,8 +247,8 @@ code, .codeblock {
 }
 /* Comments */
 .comment {
- border: 1px solid var(--main-border-color);
  margin-top: 8px;
+ box-shadow: 0px 0px 3px #0006;
 }
 .comment hr {
  margin-left: 0;
@@ -277,7 +260,6 @@ code, .codeblock {
  align-items: center;
  gap: 10px;
  padding: 6px 12px;
- border-bottom: 1px solid var(--main-border-color);
  background: #e0e0e0;
 }
 .commentContent {
@@ -290,14 +272,13 @@ code, .codeblock {
 /* Manage uploads page */
 .uploadTile {
  display: inline-block;
- border: 1px solid var(--main-border-color);
+ box-shadow: 0px 0px 6px #0006;
  padding: 8px;
  margin: 4px;
  max-width: 200px;
 }
 .manageUploads img {
  max-width: 100%;
- border: 1px solid var(--main-border-color);
 }
 /* Panel */
 .panelcontent {

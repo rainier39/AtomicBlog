@@ -56,7 +56,7 @@ if ($posts->num_rows > 0) {
         $total++;
     }
     while (($total > 0) and ($total % 5)) {
-        $postsvars["posts"] .= "<td class='dummyTile'></td>";
+        $postsvars["posts"] .= "<td></td>";
         $total++;
         if (!$total % 5) {
             $postsvars["posts"] .= "</tr>";

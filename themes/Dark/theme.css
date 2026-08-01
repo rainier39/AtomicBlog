@@ -1,9 +1,9 @@
 @import url("../Light/theme.css");
 
 /** Global **/
-html {
+body {
  background: #121212;
- color: #d0d0d0;
+ color: #e5e5e5;
 }
 a {
  color: lightblue;
@@ -12,25 +12,45 @@ a:hover {
  color: cornflowerblue;
 }
 .content, .footer {
- background: #181a1b;
- border-color: #d0d0d0;
+ background: #222;
 }
 .header {
- border-color: #d0d0d0;
- background: midnightblue;
+ background: #102a43;
+ box-shadow: none;
 }
 .navbar {
  border-color: #d0d0d0;
  background: #555;
+ box-shadow: none;
 }
-.form input, textarea {
+.content {
+ box-shadow: none;
+}
+.footer {
+ box-shadow: none;
+ margin-top: 8px;
+}
+input, textarea {
  color: white;
  background: #121212;
+ border: 1px solid #b0b0b0;
+ padding: 2px 4px;
+ border-radius: 2px;
+}
+.form input:hover, .form textarea:hover {
  border: 1px solid #d0d0d0;
 }
+.form input:disabled {
+ border: 1px solid grey;
+}
 .button, .form .button {
- background: #2222ad;
- border-color: #d0d0d0;
+ background: #22229d;
+ border: none;
+ border-radius: 0;
+}
+.button:hover {
+ background: #12128d;
+ border: none!important;
 }
 .success {
  color: white;
@@ -38,18 +58,18 @@ a:hover {
 }
 .info {
  color: white;
- background: darkgoldenrod;
- border: 1px solid goldenrod;
+ background: #736d18;
 }
 .error {
  color: white;
- background: tomato;
+ background: #9e3623;
 }
 
 /** Pages **/
 /* Post tiles */
 .postTile {
- border-color: #d0d0d0;
+ box-shadow: none;
+ background: #282828;
 }
 .postTile a {
  color: white;
@@ -57,11 +77,26 @@ a:hover {
 .postTile a:hover {
  color: lightgrey;
 }
-/* Home page */
-.posts {
- border-color: #d0d0d0;
-}
 /* Post page */
 .post h1, .postContent {
  color: white;
+}
+.tag {
+ background: #3b3b8f;
+}
+.tag:hover {
+ background: #2b1b7f;
+}
+.comment {
+ border: none;
+}
+.commentHeader {
+ background: #111;
+ border: none;
+}
+.commentContent {
+ background: #2d2d2d;
+}
+.date:hover {
+ color: #888;
 }

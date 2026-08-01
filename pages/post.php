@@ -356,6 +356,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     	            $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($p_id) . "'");
     	            $success = true;
      	            $updatePost = true;
+     	            $_SESSION["messages"][] = success("Successfully edited post.");
        	        }
        	        // Otherwise, print the errors.
        	        else {
