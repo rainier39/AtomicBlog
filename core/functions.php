@@ -400,18 +400,20 @@ function upload($file, $name) {
     
     // GIFs.
     if (str_starts_with($bytes, hex2bin("474946383761")) or str_starts_with($bytes, hex2bin("474946383961"))) {
-        $image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
+        //$image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
         
         // This is safe because we never use any user-supplied value in $name.
         $target = $upload_dir . $name . ".gif";
         
-        if ($image === false) {
-            return "Upload failed, invalid GIF image.";
-        }
+        //if ($image === false) {
+        //    return "Upload failed, invalid GIF image.";
+        //}
         
         // TODO: enforce disk quotas, rate limits.
         
-        $success = imagegif($image, $target);
+        //$success = imagegif($image, $target);
+        // Just accepting the file as-is may have security implications. Though it allows users to upload animated GIFs.
+        $success = move_uploaded_file($_FILES[$file]["tmp_name"], $target);
     
         if ($success) {
             return "";

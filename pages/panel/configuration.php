@@ -159,8 +159,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (strlen($_POST["cfooter"]) < 1) {
                 $errors[] = "Footer cannot be blank.";
             }
-            elseif (strlen($_POST["cfooter"]) > 512) {
-                $errors[] = "Footer cannot be longer than 512 characters.";
+            elseif (strlen($_POST["cfooter"]) > 2048) {
+                $errors[] = "Footer cannot be longer than 2048 characters.";
             }
             // Only write to the config if the value is actually being changed.
             elseif ($_POST["cfooter"] != $config["footer"]) {

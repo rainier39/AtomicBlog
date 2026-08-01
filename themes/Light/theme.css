@@ -89,6 +89,7 @@ input, select {
  animation: seconds 5.0s forwards;
  animation-iteration-count: 1;
  animation-delay: 5s;
+ padding: 5px 10px;
 }
 @keyframes seconds {
  0% {opacity: 1} 100% {opacity: 0; zindex: -10}
