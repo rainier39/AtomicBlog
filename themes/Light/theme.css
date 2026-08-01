@@ -132,6 +132,9 @@ input, select {
  background: cornflowerblue;
  text-decoration: none;
 }
+.button:focus {
+ outline: 1px solid blue;
+}
 
 /** Pages **/
 /* Install page */
@@ -287,17 +290,18 @@ code, .codeblock {
 /* Userlist (manage users page) */
 .userlist {
  width: 100%;
+ border-collapse: collapse;
 }
 .userlist td {
  font-weight: normal;
  border: 1px solid grey;
- padding: 8px;
+ padding: 6px;
 }
 .userlist thead th {
- background: cornflowerblue;
- border: 1px solid royalblue;
+ background: #5058d8;
+ border: 1px solid navy;
  color: white;
- padding: 8px;
+ padding: 3px 6px;
 }
 
 /** Phone/Tablet **/
