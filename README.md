@@ -14,7 +14,7 @@ Currently, there is no live online demo for the software. However, there is a [g
 ## Compatibility
 Aims to be compatible with Apache2 and Nginx. Will work with any MySQL compatible database software. Should work on any Linux distribution.
 
-Requires PHP 8+.
+Requires PHP 8+.  
 Requires php-mysql and php-gd.
 
 AtomicBlog has been tested on:
