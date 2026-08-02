@@ -200,7 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $changes++;
             }
         }
-        if (isset($_POST["registration"]) and ($_POST["registration"] == "on")) {
+        if (($_POST["registration"] ?? "") == "on") {
             $tz = true;
         }
         else {
@@ -220,6 +220,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $config["registrationMode"] = $_POST["registrationMode"];
                 $changes++;
             }
+        }
+        if (($_POST["comments"] ?? "") == "on") {
+            $ec = true;
+        }
+        else {
+            $ec = false;
+        }
+        // Only write to the config if the value is actually being changed.
+        if ($ec != $config["enableComments"]) {
+            $config["enableComments"] = $ec;
+            $changes++;
         }
         if (isset($_POST["logins"])) {
             $logins = (int)$_POST["logins"];
@@ -319,6 +330,7 @@ $configvars = array("token" => $_SESSION["csrf_token"],
 "theme" => $themeHTML,
 "allowregistration" => $config["allowRegistration"] ? " checked" : "",
 "registrationmode" => $registerHTML,
+"comments" => $config["enableComments"] ? " checked" : "",
 "loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],
 "accountsperip" => $_POST["accounts"] ?? $config["accountsPerIP"],
 "accountcooldown" => $_POST["accountcooldown"] ?? $config["accountCooldown"],

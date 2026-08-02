@@ -679,6 +679,9 @@ if ($displayPost) {
             }
         }
     }
+    else {
+        $postvars["comments"] .= error("Comments are disabled.");
+    }
 
     // Get views from this IP on this post, if any.
     $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($p_id) . "'");
