@@ -314,6 +314,7 @@ code, .codeblock {
 /* Blog statistics page */
 .stats td {
  padding: 3px 6px;
+ text-align: right;
 }
 
 /** Phone/Tablet **/
