@@ -54,7 +54,7 @@ function format($string) {
 function format_code_block($string) {
     return preg_replace_callback("/```(.*?)$(.+?)```/mis",
     function ($matches) {
-        # We don't want to format anything inside a codeblock as markdown.
+        // We don't want to format anything inside a codeblock as markdown.
         $matches[2] = str_replace(" ", "&nbsp;", $matches[2]);
         $matches[2] = str_replace("#", "&#35;", $matches[2]);
         $matches[2] = str_replace(")", "&#41;", $matches[2]);

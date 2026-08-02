@@ -30,17 +30,24 @@ $loginvars = array("username" => "",
 function handleLogin() {
     global $db, $config, $success, $ishttps, $messages;
     
-    if (!isset($_POST["username"]) || !isset($_POST["password"]) || ($_POST["username"] == "") || ($_POST["password"] == "")) {
-        $messages[] = error("Must supply a non-blank username and password.");
-        return;
-    }
     // Make sure the CSRF token is sent and valid.
-    if ((!isset($_POST["csrf_token"])) or ($_POST["csrf_token"] !== $_SESSION["csrf_token"])) {
-        $messages[] = error("Token error. This is likely a CSRF attack.");
+    if (($_POST["csrf_token"] ?? "") != $_SESSION["csrf_token"]) {
         return;
     }
     // Generate a new token.
     generateCSRFToken();
+    
+    $_POST["username"] = $_POST["username"] ?? "";
+    $_POST["password"] = $_POST["password"] ?? "";
+    
+    if (strlen($_POST["username"]) < 1) {
+        $messages[] = error("Username cannot be blank.");
+        return;
+    }
+    if (strlen($_POST["password"]) < 1) {
+        $messages[] = error("Password cannot be blank.");
+        return;
+    }
 
     // Delete login attempts older than an hour.
     $db->query("DELETE FROM `logins` WHERE `timestamp`<" . time() . "-3600");
@@ -110,7 +117,7 @@ function handleLogin() {
 }
 
 // If the user is already logged in, don't let them into the page.
-if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
+if (($_SESSION["logged_in"] ?? "") === true) {
    $messages[] = error("You're already logged in.");
    render_page("", $loginvars, $title);
 }

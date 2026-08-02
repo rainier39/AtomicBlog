@@ -115,7 +115,7 @@ function error($message) {
 function makeURL($page, $direct=false) {
     global $config;
     // If we're using pretty URLs or linking directly to a file.
-    if ($config["prettyURLs"] || $direct) {
+    if ($config["prettyURLs"] or $direct) {
         return ($config["dir"] != "" ? "/" . $config["dir"] . "/" : "/") . (trim($page, "/"));
     }
     // If not.
@@ -229,7 +229,7 @@ function validateEmail($email, $takenCheck=false) {
         $errors[] = "Your email address is invalid. Please try entering a valid email address.";
     }
     // Make sure their email isn't taken.
-    if ($config["installed"] && $takenCheck) {
+    if ($config["installed"] and $takenCheck) {
         $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE `email`='" . $db->real_escape_string($email) . "'");
         if ($emailCheck->num_rows != 0) {
             $errors[] = "Your email address is already taken.";
@@ -243,7 +243,7 @@ function validateEmail($email, $takenCheck=false) {
 function redirect($loc, int $delay=0) {
     global $config;
     // Figure out if we're using HTTP or HTTPS.
-    if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
+    if (($_SERVER["HTTPS"] ?? "") == "on") {
         $proto = "https://";
     }
     else {

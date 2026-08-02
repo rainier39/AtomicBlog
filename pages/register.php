@@ -26,7 +26,7 @@ $registervars = array();
 $title = lang("global.register");
 
 // If the user is already logged in, don't let them into the page.
-if (isset($_SESSION["logged_in"]) && ($_SESSION["logged_in"] === true)) {
+if (($_SESSION["logged_in"] ?? "") === true) {
     $messages[] = error("You're already logged in.");
     render_page("", $registervars, $title);
     exit();
@@ -46,7 +46,7 @@ $registerSuccess = false;
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If the CSRF token is sent and valid.
-    if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+    if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
         // Generate a new token.
         generateCSRFToken();
             
@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
             
         // If everything checks out, make the account.
-        if (count($errors) === 0) {
+        if (count($errors) == 0) {
             // Decide what role to assign.
             switch ($config["registrationMode"]) {
                 case "approval":

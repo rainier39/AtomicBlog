@@ -26,7 +26,7 @@ $title = "Installer";
 
 // If the blog is being installed in a folder, take note of that fact.
 $dir = explode("/", $_SERVER["REQUEST_URI"]);
-if (end($dir) && str_starts_with(end($dir), "index.php")) {
+if (end($dir) and str_starts_with(end($dir), "index.php")) {
     array_pop($dir);
 }
 if (count($dir) > 0) {
@@ -34,14 +34,14 @@ if (count($dir) > 0) {
 }
 
 // If mod rewrite is enabled, we can have pretty URLs.
-if (function_exists("apache_get_modules") && in_array("mod_rewrite", apache_get_modules())) {
+if (function_exists("apache_get_modules") and in_array("mod_rewrite", apache_get_modules())) {
     $config["prettyURLs"] = true;
 }
 
 // Handle requests.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Hard stop if this is a CSRF attack.
-    if ((!isset($_POST["csrf_token"])) or ($_POST["csrf_token"] !== $_SESSION["csrf_token"])) {
+    if (($_POST["csrf_token"] ?? "") != $_SESSION["csrf_token"]) {
         exit();
     }
     // If not, generate a fresh new token for additional security.
@@ -56,30 +56,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors[] = "Cannot install, config directory isn't writable.";
     }
     // Stop if any of the SQL details are blank.
-    if ((!isset($_POST["SQLServer"])) or ($_POST["SQLServer"] == "")) {
+    if (($_POST["SQLServer"] ?? "") == "") {
         $errors[] = "Cannot install, SQLServer field cannot be blank.";
     }
-    if ((!isset($_POST["SQLUsername"])) or ($_POST["SQLUsername"] == "")) {
+    if (($_POST["SQLUsername"] ?? "") == "") {
         $errors[] = "Cannot install, SQLUsername field cannot be blank.";
     }
-    if ((!isset($_POST["SQLPassword"])) or ($_POST["SQLPassword"] == "")) {
+    if (($_POST["SQLPassword"] ?? "") == "") {
         $errors[] = "Cannot install, SQLPassword field cannot be blank.";
     }
-    if ((!isset($_POST["SQLDatabase"])) or ($_POST["SQLDatabase"] == "")) {
+    if (($_POST["SQLDatabase"] ?? "") == "") {
         $errors[] = "Cannot install, SQLDatabase field cannot be blank.";
     }
     // Stop if the title is too long or too short.
-    if ((!isset($_POST["title"])) or (strlen($_POST["title"]) < 1)) {
+    if (strlen($_POST["title"] ?? "") < 1) {
         $errors[] = "Cannot install, title must be at least 1 character long.";
     }
-    elseif (strlen($_POST["title"]) > 32) {
+    elseif (strlen($_POST["title"] ?? "") > 32) {
         $errors[] = "Cannot install, title cannot be longer than 32 characters.";
     }
     // Stop if the description is too long or too short.
-    if ((!isset($_POST["description"])) or (strlen($_POST["description"]) < 1)) {
+    if (strlen($_POST["description"] ?? "") < 1) {
         $errors[] = "Cannot install, description must be at least 1 character long.";
     }
-    elseif (strlen($_POST["description"]) > 128) {
+    elseif (strlen($_POST["description"] ?? "") > 128) {
         $errors[] = "Cannot install, description cannot be longer than 128 characters.";
     }
     // Stop if the name is invalid.
@@ -89,11 +89,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Stop if the email is invalid.
     $errors = array_merge($errors, validateEmail($_POST["email"] ?? ""));
     // Stop if the password(s) is/are too short.
-    if ((!isset($_POST["password"])) or (strlen($_POST["password"]) < MIN_PASSWORD_LENGTH)) {
+    if (strlen($_POST["password"] ?? "") < MIN_PASSWORD_LENGTH) {
         $errors[] = "Cannot install, password must be at least " . MIN_PASSWORD_LENGTH . " characters long.";
     }
     // Stop if the password(s) don't match.
-    if ((!isset($_POST["repeatpassword"])) or ($_POST["password"] !== $_POST["repeatpassword"])) {
+    if (($_POST["password"] ?? "") != ($_POST["repeatpassword"] ?? "")) {
         $errors[] = "Cannot install, passwords do not match.";
     }
     // TODO: enforce more advanced, stringent password requirements?
@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     // Otherwise, install.
     else {
-        if (isset($_POST["overwrite"]) && ($_POST["overwrite"] == "on")) {
+        if (($_POST["overwrite"] ?? "") == "on") {
             $db->query("DROP TABLE IF EXISTS `accounts`");
             $db->query("DROP TABLE IF EXISTS `posts`");
             $db->query("DROP TABLE IF EXISTS `comments`");

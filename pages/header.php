@@ -33,7 +33,7 @@ $headervars = array("pagetitle" => $htitle,
 // Generate the navbar appropriately.
 if ($config["installed"]) {
     $headervars["navbar"] .= "<div class='navbar'><a href='" . makeURL("") . "'>" . lang("navbar.home") . "</a><a href='" . makeURL("posts") . "'>" . lang("global.posts") . "</a>";
-    if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
+    if ($_SESSION["logged_in"]) {
         $headervars["navbar"] .= "<a href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a><a href='" . makeURL("logout") . "'>" . lang("navbar.logout") . "</a>";
     }
     else {

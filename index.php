@@ -48,7 +48,7 @@ date_default_timezone_set($config["timezone"]);
 
 // Make sure that the page is accessed over HTTPS if applicable.
 $ishttps = $_SERVER["HTTPS"] ?? "";
-if (($ishttps != "on") && $config["https"])
+if (($ishttps != "on") and $config["https"])
 {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
     exit();
@@ -104,20 +104,24 @@ session_start([
     'cookie_secure' => (($ishttps == "on") ? true : false),
 ]);
 
+$_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
+
 // Generate a CSRF token if needed.
 if (!isset($_SESSION["csrf_token"])) {
     generateCSRFToken();
 }
 
+// Display any messages stored in the user's session.
 if (isset($_SESSION["messages"])) {
     foreach ($_SESSION["messages"] as $message) {
         $messages[] = $message;
     }
+    // Remove them from the session so they don't show up again.
     unset($_SESSION["messages"]);
 }
 
 // If a user is logged out, but has a login cookie, try to log them in.
-if ((!isset($_SESSION["logged_in"]) or !$_SESSION["logged_in"]) and isset($_COOKIE["AtomicBlog_login"])) {
+if ((!$_SESSION["logged_in"]) and isset($_COOKIE["AtomicBlog_login"])) {
     $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE["AtomicBlog_login"]) . "' AND `cookietime`>=" . time()-60*60*24*7);
     
     if ($cookieValid->num_rows > 0) {
@@ -133,7 +137,7 @@ if ((!isset($_SESSION["logged_in"]) or !$_SESSION["logged_in"]) and isset($_COOK
 }
 
 // If a user is logged in but lacks permission to log in (i.e. their role has been changed since they logged in), log them out.
-if (isset($_SESSION["logged_in"]) and $_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
+if ($_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
     logout(true);
 }
 

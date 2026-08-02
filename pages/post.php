@@ -62,7 +62,7 @@ elseif (isset($_POST["toggleStar"])) {
     // Make sure the user is allowed to star/unstar the post.
     if ((($id == $p_account) and checkPerm(PERM_STAR_POST)) or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
             // Generate a new token.
             generateCSRFToken();
             
@@ -86,7 +86,7 @@ elseif (isset($_POST["togglePublished"])) {
     // Make sure the user is allowed to publish/unpublish the post.
     if (($id == $p_account) and checkPerm(PERM_NEW_POST)) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
             // Generate a new token.
             generateCSRFToken();
                 
@@ -110,7 +110,7 @@ elseif (isset($_POST["delete"])) {
     // Make sure the user is allowed to delete the post.
     if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
             // Generate a new token.
             generateCSRFToken();
                 
@@ -142,7 +142,7 @@ elseif (isset($_POST["newcomment"])) {
     // Make sure the user is allowed to comment.
     if (checkPerm(PERM_COMMENT)) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
             // Generate a new token.
             generateCSRFToken();
             
@@ -240,7 +240,7 @@ elseif (isset($_POST["deletecomment"])) {
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
                 // If the CSRF token is sent and valid.
-                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
                     // Generate a new token.
                     generateCSRFToken();
                     
@@ -277,7 +277,7 @@ elseif (isset($_POST["editcomment"])) {
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
                 // If the CSRF token is sent and valid.
-                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
                     // Generate a new token.
                     generateCSRFToken();
                     
@@ -332,7 +332,7 @@ elseif (isset($_POST["canceleditcomment"])) {
     redirect(makeURL("post/" . $p_id));
 }
 // Handle editing.
-elseif (isset($url[2]) && ($url[2] == "edit")) {
+elseif (($url[2] ?? "") == "edit") {
     $title = "Edit Post";
     $displayPost = false;
     $success = false;
@@ -340,7 +340,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     if ((($id === $p_account) and checkPerm(PERM_NEW_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
         if (isset($_POST["edit"])) {
             // If the CSRF token is sent and valid.
-            if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
+            if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
                 // Generate a new token.
                 generateCSRFToken();
 
@@ -389,7 +389,7 @@ elseif (isset($url[2]) && ($url[2] == "edit")) {
     }
 }
 // Handle uploading.
-elseif (isset($url[2]) && ($url[2] == "uploads")) {
+elseif (($url[2] ?? "") == "uploads") {
     $title = "Manage Uploads";
     $displayPost = false;
     $success = false;
