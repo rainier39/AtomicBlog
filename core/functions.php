@@ -531,6 +531,11 @@ function parseTags($tagstring) {
     return $tags;
 }
 
+// Make sure a number is within a specified range.
+function clamp($number, $min, $max) {
+    return max($min, min($max, $number));
+}
+
 // --- PHP 7.* Compatibility ---
 if (!function_exists("str_starts_with")) {
     function str_starts_with(string $haystack, string $needle) {

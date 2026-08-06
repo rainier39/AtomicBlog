@@ -10,6 +10,9 @@ body {
  font-family: 'Helvetica', 'Arial', sans-serif;
  background: #f2f2f2;
 }
+h1, h2, h3, h4, h5, h6 {
+ margin: 10px 0px 10px 0px;
+}
 a {
  color: blue;
  text-decoration: none;
@@ -248,13 +251,20 @@ code, .codeblock {
  margin: 3px;
  background: #99f;
  padding: 2px 4px;
+ color: white;
 }
 .tag:hover {
- background: #ccf;
+ background: #7a7ad8;
+ color: white;
+ text-decoration: none;
 }
 .tagslabel {
  display: inline-block;
  margin-right: 4px;
+}
+.tagCloud a {
+ display: inline-block;
+ padding: 4px 8px;
 }
 /* Comments */
 .comment {

@@ -587,7 +587,7 @@ if ($displayPost) {
     }
     $tags = parseTags($p_tags);
     foreach ($tags as $tag) {
-        $postvars["tags"] .= "<div class='tag'>" . htmlspecialchars($tag) . "</div>";
+        $postvars["tags"] .= "<a href='" . makeURL("posts/&tag=" . htmlspecialchars($tag)) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
     }
     
     if ($config["enableComments"]) {

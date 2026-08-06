@@ -34,14 +34,21 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 
 $id = $_SESSION["id"] ?? 0;
 
+$tagQuery = "";
+
+if (isset($_GET["tag"])) {
+    $tagQuery = " AND `tags` LIKE '%" . $db->real_escape_string($_GET["tag"]) . "%'";
+}
+
 // Get all of the blog posts.
-$posts = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `id` DESC");
+$posts = $db->query("SELECT `id`, `title`, `account`, `tags` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')){$tagQuery} ORDER BY `id` DESC");
 
 // If there are posts, display them.
 if ($posts->num_rows > 0) {
     $postsvars["posts"] .= "<table class='postsTable'><tbody>";
     $counter = 0;
     $total = 0;
+    $tags = array();
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
         if ($counter == 0) {
@@ -54,6 +61,15 @@ if ($posts->num_rows > 0) {
         $postsvars["posts"] .= displayPost($p["id"], $p["title"], $p["account"]);
         $counter++;
         $total++;
+        $tagsTemp = parseTags($p["tags"]);
+        foreach ($tagsTemp as $tag) {
+            if (!array_key_exists($tag, $tags)) {
+                $tags[$tag] = 1;
+            }
+            else {
+                $tags[$tag] += 1;
+            }
+        }
     }
     while (($total > 0) and ($total % 5)) {
         $postsvars["posts"] .= "<td></td>";
@@ -63,6 +79,16 @@ if ($posts->num_rows > 0) {
         }
     }
     $postsvars["posts"] .= "</tbody></table>";
+    // Display a tag cloud.
+    // Only keep the top 100 tags.
+    $tags = array_slice($tags, 0, 100);
+    ksort($tags);
+    $tagCloud = "<div class='tagCloud'>";
+    foreach ($tags as $tag=>$val) {
+        $tagCloud .= "<a href='" . makeURL("posts/&tag=" . htmlspecialchars($tag)) . "' style='font-size:" . clamp($val+14, 14, 50) . "px'>" . htmlspecialchars($tag) . "</a>";
+    }
+    $tagCloud .= "</div>";
+    $postsvars["posts"] = $tagCloud . $postsvars["posts"];
 }
 // Otherwise print a message.
 else {
