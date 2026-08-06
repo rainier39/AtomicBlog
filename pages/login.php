@@ -136,7 +136,7 @@ else {
     }
     // Otherwise redirect the successfully logged-in user.
     else {
-        redirect(makeURL("panel"));
+        redirect("panel");
     }
 }
 

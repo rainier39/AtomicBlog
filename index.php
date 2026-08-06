@@ -22,7 +22,7 @@
 // Define a constant to ensure pages are only loaded through this index file.
 define("INDEX", "1");
 // Define the software's current version.
-define("VERSION", "v1.0.0-beta");
+define("VERSION", "v1.0.1-beta");
 // Generally this should not change, and so is not in the config.
 // Updates to the software may raise this depending on relevant advances in computing hardware.
 define("MIN_PASSWORD_LENGTH", 12);
@@ -122,7 +122,7 @@ if (isset($_SESSION["messages"])) {
 
 // If a user is logged out, but has a login cookie, try to log them in.
 if ((!$_SESSION["logged_in"]) and isset($_COOKIE["AtomicBlog_login"])) {
-    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE["AtomicBlog_login"]) . "' AND `cookietime`>=" . time()-60*60*24*7);
+    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE["AtomicBlog_login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
     
     if ($cookieValid->num_rows > 0) {
         while ($c = $cookieValid->fetch_assoc()) {

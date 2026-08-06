@@ -149,7 +149,7 @@ elseif (isset($_POST["newcomment"])) {
             $rateLimited = false;
             
             // Get comments from this IP.
-            $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . time()-$config["commentDelay"]);
+            $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
             
             if ($ipCheck->num_rows > 0) {
                 $rateLimited = true;
@@ -166,7 +166,7 @@ elseif (isset($_POST["newcomment"])) {
                 $commentid = $id;
                 
                 // Get comments from this account too.
-                $accCheck = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $id . "' AND `timestamp`>" . time()-$config["commentDelay"]);
+                $accCheck = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $id . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
             
                 if ($accCheck->num_rows > 0) {
                     $rateLimited = true;
@@ -317,7 +317,7 @@ elseif (isset($_POST["editcomment"])) {
                         $db->query("UPDATE `comments` SET `content`='" . $db->real_escape_string($content) . "', `timestamp`='" . time() . "' WHERE `id`='" . $c_id . "'");
                     
                         $_SESSION["messages"][] = success("Successfully edited comment.");
-                        redirect(makeURL("post/" . $p_id));
+                        redirect("post/" . $p_id);
                     }
                 }
             }
@@ -329,7 +329,7 @@ elseif (isset($_POST["editcomment"])) {
 }
 // Handle cancelling editing a comment.
 elseif (isset($_POST["canceleditcomment"])) {
-    redirect(makeURL("post/" . $p_id));
+    redirect("post/" . $p_id);
 }
 // Handle editing.
 elseif (($url[2] ?? "") == "edit") {
@@ -482,7 +482,7 @@ elseif (($url[2] ?? "") == "uploads") {
         // Display forms and images.
         $postuploadsvars = array("back" => makeURL("post/{$p_id}"),
         "icons" => "",
-        "script" => makeURL("javascript/uploads.js"),
+        "script" => makeURL("javascript/uploads.js", true),
         "attachments" => "");
         
         foreach ($icons as $icon) {

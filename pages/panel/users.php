@@ -41,9 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST["changerole"]) and isset($_POST["id"])) {
             $_POST["id"] = (int)$_POST["id"];
             $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-            $crole = $rolequery->fetch_column(0);
+            $crole = $rolequery->fetch_assoc()["role"];
             $userquery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_POST["id"]) . "'");
-            $urole = $userquery->fetch_column(0);
+            $urole = $userquery->fetch_assoc();
             // Does the user exist?
             if ($userquery->num_rows != 1) {
                 $messages[] = error("Specified user does not exist.");
@@ -65,11 +65,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $messages[] = error("You don't have permission to do this.");
             }
             // Does the other user outrank or have the same role as us?
-            elseif ($permissions[$urole] >= $permissions[$crole]) {
+            elseif ($permissions[$urole["role"]] >= $permissions[$crole]) {
                 $messages[] = error("You don't have permission to do this.");
             }
             // Is the role actually different from the role they already have?
-            elseif ($_POST["changerole"] == $urole) {
+            elseif ($_POST["changerole"] == $urole["role"]) {
                 $messages[] = success("Successfully did nothing.");
             }
             // Change the role.
@@ -88,7 +88,7 @@ $usersvars = array("tbody" => "");
 while ($u = $users->fetch_assoc()) {
     // If this user's role is below the current user's role, allow it to be changed.
     $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-    $crole = $rolequery->fetch_column(0);
+    $crole = $rolequery->fetch_assoc()["role"];
     if ($permissions[$u["role"]] < $permissions[$crole]) {
         $roleform = "<form method='post'>";
         $roleform .= "<input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>";

@@ -495,7 +495,7 @@ function upload($file, $name) {
 
 function markdownButtons() {
     // We need the "javascript:;" part because we need a valid href attribute so that these buttons are focusable (I.E. the user can use tab to select them).
-    return "<div></div><div class='markdownbuttons'><script src='" . makeURL("javascript/markdownbuttons.js") . "'></script>
+    return "<div></div><div class='markdownbuttons'><script src='" . makeURL("javascript/markdownbuttons.js", true) . "'></script>
     <label></label>
     <a class='button buttonSmall' title='bold' onclick='format(\"bold\")' href='javascript:;'><b>B</b></a>
     <a class='button buttonSmall' title='italic' onclick='format(\"italic\")' href='javascript:;'><i>i</i></a>
@@ -529,6 +529,37 @@ function parseTags($tagstring) {
     $tags = array_unique($tags);
     
     return $tags;
+}
+
+// --- PHP 7.* Compatibility ---
+if (!function_exists("str_starts_with")) {
+    function str_starts_with(string $haystack, string $needle) {
+        if (strlen($needle) > strlen($haystack)) {
+            return false;
+        }
+        
+        if (substr($haystack, 0, strlen($needle)) === $needle) {
+            return true;
+        }
+        
+        // Default to false.
+        return false;
+    }
+}
+
+if (!function_exists("str_ends_with")) {
+    function str_ends_with(string $haystack, string $needle) {
+        if (strlen($needle) > strlen($haystack)) {
+            return false;
+        }
+        
+        if (substr($haystack, strlen($needle)*-1) === $needle) {
+            return true;
+        }
+        
+        // Default to false.
+        return false;
+    }
 }
 
 ?>
