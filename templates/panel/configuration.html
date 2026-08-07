@@ -3,11 +3,11 @@
   <form method='post' class='form configForm'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='ctitle'>Blog Title:</label>
-   <input type='text' name='ctitle' id='ctitle' value='{{{ title }}}'>
+   <input type='text' name='ctitle' id='ctitle' maxlength='32' value='{{{ title }}}'>
    <label for='cdescription'>Blog Description:</label>
-   <textarea id='cdescription' name='cdescription'>{{{ description }}}</textarea>
+   <textarea id='cdescription' name='cdescription' maxlength='128'>{{{ description }}}</textarea>
    <label for='cfooter'>Footer:</label>
-   <textarea id='cfooter' name='cfooter'>{{{ footer }}}</textarea>
+   <textarea id='cfooter' name='cfooter' maxlength='4096'>{{{ footer }}}</textarea>
    <label for='timezone'>Server Timezone:</label>
    <select name='timezone' id='timezone'>
    {{ timezone }}
@@ -20,6 +20,9 @@
    <select name='theme' id='theme'>
    {{ theme }}
    </select>
+   <h2>Customization</h2><div></div>
+   <label for='customCSS'>Custom CSS:</label>
+   <textarea id='customCSS' name='customCSS' maxlength='4096'>{{{ customcss }}}</textarea>
    <h2>User Management</h2><div></div>
    <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>
    <input type='checkbox' id='registration' name='registration'{{ allowregistration }}>
@@ -27,8 +30,12 @@
    <select name='registrationMode' id='registrationMode'>
    {{ registrationmode }}
    </select>
-   <label for='comments' title='Whether or not people can comment.'>Enable comments:</label>
+   <label for='comments' title='Whether or not people can comment.'>Enable Comments:</label>
    <input type='checkbox' id='comments' name='comments'{{ comments }}>
+   <label for='captcha' title='Whether or not registration has a captcha.'>Enable Captcha:</label>
+   <input type='checkbox' id='captcha' name='captcha'{{ captcha }}>
+   <label for='captchaLength' title='How many characters the CAPTCHA contains.'>CAPTCHA Length:</label>
+   <input type='text' id='captchaLength' name='captchaLength' value='{{{ captchalength }}}'>
    <h2>Rate Limits</h2><div></div>
    <label for='logins' title='Allowed logins/login attempts per hour from an IP.'>Logins Per Hour:</label>
    <input type='text' id='logins' name='logins' value='{{{ loginsperhour }}}'>

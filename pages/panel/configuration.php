@@ -129,6 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors = array();
         $changes = 0;
         
+        // --- Blog Configuration ---
         if (isset($_POST["ctitle"])) {
             if (strlen($_POST["ctitle"]) < 1) {
                 $errors[] = "Title cannot be blank.";
@@ -159,8 +160,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (strlen($_POST["cfooter"]) < 1) {
                 $errors[] = "Footer cannot be blank.";
             }
-            elseif (strlen($_POST["cfooter"]) > 2048) {
-                $errors[] = "Footer cannot be longer than 2048 characters.";
+            elseif (strlen($_POST["cfooter"]) > 4096) {
+                $errors[] = "Footer cannot be longer than 4096 characters.";
             }
             // Only write to the config if the value is actually being changed.
             elseif ($_POST["cfooter"] != $config["footer"]) {
@@ -200,6 +201,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $changes++;
             }
         }
+        // --- Customization ---
+        if (isset($_POST["customCSS"])) {
+            if (strlen($_POST["customCSS"]) > 4096) {
+                $errors[] = "Custom CSS cannot be longer than 4096 characters.";
+            }
+            // Only write to the config if the value is actually being changed.
+            elseif ($_POST["customCSS"] != $config["customCSS"]) {
+                $config["customCSS"] = $_POST["customCSS"];
+                $changes++;
+            }
+        }
+        // --- User Management ---
         if (($_POST["registration"] ?? "") == "on") {
             $tz = true;
         }
@@ -232,6 +245,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $config["enableComments"] = $ec;
             $changes++;
         }
+        if (($_POST["captcha"] ?? "") == "on") {
+            $eca = true;
+        }
+        else {
+            $eca = false;
+        }
+        // Only write to the config if the value is actually being changed.
+        if ($eca != $config["captchaEnabled"]) {
+            $config["captchaEnabled"] = $eca;
+            $changes++;
+        }
+        if (isset($_POST["captchaLength"])) {
+            $captchaLength = (int)$_POST["captchaLength"];
+            if ($captchaLength < 1) {
+                $errors[] = "CAPTCHA length cannot be less than 1.";
+            }
+            elseif ($captchaLength > 16) {
+                $errors[] = "CAPTCHA length cannot be greater than 16.";
+            }
+            // Only write to the config if the value is actually being changed.
+            elseif ($captchaLength != $config["captchaLength"]) {
+                $config["captchaLength"] = $captchaLength;
+                $changes++;
+            }
+        }
+        // --- Rate Limits ---
         if (isset($_POST["logins"])) {
             $logins = (int)$_POST["logins"];
             if ($logins < 1) {
@@ -328,9 +367,12 @@ $configvars = array("token" => $_SESSION["csrf_token"],
 "timezone" => $timezonesHTML,
 "language" => $languageHTML,
 "theme" => $themeHTML,
+"customcss" => $_POST["customCSS"] ?? $config["customCSS"],
 "allowregistration" => $config["allowRegistration"] ? " checked" : "",
 "registrationmode" => $registerHTML,
 "comments" => $config["enableComments"] ? " checked" : "",
+"captcha" => $config["captchaEnabled"] ? " checked" : "",
+"captchalength" => $_POST["captchaLength"] ?? $config["captchaLength"],
 "loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],
 "accountsperip" => $_POST["accounts"] ?? $config["accountsPerIP"],
 "accountcooldown" => $_POST["accountcooldown"] ?? $config["accountCooldown"],

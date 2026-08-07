@@ -23,12 +23,18 @@
 if (!defined('INDEX')) exit;
 
 $headervars = array("pagetitle" => $htitle,
+"head" => "",
 "theme" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true),
 "icon" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true),
 "blogtitle" => $config["title"],
 "description" => $config["description"],
 "navbar" => "",
 "messages" => implode($messages));
+
+if (strlen($config["customCSS"]) > 0) {
+    // *** This may be dangerous security-wise. ***
+    $headervars["head"] .= "<style>" . htmlspecialchars($config["customCSS"], ENT_NOQUOTES) . "</style>";
+}
 
 // Generate the navbar appropriately.
 if ($config["installed"]) {

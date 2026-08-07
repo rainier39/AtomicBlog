@@ -69,7 +69,8 @@ $default_config = array(
     "commentDelay" => 30,
     "captchaEnabled" => true,
     "captchaLength" => 6,
-    "clickjackingPrevention" => true
+    "clickjackingPrevention" => true,
+    "customCSS" => ""
 );
 
 ?>
