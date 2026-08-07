@@ -144,21 +144,18 @@ function validatePost($edit=false) {
     $errors = array();
         	
     // Title.
-    if (!isset($_POST["title"]) or (strlen($_POST["title"]) < 1)) {
+    if (strlen($_POST["title"] ?? "") < 1) {
         $errors[] = "Post title cannot be less than 1 character long.";
     }
     elseif (strlen($_POST["title"]) > 32) {
         $errors[] = "Post title cannot be more than 32 characters long.";
     }
     // Tags.
-    if (!isset($_POST["tags"]) or (strlen($_POST["tags"]) < 1)) {
-        $errors[] = "Post tags cannot be less than 1 character long.";
-    }
-    elseif (strlen($_POST["tags"]) > 128) {
+    if (strlen($_POST["tags"] ?? "") > 128) {
         $errors[] = "Post tags cannot be more than 128 characters long.";
     }
     // Content.
-    if (!isset($_POST["content"]) or (strlen($_POST["content"]) < 1)) {
+    if (strlen($_POST["content"] ?? "") < 1) {
         $errors[] = "Post content cannot be less than 1 character long.";
     }
     elseif (strlen($_POST["content"]) > 65500) {

@@ -668,11 +668,11 @@ if ($displayPost) {
                 <form method='post' class='form'>
                  <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                  <input type='hidden' name='commentid' value='" . $c["id"] . "'>
-                 <textarea name='newcontent'>" . htmlspecialchars($_POST["newcontent"] ?? $c["content"]) . "</textarea>
+                 <textarea name='newcontent' maxlength='" . $config["commentMaxLength"] . "' required>" . htmlspecialchars($_POST["newcontent"] ?? $c["content"]) . "</textarea>
                  <div></div>
                  <input class='button' type='submit' name='editcomment' value='Edit'>
                  <div></div>
-                 <input class='button' type='submit' name='canceleditcomment' value='Cancel Edit'>
+                 <input class='button' type='submit' name='canceleditcomment' value='Cancel Edit' formnovalidate>
                 </form>
                 </div>
                 </div>";

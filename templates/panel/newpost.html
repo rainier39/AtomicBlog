@@ -3,12 +3,12 @@
   <form method='post' class='form newPostForm'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='title'>Title: </label>
-   <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}'>
+   <input type='text' name='title' id='title' maxlength='32' required value='{{{ title }}}'>
    <label for='tags'>Tags: </label>
    <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
    {{ markdownbuttons }}
    <label for='content'>Content: </label>
-   <textarea name='content' id='content' maxlength='65500'>{{{ content }}}</textarea>
+   <textarea name='content' id='content' required maxlength='65500'>{{{ content }}}</textarea>
    <label for='unpublished'>Unpublished: </label>
    <input type='checkbox' name='unpublished' id='unpublished'{{ unpublished }}>
    <br>
