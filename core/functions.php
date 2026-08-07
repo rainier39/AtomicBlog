@@ -493,6 +493,69 @@ function upload($file, $name) {
     }
 }
 
+function generateCaptchaText(int $length) {
+    $characters = "abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+    $text = "";
+    for ($i = 0; $i < $length; $i++) {
+        $text .= $characters[random_int(0, strlen($characters)-1)];
+    }
+    return $text;
+}
+
+function generateCaptcha() {
+    global $config;
+
+    $length = $config["captchaLength"];
+
+    $_SESSION["captcha"] = generateCaptchaText($length);
+    
+    // Pick a random font.
+    $font = random_int(2, 5);
+    
+    $fontwidth = imagefontwidth($font);
+    $fontheight = imagefontheight($font);
+
+    $width = $length*$fontwidth+($length*5)+5;
+    $height = $fontheight+20;
+
+    $img = imagecreatetruecolor($width, $height);
+    
+    // Put a background of random pixels.
+    for ($w = 0; $w < $width; $w++) {
+        for ($h = 0; $h < $height; $h++) {
+            $rand = imagecolorallocate($img, rand(0, 80), rand(0, 80), rand(0, 80));
+            imagesetpixel($img, $w, $h, $rand);
+        }
+    }
+    
+    $white = imagecolorallocate($img, 255, 255, 255);
+    
+    // Draw some lines.
+    $rand = imagecolorallocate($img, random_int(120, 200), random_int(120, 200), random_int(120, 200));
+    imageline($img, 1+random_int(2, 10), 1+random_int(2, 10), $width-random_int(2, 10), $height-random_int(2, 10), $rand);
+    $rand = imagecolorallocate($img, random_int(120, 200), random_int(120, 200), random_int(120, 200));
+    imageline($img, $width+random_int(2, 10), 1+random_int(2, 10), 1-random_int(2, 10), $height-random_int(2, 10), $rand);
+    
+    // Draw the letters.
+    for ($i = 0; $i < $length; $i++) {
+        $rand = imagecolorallocate($img, random_int(180, 255), random_int(180, 255), random_int(180, 255));
+        imagestring($img, $font, $i*($fontwidth+5)+5+random_int(-3, 3), $fontheight/2+random_int(-6, 6), $_SESSION["captcha"][$i], $rand);
+    }
+    
+    // Make the image larger so it's easier to read.
+    $img = imagescale($img, $width*3, $height*3);
+    
+    imagefilter($img, IMG_FILTER_SCATTER, 0, 2);
+    imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
+    
+    // Turn the image into a webp.
+    ob_start();
+    imagewebp($img);
+    $webp = ob_get_clean();
+    
+    return base64_encode($webp);
+}
+
 function markdownButtons() {
     // We need the "javascript:;" part because we need a valid href attribute so that these buttons are focusable (I.E. the user can use tab to select them).
     return "<div></div><div class='markdownbuttons'><script src='" . makeURL("javascript/markdownbuttons.js", true) . "'></script>

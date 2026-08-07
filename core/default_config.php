@@ -66,7 +66,10 @@ $default_config = array(
     // The longest (in characters) a comment may be.
     "commentMaxLength" => 2048,
     // Amount of time (in seconds) one must wait in between making a comment.
-    "commentDelay" => 30
+    "commentDelay" => 30,
+    "captchaEnabled" => true,
+    "captchaLength" => 6,
+    "clickjackingPrevention" => true
 );
 
 ?>

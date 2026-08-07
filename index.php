@@ -27,11 +27,6 @@ define("VERSION", "v1.0.1-beta");
 // Updates to the software may raise this depending on relevant advances in computing hardware.
 define("MIN_PASSWORD_LENGTH", 12);
 
-// Prevent clickjacking by preventing the website from loading in an iframe.
-// TODO: make it possible to disable this in the config.
-header("Content-Security-Policy: frame-ancestors 'none';");
-header("X-Frame-Options: DENY");
-
 $messages = array();
 
 // Get the configuration settings.
@@ -43,6 +38,12 @@ else {
     $config = array();
 }
 $config = array_merge($default_config, $config);
+
+// Prevent clickjacking by preventing the website from loading in an iframe.
+if ($config["clickjackingPrevention"]) {
+    header("Content-Security-Policy: frame-ancestors 'none';");
+    header("X-Frame-Options: DENY");
+}
 
 date_default_timezone_set($config["timezone"]);
 

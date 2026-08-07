@@ -81,6 +81,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($_POST["password"] != $_POST["repeatpassword"]) {
             $errors[] = "Your passwords don't match. Please try again.";
         }
+        
+        // Make sure the CAPTCHA was filled out correctly.
+        if (extension_loaded("gd") and $config["captchaEnabled"]) {
+            if (strtolower($_POST["captcha"]?? "") != strtolower($_SESSION["captcha"])) {
+                $errors[] = "CAPTCHA was not filled out correctly.";
+            }
+        }
             
         // If everything checks out, make the account.
         if (count($errors) == 0) {
@@ -123,7 +130,15 @@ if (!$registerSuccess) {
     "username" => $_POST["username"] ?? "",
     "email" => $_POST["email"] ?? "",
     "password" => $_POST["password"] ?? "",
-    "repeatpassword" => $_POST["repeatpassword"] ?? "");
+    "repeatpassword" => $_POST["repeatpassword"] ?? "",
+    "captcha" => "");
+    
+    // Add the CAPTCHA if we can and it's enabled.
+    if (extension_loaded("gd") and $config["captchaEnabled"]) {
+        $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='CAPTCHA image'>";
+        $registervars["captcha"] .= "<label for='captcha'>CAPTCHA:</label>
+        <input id='captcha' name='captcha' type='text' value='" . htmlspecialchars($_POST["captcha"] ?? "") . "'>";
+    }
 }
 else {
     render_page("", $registervars, $title);
