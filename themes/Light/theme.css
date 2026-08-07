@@ -178,6 +178,12 @@ input, select {
  overflow-wrap: break-word;
  box-shadow: 0px 0px 4px #0006;
 }
+.postTileStarred {
+ box-shadow: 0px 0px 4px #ebff00ee;
+}
+.postTileUnpublished {
+ background: #f8f8f8;
+}
 .postTile a {
  color: black;
  font-weight: bold;

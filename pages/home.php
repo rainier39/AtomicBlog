@@ -35,7 +35,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $id = $_SESSION["id"] ?? 0;
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `id` DESC");
+$starred = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `id` DESC");
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
@@ -51,7 +51,7 @@ if ($starred->num_rows > 0) {
             $homevars["starred"] .= "</tr><tr>";
             $counter = 0;
         }
-        $homevars["starred"] .= displayPost($s["id"], $s["title"], $s["account"]);
+        $homevars["starred"] .= displayPost($s["id"], $s["title"], $s["account"], $s["starred"], $s["published"]);
         $counter++;
         $total++;
     }
@@ -70,7 +70,7 @@ else {
 }
 
 // Get the 5 most recent posts.
-$recent = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `starttime` DESC LIMIT 5");
+$recent = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `starttime` DESC LIMIT 5");
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
@@ -78,7 +78,7 @@ if ($recent->num_rows > 0) {
     $total = 0;
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        $homevars["recent"] .= displayPost($r["id"], $r["title"], $r["account"]);
+        $homevars["recent"] .= displayPost($r["id"], $r["title"], $r["account"], $r["starred"], $r["published"]);
         $total++;
     }
     while (($total > 0) and ($total % 5)) {
@@ -135,11 +135,11 @@ if (count($mostViewed) > 0) {
     $total = 0;
     foreach ($mostViewed as $mv=>$views) {
         // Get the posts we wish to display.
-        $mostViewedPosts = $db->query("SELECT `id`, `title`, `account` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
+        $mostViewedPosts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
 
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
-            $homevars["viewed"] .= displayPost($m["id"], $m["title"], $m["account"]);
+            $homevars["viewed"] .= displayPost($m["id"], $m["title"], $m["account"], $m["starred"], $m["published"]);
             $total++;
         }
     }

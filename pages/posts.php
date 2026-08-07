@@ -41,7 +41,7 @@ if (isset($_GET["tag"])) {
 }
 
 // Get all of the blog posts.
-$posts = $db->query("SELECT `id`, `title`, `account`, `tags` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')){$tagQuery} ORDER BY `id` DESC");
+$posts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published`, `tags` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')){$tagQuery} ORDER BY `id` DESC");
 
 // If there are posts, display them.
 if ($posts->num_rows > 0) {
@@ -58,7 +58,7 @@ if ($posts->num_rows > 0) {
             $postsvars["posts"] .= "</tr><tr>";
             $counter = 0;
         }
-        $postsvars["posts"] .= displayPost($p["id"], $p["title"], $p["account"]);
+        $postsvars["posts"] .= displayPost($p["id"], $p["title"], $p["account"], $p["starred"], $p["published"]);
         $counter++;
         $total++;
         $tagsTemp = parseTags($p["tags"]);

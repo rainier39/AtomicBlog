@@ -63,7 +63,7 @@ function flushConfig() {
 }
 
 // Display a blog post tile.
-function displayPost($id, $title, $account) {
+function displayPost($id, $title, $account, $starred, $published) {
     global $db;
     
     $id = (int)$id;
@@ -71,7 +71,15 @@ function displayPost($id, $title, $account) {
     $postTilevars = array("url" => makeURL("post/" . $id),
     "image" => "",
     "title" => htmlspecialchars($title),
-    "author" => "Nobody");
+    "author" => "Nobody",
+    "classes" => "");
+    
+    if ($starred) {
+        $postTilevars["classes"] = " postTileStarred";
+    }
+    if (!$published) {
+        $postTilevars["classes"] .= " postTileUnpublished";
+    }
 
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
