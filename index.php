@@ -142,6 +142,11 @@ if ($_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
     logout(true);
 }
 
+// Update a logged-in user's last action time.
+if ($_SESSION["logged_in"]) {
+    $db->query("UPDATE `accounts` SET `lastactive`='" . time() . "' WHERE `id`='" . $_SESSION["id"] . "'");
+}
+
 // If the software hasn't been installed yet, direct all requests to the install page.
 if ($config["installed"] == false)
 {
