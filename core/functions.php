@@ -67,6 +67,7 @@ function displayPost($id, $title, $account, $starred, $published) {
     global $db;
     
     $id = (int)$id;
+    $account = (int)$account;
     
     $postTilevars = array("url" => makeURL("post/" . $id),
     "image" => "",
@@ -96,7 +97,7 @@ function displayPost($id, $title, $account, $starred, $published) {
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
             if ($a["namevisible"]) {
-                $postTilevars["author"] = $a["name"];
+                $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $account) . "'>" . htmlspecialchars($a["name"]) . "</a>";
             }
             else {
                 $postTilevars["author"] = "Anonymous";

@@ -188,6 +188,9 @@ input, select {
  color: black;
  font-weight: bold;
 }
+.postTile .profileLink {
+ font-weight: normal;
+}
 .postTile a:hover {
  color: #444;
 }
@@ -197,6 +200,12 @@ input, select {
  max-height: 15vh;
  display: block;
  margin: auto;
+}
+.profileLink {
+ color: black;
+}
+.profileLink:hover {
+ color: #444;
 }
 /* Post page */
 .post {
@@ -255,12 +264,12 @@ code, .codeblock {
 .tag {
  display: inline-block;
  margin: 3px;
- background: #99f;
+ background: royalblue;
  padding: 2px 4px;
  color: white;
 }
 .tag:hover {
- background: #7a7ad8;
+ background: cornflowerblue;
  color: white;
  text-decoration: none;
 }
@@ -285,7 +294,6 @@ code, .codeblock {
  display: flex;
  flex-flow: row wrap;
  align-items: center;
- gap: 10px;
  padding: 6px 12px;
  background: #e0e0e0;
 }
@@ -306,6 +314,24 @@ code, .codeblock {
 }
 .manageUploads img {
  max-width: 100%;
+}
+/* Profiles */
+.profile {
+ padding: 14px;
+}
+.profile h1 {
+ background: white;
+ width: fit-content;
+ padding: 4px 8px;
+ margin-top: 0px;
+}
+.profileContent {
+ background: white;
+ padding: 4px 8px;
+}
+.profileContent td {
+ text-align: right;
+ padding: 2px 4px;
 }
 /* Panel */
 .panelcontent {

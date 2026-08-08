@@ -65,10 +65,7 @@ if (isset($_POST["csrf_token"]) and ($_POST["csrf_token"] == $_SESSION["csrf_tok
         $bioChanged = true;
         $bio = $_POST["bio"];
         
-        if (strlen($bio) < 1) {
-            $errors[] = error("Bio cannot be blank.");
-        }
-        elseif (strlen($bio) > 4096) {
+        if (strlen($bio) > 4096) {
             $errors[] = error("Bio cannot be longer than 4,096 characters.");
         }
         // Don't change it if it's already the same.

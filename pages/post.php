@@ -582,7 +582,7 @@ if ($displayPost) {
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
             if ($a["namevisible"]) {
-                $postvars["author"] = $a["name"];
+                $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p_account) . "'>" . htmlspecialchars($a["name"]) . "</a>";
             }
             else {
                 $postvars["author"] = "Anonymous";
@@ -638,7 +638,7 @@ if ($displayPost) {
                 $an = $db->query("SELECT `name`, `color`, `namevisible` FROM `accounts` WHERE `id`='" . $c["account"] . "'");
                 while ($a = $an->fetch_assoc()) {
                     if ($a["namevisible"]) {
-                        $authorname = $a["name"];
+                        $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>" . htmlspecialchars($a["name"]) . "</a>";
                     }
                     else {
                         $authorname = "Anonymous";
@@ -656,16 +656,16 @@ if ($displayPost) {
                 $editing = true;
             }
             
-            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . ">By: " . htmlspecialchars($authorname);
+            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . ">By:&nbsp;" . $authorname;
             
-            $postvars["comments"] .= "<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>";
+            $postvars["comments"] .= "&nbsp;<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>&nbsp;";
             
             if (((checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id)
             // Guest with same IP.
             or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS))
             and (!$editing)) {
-                $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
+                $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>&nbsp;";
             }
             
             if ((checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id)
