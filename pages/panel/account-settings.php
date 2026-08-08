@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// settings.php
+// account-settings.php
 // Allows a user to change some of their account information.
 
 // Only load the page if it's being requested via the index file.
@@ -114,6 +114,6 @@ $settingsVars = array("token" => $_SESSION["csrf_token"],
 "newpassword" => $_POST["newpassword"] ?? "",
 "repeatpassword" => $_POST["repeatpassword"] ?? "");
 
-render_page("panel/settings.html", $settingsVars, $title);
+render_page("panel/account-settings.html", $settingsVars, $title);
 
 ?>

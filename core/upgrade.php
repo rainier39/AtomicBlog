@@ -62,6 +62,14 @@ if ($config["version"] != VERSION) {
         // Just bump version.
         $config["version"] = "v1.0.1-beta";
     }
+    if ($config["version"] == "v1.0.1-beta") {
+        $db->query("ALTER TABLE `accounts` DROP COLUMN IF EXISTS `avatar`");
+        $db->query("ALTER TABLE `accounts` ADD COLUMN IF NOT EXISTS `color` char(6) NOT NULL DEFAULT 'e0e0e0'");
+        $db->query("ALTER TABLE `accounts` MODIFY COLUMN `namevisible` tinyint(1) NOT NULL DEFAULT '1'");
+    
+        // Bump the version.
+        $config["version"] = "v2.0.0-beta";
+    }
     
     // Write the new config to a file.
     flushConfig();

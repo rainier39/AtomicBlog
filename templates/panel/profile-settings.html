@@ -1,0 +1,15 @@
+  <!-- pages/panel/profile-settings.php -->
+  <h1>Profile Settings</h1>
+  <form method='post' class='form'>
+   <input type='hidden' name='csrf_token' value='{{ token }}'>
+   <label for='color'>Color:</label>
+   <input id='color' type='color' name='color' value='{{{ color }}}'>
+   <label for='bio'>Bio:</label>
+   <textarea id='bio' name='bio'>{{{ bio }}}</textarea>
+   <label for='namevisible'>Name Visible:</label>
+   <input type='checkbox' name='namevisible' id='namevisible'{{ namevisible }}>
+   <label for='emailvisible'>Email Visible:</label>
+   <input type='checkbox' name='emailvisible' id='emailvisible'{{ emailvisible }}>
+   <br>
+   <input type='submit' value='Change settings' class='button'>
+  </form>

@@ -533,7 +533,7 @@ if ($displayPost) {
         while ($p = $post->fetch_assoc()) {
             $p_id = $p["id"];
             $p_title = $p["title"];
-            $p_tags = $p["tags"]; //unused
+            $p_tags = $p["tags"];
             $p_content = $p["content"];
             $p_account = $p["account"];
             $p_starttime = $p["starttime"];
@@ -578,10 +578,15 @@ if ($displayPost) {
             <a href='" . makeURL("post/{$p_id}/uploads") . "' class='button postButton'>Manage Uploads</a>";
     }
     // Get the account information of the post author.
-    $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p_account) . "'");
+    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p_account) . "'");
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
-            $postvars["author"] = $a["name"];
+            if ($a["namevisible"]) {
+                $postvars["author"] = $a["name"];
+            }
+            else {
+                $postvars["author"] = "Anonymous";
+            }
         }
     }
     if (!empty($p_edittime)) {
@@ -627,11 +632,19 @@ if ($displayPost) {
             // Get author name.
             if ($c["account"] === "0") {
                 $authorname = "Guest";
+                $authorcolor = "";
             }
             else {
-                $an = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $c["account"] . "'");
+                $an = $db->query("SELECT `name`, `color`, `namevisible` FROM `accounts` WHERE `id`='" . $c["account"] . "'");
                 while ($a = $an->fetch_assoc()) {
-                    $authorname = $a["name"];
+                    if ($a["namevisible"]) {
+                        $authorname = $a["name"];
+                    }
+                    else {
+                        $authorname = "Anonymous";
+                    }
+                    // This is safe because the value of `color` is constrained.
+                    $authorcolor = " style='background: #" . $a["color"] . ";'";
                 }
             }
             
@@ -643,7 +656,7 @@ if ($displayPost) {
                 $editing = true;
             }
             
-            $postvars["comments"] .= "<div class='commentHeader'>By: " . htmlspecialchars($authorname);
+            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . ">By: " . htmlspecialchars($authorname);
             
             $postvars["comments"] .= "<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>";
             

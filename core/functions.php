@@ -70,7 +70,7 @@ function displayPost($id, $title, $account, $starred, $published) {
     
     $postTilevars = array("url" => makeURL("post/" . $id),
     "image" => "",
-    "title" => htmlspecialchars($title),
+    "title" => $title,
     "author" => "Nobody",
     "classes" => "");
     
@@ -92,10 +92,15 @@ function displayPost($id, $title, $account, $starred, $published) {
     }
 
     // Get the account information of the post author.
-    $acc = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $db->real_escape_string($account) . "'");
+    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($account) . "'");
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
-            $postTilevars["author"] = htmlspecialchars($a["name"]);
+            if ($a["namevisible"]) {
+                $postTilevars["author"] = $a["name"];
+            }
+            else {
+                $postTilevars["author"] = "Anonymous";
+            }
         }
     }
     
