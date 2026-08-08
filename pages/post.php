@@ -343,6 +343,9 @@ elseif (($url[2] ?? "") == "edit") {
             if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
                 // Generate a new token.
                 generateCSRFToken();
+                
+                // Remove ampersands from tags because they can be used to inject URL parameters.
+                $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
 
                 $errors = validatePost(true);
                 
