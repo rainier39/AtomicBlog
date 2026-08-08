@@ -85,7 +85,7 @@ if ($posts->num_rows > 0) {
     ksort($tags);
     $tagCloud = "<div class='tagCloud'>";
     foreach ($tags as $tag=>$val) {
-        $tagCloud .= "<a href='" . makeURL("posts/&tag=" . htmlspecialchars($tag)) . "' style='font-size:" . clamp($val+14, 14, 50) . "px'>" . htmlspecialchars($tag) . "</a>";
+        $tagCloud .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag))) . "' style='font-size:" . clamp($val+14, 14, 50) . "px'>" . htmlspecialchars($tag) . "</a>";
     }
     $tagCloud .= "</div>";
     $postsvars["posts"] = $tagCloud . $postsvars["posts"];
