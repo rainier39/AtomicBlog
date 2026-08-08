@@ -8,6 +8,7 @@
    {{ icons }}
    <h3>Upload a new icon</h3>
    <form method='post' enctype='multipart/form-data'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
     <input type='file' name='icon'>
     <input type='submit' value='Upload icon'>
    </form>
@@ -17,6 +18,7 @@
    {{ attachments }}
    <h3>Upload a new attachment</h3>
    <form method='post' enctype='multipart/form-data'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
     <input type='file' name='attachment'>
     <input type='submit' value='Upload attachment'>
    </form>

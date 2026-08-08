@@ -26,7 +26,7 @@ $registervars = array();
 $title = lang("global.register");
 
 // If the user is already logged in, don't let them into the page.
-if (($_SESSION["logged_in"] ?? "") === true) {
+if ($_SESSION["logged_in"]) {
     $messages[] = error("You're already logged in.");
     render_page("", $registervars, $title);
     exit();

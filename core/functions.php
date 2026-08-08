@@ -291,8 +291,8 @@ function checkPerm($perm) {
         return false;
     }
     
-    // If a user is signed in.
-    if (isset($_SESSION["logged_in"]) and ($_SESSION["logged_in"] == true)) {
+    // If a user is logged in.
+    if ($_SESSION["logged_in"]) {
         $roleCheck = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_SESSION["id"]) . "'");
         
         // If the account doesn't exist, deny.

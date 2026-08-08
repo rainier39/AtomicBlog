@@ -62,7 +62,7 @@ elseif (isset($_POST["toggleStar"])) {
     // Make sure the user is allowed to star/unstar the post.
     if ((($id == $p_account) and checkPerm(PERM_STAR_POST)) or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
+        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
             // Generate a new token.
             generateCSRFToken();
             
@@ -86,7 +86,7 @@ elseif (isset($_POST["togglePublished"])) {
     // Make sure the user is allowed to publish/unpublish the post.
     if (($id == $p_account) and checkPerm(PERM_NEW_POST)) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
+        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
             // Generate a new token.
             generateCSRFToken();
                 
@@ -110,7 +110,7 @@ elseif (isset($_POST["delete"])) {
     // Make sure the user is allowed to delete the post.
     if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
+        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
             // Generate a new token.
             generateCSRFToken();
                 
@@ -142,7 +142,7 @@ elseif (isset($_POST["newcomment"])) {
     // Make sure the user is allowed to comment.
     if (checkPerm(PERM_COMMENT)) {
         // If the CSRF token is sent and valid.
-        if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
+        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
             // Generate a new token.
             generateCSRFToken();
             
@@ -156,7 +156,7 @@ elseif (isset($_POST["newcomment"])) {
             }
             
             // If it's a user with an account.
-            if (isset($_SESSION["logged_in"]) and $_SESSION["logged_in"]) {
+            if ($_SESSION["logged_in"]) {
                 $emailquery = $db->query("SELECT `email` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
                 
                 while ($e = $emailquery->fetch_assoc()) {
@@ -240,7 +240,7 @@ elseif (isset($_POST["deletecomment"])) {
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
                 // If the CSRF token is sent and valid.
-                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
+                if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
                     // Generate a new token.
                     generateCSRFToken();
                     
@@ -277,7 +277,7 @@ elseif (isset($_POST["editcomment"])) {
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
                 // If the CSRF token is sent and valid.
-                if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
+                if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
                     // Generate a new token.
                     generateCSRFToken();
                     
@@ -397,7 +397,12 @@ elseif (($url[2] ?? "") == "uploads") {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to upload.
-    if ((($id === $p_account) and checkPerm(PERM_UPLOAD)) or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
+    if ((($id === $p_account) and checkPerm(PERM_UPLOAD))
+    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))
+    and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
+        // Generate a new token.
+        generateCSRFToken();
+        
         // Handle uploading icon.
         if (isset($_FILES["icon"])) {
             $upload = upload("icon", $p_id);
@@ -484,6 +489,7 @@ elseif (($url[2] ?? "") == "uploads") {
         }
         // Display forms and images.
         $postuploadsvars = array("back" => makeURL("post/{$p_id}"),
+        "token" => $_SESSION["csrf_token"],
         "icons" => "",
         "script" => makeURL("javascript/uploads.js", true),
         "attachments" => "");
@@ -493,6 +499,7 @@ elseif (($url[2] ?? "") == "uploads") {
               <img src='" . makeURL("images/{$icon}") . "'>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this icon?\");'>
+                <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <input type='hidden' value='{$icon}' name='dicon'>
                 <input type='submit' value='Delete' name='deleteIcon' class='button'>
               </form>
@@ -504,6 +511,7 @@ elseif (($url[2] ?? "") == "uploads") {
               URL: <a onclick='copy(\"" . (($ishttps == "on") ? "https://" : "http://") . $_SERVER["SERVER_NAME"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
+                <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <input type='hidden' value='{$attachment}' name='dattachment'>
                 <input type='submit' value='Delete' name='deleteAttachment' class='button'>
               </form>
