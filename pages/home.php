@@ -39,30 +39,16 @@ $starred = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` F
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
-    $homevars["starred"] .= "<table class='postsTable'><tbody>";
-    $counter = 0;
-    $total = 0;
+    $homevars["starred"] .= "<div class='postTiles'>";
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
-        if ($counter == 0) {
-            $homevars["starred"] .= "<tr>";
-        }
-        if ($counter == 5) {
-            $homevars["starred"] .= "</tr><tr>";
-            $counter = 0;
-        }
         $homevars["starred"] .= displayPost($s["id"], $s["title"], $s["account"], $s["starred"], $s["published"]);
-        $counter++;
-        $total++;
     }
-    while (($total > 0) and ($total % 5)) {
-        $homevars["starred"] .= "<td></td>";
-        $total++;
-        if (!$total % 5) {
-            $homevars["starred"] .= "</tr>";
-        }
+    // Add placeholder divs if needed to prevent one or two giant tiles.
+    for ($extra = 0; $extra < 5-$starred->num_rows; $extra++) {
+        $homevars["starred"] .= "<div class='postTile postTileUnpublished'></div>";
     }
-    $homevars["starred"] .= "</tbody></table>";
+    $homevars["starred"] .= "</div>";
 }
 // Otherwise print a message.
 else {
@@ -74,21 +60,16 @@ $recent = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FR
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
-    $homevars["recent"] .= "<table class='postsTable'><tbody><tr>";
-    $total = 0;
+    $homevars["recent"] .= "<div class='postTiles'>";
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
         $homevars["recent"] .= displayPost($r["id"], $r["title"], $r["account"], $r["starred"], $r["published"]);
-        $total++;
     }
-    while (($total > 0) and ($total % 5)) {
-        $homevars["recent"] .= "<td></td>";
-        $total++;
-        if (!$total % 5) {
-            $homevars["recent"] .= "</tr>";
-        }
+    // Add placeholder divs if needed to prevent one or two giant tiles.
+    for ($extra = 0; $extra < 5-$recent->num_rows; $extra++) {
+        $homevars["recent"] .= "<div class='postTile postTileUnpublished'></div>";
     }
-    $homevars["recent"] .= "</tr></tbody></table>";
+    $homevars["recent"] .= "</div>";
 }
 // Otherwise print a message.
 else {
@@ -131,8 +112,7 @@ for ($i = 0; (($i < 5) and (count($views) != 0)); $i++) {
 
 // Only try to display posts if there are any.
 if (count($mostViewed) > 0) {
-    $homevars["viewed"] .= "<table class='postsTable'><tbody><tr>";
-    $total = 0;
+    $homevars["viewed"] .= "<div class='postTiles'>";
     foreach ($mostViewed as $mv=>$views) {
         // Get the posts we wish to display.
         $mostViewedPosts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
@@ -140,17 +120,13 @@ if (count($mostViewed) > 0) {
         // Display the posts.
         while ($m = $mostViewedPosts->fetch_assoc()) {
             $homevars["viewed"] .= displayPost($m["id"], $m["title"], $m["account"], $m["starred"], $m["published"]);
-            $total++;
         }
     }
-    while (($total > 0) and ($total % 5)) {
-        $homevars["viewed"] .= "<td></td>";
-        $total++;
-        if (!$total % 5) {
-            $homevars["viewed"] .= "</tr>";
-        }
+    // Add placeholder divs if needed to prevent one or two giant tiles.
+    for ($extra = 0; $extra < 5-count($mostViewed); $extra++) {
+        $homevars["viewed"] .= "<div class='postTile postTileUnpublished'></div>";
     }
-    $homevars["viewed"] .= "</tr></tbody></table>";
+    $homevars["viewed"] .= "</div>";
 }
 // Otherwise print a message.
 else {

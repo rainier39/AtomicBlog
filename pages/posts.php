@@ -45,22 +45,11 @@ $posts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published`, `t
 
 // If there are posts, display them.
 if ($posts->num_rows > 0) {
-    $postsvars["posts"] .= "<table class='postsTable'><tbody>";
-    $counter = 0;
-    $total = 0;
+    $postsvars["posts"] .= "<div class='postTiles'>";
     $tags = array();
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
-        if ($counter == 0) {
-            $postsvars["posts"] .= "<tr>";
-        }
-        if ($counter == 5) {
-            $postsvars["posts"] .= "</tr><tr>";
-            $counter = 0;
-        }
         $postsvars["posts"] .= displayPost($p["id"], $p["title"], $p["account"], $p["starred"], $p["published"]);
-        $counter++;
-        $total++;
         $tagsTemp = parseTags($p["tags"]);
         foreach ($tagsTemp as $tag) {
             if (!array_key_exists($tag, $tags)) {
@@ -71,14 +60,7 @@ if ($posts->num_rows > 0) {
             }
         }
     }
-    while (($total > 0) and ($total % 5)) {
-        $postsvars["posts"] .= "<td></td>";
-        $total++;
-        if (!$total % 5) {
-            $postsvars["posts"] .= "</tr>";
-        }
-    }
-    $postsvars["posts"] .= "</tbody></table>";
+    $postsvars["posts"] .= "</div>";
     // Display a tag cloud.
     // Only keep the top 100 tags.
     $tags = array_slice($tags, 0, 100);

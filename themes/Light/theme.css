@@ -42,8 +42,9 @@ input, select {
 .navbar {
  padding: 6px 12px;
  background: lightslategrey;
- text-align: center;
  box-shadow: 0px 1px 5px #0006;
+ display: flex;
+ justify-content: space-evenly;
 }
 .navbar a {
  margin-right: 5%;
@@ -59,7 +60,7 @@ input, select {
  color: lightgray;
 }
 .content {
- padding: 10px 20px;
+ padding: 8px 16px;
  background: white;
  box-shadow: 0px 3px 5px #0006;
 }
@@ -165,21 +166,25 @@ input, select {
  min-height: 120px;
 }
 /* Post tiles */
-.postsTable {
+.postTiles {
  width: 100%;
- table-layout: fixed;
- border-spacing: 12px;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ justify-content: space-between;
+ align-content: space-between;
+ margin: 4px 0 4px 0;
 }
 .postTile {
  padding: 14px;
- height: 100%;
  text-align: center;
- vertical-align: top;
  overflow-wrap: break-word;
  box-shadow: 0px 0px 4px #0006;
+ flex-grow: 0.5;
 }
 .postTileStarred {
- box-shadow: 0px 0px 4px #ebff00ee;
+ background: #f7ff0018;
+ box-shadow: 0px 0px 4px #96a017;
 }
 .postTileUnpublished {
  background: #f8f8f8;
@@ -200,6 +205,7 @@ input, select {
  max-height: 15vh;
  display: block;
  margin: auto;
+ box-shadow: 0px 0px 3px #0006;
 }
 .profileLink {
  color: black;
@@ -209,7 +215,6 @@ input, select {
 }
 /* Post page */
 .post {
- padding: 15px;
 }
 .postHeader {
  text-align: center;
@@ -222,6 +227,7 @@ input, select {
  display: block;
  margin-left: auto;
  margin-right: auto;
+ box-shadow: 0px 0px 3px #0006;
 }
 .postButtons {
  display: flex;
@@ -291,14 +297,21 @@ code, .codeblock {
  margin-right: 0;
 }
 .commentHeader {
- display: flex;
- flex-flow: row wrap;
- align-items: center;
- padding: 6px 12px;
+ padding: 8px 16px;
  background: #e0e0e0;
+ border-bottom: 1px solid #ddd;
+}
+.commentHeaderItems {
+ display: flex;
+ gap: 8px;
+ align-items: baseline;
+ background: white;
+ padding: 4px 8px;
+ box-shadow: 0px 0px 2px #0006;
+ width: max-content;
 }
 .commentContent {
- padding: 6px 12px;
+ padding: 8px 16px;
 }
 /* Edit post page */
 .editPostForm textarea {
@@ -317,17 +330,19 @@ code, .codeblock {
 }
 /* Profiles */
 .profile {
- padding: 14px;
+ padding: 18px;
 }
 .profile h1 {
  background: white;
  width: fit-content;
  padding: 4px 8px;
  margin-top: 0px;
+ box-shadow: 0px 0px 3px #0006;
 }
 .profileContent {
  background: white;
  padding: 4px 8px;
+ box-shadow: 0px 0px 3px #0006;
 }
 .profileContent td {
  text-align: right;

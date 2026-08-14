@@ -656,16 +656,16 @@ if ($displayPost) {
                 $editing = true;
             }
             
-            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . ">By:&nbsp;" . $authorname;
+            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . "><div class='commentHeaderItems'><div>By: " . $authorname . "</div>";
             
-            $postvars["comments"] .= "&nbsp;<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>&nbsp;";
+            $postvars["comments"] .= "<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>";
             
             if (((checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id)
             // Guest with same IP.
             or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS))
             and (!$editing)) {
-                $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>&nbsp;";
+                $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
             }
             
             if ((checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id)
@@ -680,7 +680,7 @@ if ($displayPost) {
             }
             
             if (!$editing) {
-                $postvars["comments"] .= "</div>
+                $postvars["comments"] .= "</div></div>
                 <div class='commentContent'>
                 " . htmlspecialchars($c["content"]) . "
                 </div>
