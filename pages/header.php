@@ -40,7 +40,9 @@ if (strlen($config["customCSS"]) > 0) {
 if ($config["installed"]) {
     $headervars["navbar"] .= "<div class='navbar'><a href='" . makeURL("") . "'>" . lang("navbar.home") . "</a><a href='" . makeURL("posts") . "'>" . lang("global.posts") . "</a>";
     if ($_SESSION["logged_in"]) {
-        $headervars["navbar"] .= "<a href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a><a href='" . makeURL("logout") . "'>" . lang("navbar.logout") . "</a>";
+        $headervars["navbar"] .= "<a href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a>";
+        $headervars["navbar"] .= "<a href='" . makeURL("profile/" . $_SESSION["id"]) . "'>Profile</a>";
+        $headervars["navbar"] .= "<a href='" . makeURL("logout") . "'>" . lang("navbar.logout") . "</a>";
     }
     else {
         $headervars["navbar"] .= "<a href='" . makeURL("login") . "'>" . lang("global.login") . "</a>";

@@ -31,7 +31,7 @@ if (!checkPerm(PERM_VIEW_PROFILE)) {
     exit();
 }
 
-$profileinfo = $db->query("SELECT `name`, `color`, `bio`, `email`, `lastactive`, `namevisible`, `emailvisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($uid) . "'");
+$profileinfo = $db->query("SELECT `name`, `color`, `bio`, `email`, `lastactive`, `namevisible`, `emailvisible`, `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($uid) . "'");
 $p = $profileinfo->fetch_assoc();
 
 if ($profileinfo->num_rows < 1) {
@@ -39,6 +39,9 @@ if ($profileinfo->num_rows < 1) {
     render_page("", array(), $title);
     exit();
 }
+
+$comments = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $_SESSION["id"] . "'");
+$posts = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "'");
 
 if ($p["namevisible"]) {
     $name = $p["name"];
@@ -54,15 +57,25 @@ else {
     $email = "***@***";
 }
 
+if ($p["bio"]) {
+    $bio = format($p["bio"]);
+}
+else {
+    $bio = info("No bio to display yet.");
+}
+
 $lastactiveHTML = "<small><span class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</span></small>";
 
 $title = htmlspecialchars($name) . "'s Profile";
 
 $profilevars = array("color" => $p["color"],
 "name" => $name,
-"bio" => $p["bio"],
+"bio" => $bio,
 "lastactive" => $lastactiveHTML,
-"email" => $email);
+"role" => $p["role"],
+"email" => $email,
+"comments" => $comments->num_rows,
+"posts" => $posts->num_rows);
 
 render_page("profile.html", $profilevars, $title);
 

@@ -335,17 +335,20 @@ code, .codeblock {
 .profile h1 {
  background: white;
  width: fit-content;
- padding: 4px 8px;
+ padding: 5px 10px;
  margin-top: 0px;
  box-shadow: 0px 0px 3px #0006;
 }
 .profileContent {
  background: white;
- padding: 4px 8px;
+ padding: 5px 10px;
  box-shadow: 0px 0px 3px #0006;
 }
 .profileContent td {
  text-align: right;
+ padding: 2px 4px;
+}
+.bio {
  padding: 2px 4px;
 }
 /* Panel */
