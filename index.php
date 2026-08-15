@@ -177,6 +177,10 @@ elseif ($url[0] == "post")
 {
     require "pages/post.php";
 }
+elseif ($url[0] == "profile")
+{
+    require "pages/profile.php";
+}
 elseif ($url[0] == "")
 {
     require "pages/home.php";
