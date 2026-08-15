@@ -26,7 +26,6 @@ input, select {
 }
 .header {
  padding: 20px 40px;
- font-size: 160%;
  background: #046791;
  color: white;
  text-align: center;
@@ -35,6 +34,7 @@ input, select {
 #blogtitle {
  display: block;
  font-weight: bold;
+ font-size: 34px;
 }
 #blogdesc {
  font-size: 18px;
@@ -45,6 +45,7 @@ input, select {
  box-shadow: 0px 1px 5px #0006;
  display: flex;
  justify-content: space-evenly;
+ flex-wrap: wrap;
 }
 .navbar a {
  margin-right: 5%;
@@ -289,7 +290,7 @@ code, .codeblock {
 }
 /* Comments */
 .comment {
- margin-top: 8px;
+ margin-top: 12px;
  box-shadow: 0px 0px 3px #0006;
 }
 .comment hr {
@@ -297,7 +298,7 @@ code, .codeblock {
  margin-right: 0;
 }
 .commentHeader {
- padding: 8px 16px;
+ padding: 10px 20px;
  background: #e0e0e0;
  border-bottom: 1px solid #ddd;
 }
@@ -311,7 +312,7 @@ code, .codeblock {
  width: max-content;
 }
 .commentContent {
- padding: 8px 16px;
+ padding: 10px 20px;
 }
 /* Edit post page */
 .editPostForm textarea {
@@ -391,6 +392,10 @@ code, .codeblock {
  .navbar {
   border-left: 0;
   border-right: 0;
+  justify-content: space-between;
+ }
+ .navbar a {
+  font-size: 16px;
  }
  .content {
   border-left: 0;
