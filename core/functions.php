@@ -250,6 +250,30 @@ function validateEmail($email, $takenCheck=false) {
     return $errors;
 }
 
+function validatePassword($password) {
+    $errors = array();
+    
+    $passwordLen = strlen($password);
+    
+    // Enforce minimum password length requirement.
+    if ($passwordLen < MIN_PASSWORD_LENGTH) {
+        $errors[] = "Password must be at least " . MIN_PASSWORD_LENGTH . " characters long.";
+    }
+    
+    // Protect against mostly numeric passwords (these will be relatively weak).
+    $numbers = array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+    $numberCount = 0;
+    foreach ($numbers as $number) {
+        $numberCount += substr_count($password, $number);
+    }
+    $otherCount = $passwordLen - $numberCount;
+    if ($numberCount > $otherCount) {
+        $errors[] = "More than half of your password cannot be numeric.";
+    }
+
+    return $errors;
+}
+
 // Safely redirect to some page.
 function redirect($loc, int $delay=0) {
     global $config;

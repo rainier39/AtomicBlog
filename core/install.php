@@ -88,15 +88,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
     // Stop if the email is invalid.
     $errors = array_merge($errors, validateEmail($_POST["email"] ?? ""));
-    // Stop if the password(s) is/are too short.
-    if (strlen($_POST["password"] ?? "") < MIN_PASSWORD_LENGTH) {
-        $errors[] = "Cannot install, password must be at least " . MIN_PASSWORD_LENGTH . " characters long.";
-    }
+    // Stop if the password doesn't meet the requirements.
+    $errors = array_merge($errors, validatePassword($_POST["password"] ?? ""));
     // Stop if the password(s) don't match.
     if (($_POST["password"] ?? "") != ($_POST["repeatpassword"] ?? "")) {
         $errors[] = "Cannot install, passwords do not match.";
     }
-    // TODO: enforce more advanced, stringent password requirements?
     
     // Connect to the database with the given credentials.
     try {

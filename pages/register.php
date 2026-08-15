@@ -72,11 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
         // Validate their email.
         $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
-           
-        // Make sure their password is long enough.
-        if (strlen($_POST["password"]) < MIN_PASSWORD_LENGTH) {
-            $errors[] = "Your password isn't long enough. Make sure your password is at least " . MIN_PASSWORD_LENGTH . " characters in length.";
-        }
+        
+        // Validate their password.
+        $errors = array_merge($errors, validatePassword($_POST["password"] ?? ""));
+        
         // Make sure their password entries match.
         if ($_POST["password"] != $_POST["repeatpassword"]) {
             $errors[] = "Your passwords don't match. Please try again.";

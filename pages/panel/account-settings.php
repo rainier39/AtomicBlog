@@ -81,9 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!password_verify($_POST["password"], $password)) {
                 $errors[] = "Incorrect password.";
             }
-            if (strlen($_POST["newpassword"]) < MIN_PASSWORD_LENGTH) {
-                $errors[] = "Your password isn't long enough. Make sure your password is at least " . MIN_PASSWORD_LENGTH . " characters in length.";
-            }
+            $errors = array_merge($errors, validatePassword($_POST["newpassword"]));
             if ($_POST["newpassword"] != $_POST["repeatpassword"]) {
                 $errors[] = "Your passwords don't match. Please try again.";
             }
