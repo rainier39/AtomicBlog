@@ -101,7 +101,7 @@ foreach ($themes as $t) {
 
 // Registration mode stuff.
 $registerHTML = "";
-$modes = array("approval", "open");
+$modes = array("approval", "email", "open");
 // Use the user-supplied mode if it's valid, otherwise default to the config.
 if (isset($_POST["registrationMode"]) and in_array($_POST["registrationMode"], $modes)) {
     $currentMode = $_POST["registrationMode"];

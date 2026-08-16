@@ -40,8 +40,8 @@ if ($profileinfo->num_rows < 1) {
     exit();
 }
 
-$comments = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $_SESSION["id"] . "'");
-$posts = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "'");
+$comments = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $db->real_escape_string($uid) . "'");
+$posts = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $db->real_escape_string($uid) . "'");
 
 if ($p["namevisible"]) {
     $name = $p["name"];

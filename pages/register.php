@@ -40,6 +40,24 @@ if (!$config["allowRegistration"]) {
 
 }
 
+if (isset($url[1]) and ($config["registrationMode"] == "email")) {
+    $account = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($url[1]) . "' AND `role`='Unapproved'");
+    
+    if ($account->num_rows < 1) {
+        $messages[] = error("Invalid account activation link.");
+        render_page("", $registervars, $title);
+        exit();
+    }
+    
+    $a = $account->fetch_assoc();
+    
+    $db->query("UPDATE `accounts` SET `cookie`=NULL, `role`='Member' WHERE `id`='" . $a["id"] . "'");
+
+    $messages[] = unsafe_success("Successfully activated your account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
+    render_page("", $registervars, $title);
+    exit();
+}
+
 // Keep track of whether or not the user successfully registered.
 $registerSuccess = false;
 
@@ -90,24 +108,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
         // If everything checks out, make the account.
         if (count($errors) == 0) {
+            $cookie = "NULL";
             // Decide what role to assign.
             switch ($config["registrationMode"]) {
-                case "approval":
-                    $role = "Unapproved";
-                    break;
                 case "open":
                     $role = "Member";
                     break;
+                // Fallthrough intentional.
+                case "approval":
+                case "email":
+                    $cookie = hash("sha256", random_bytes(64));
                 // Default to approval.
                 default:
                     $role = "Unapproved";
             }
             $now = time();
-            $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "')");
+            $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "', '" . $cookie . "')");
 
             // Inform the user that they've successfully registered.
             if ($role == "Unapproved") {
-                $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
+                switch ($config["registrationMode"]) {
+                    case "approval":
+                        $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
+                        break;
+                    case "email":
+                        $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . makeURL("register/" . $cookie)));
+                        if ($emailSuccess) {
+                            $messages[] = success("You've successfully registered for an account. Click the link provided to the email you specified to activate your account.");
+                        }
+                        else {
+                            $messages[] = error("Failed to send activation email. Please contact the blog owner/administrator(s).");
+                        }
+                        break;
+                }
             }
             elseif ($role == "Member") {
                 $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");

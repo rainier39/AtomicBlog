@@ -41,7 +41,7 @@ $default_config = array(
     "prettyURLs" => false,
     // Whether to allow people to create accounts.
     "allowRegistration" => true,
-    // "approval", "open"
+    // "approval", "email", "open"
     "registrationMode" => "approval",
     "loginsPerHour" => 5,
     "accountsPerIP" => 3,

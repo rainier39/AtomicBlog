@@ -634,6 +634,15 @@ function clamp($number, $min, $max) {
     return max($min, min($max, $number));
 }
 
+function sendEmail($address, $subject, $message) {
+    // If there are already CRLFs change them so we don't end up duplicating the CR's.
+    $message = str_replace("\r\n", "\n", $message);
+    // All lines must be separated by CRLF.
+    $message = str_replace("\n", "\r\n", $message);
+
+    return mail($address, $subject, $message);
+}
+
 // --- PHP 7.* Compatibility ---
 if (!function_exists("str_starts_with")) {
     function str_starts_with(string $haystack, string $needle) {
