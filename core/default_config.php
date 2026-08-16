@@ -39,6 +39,7 @@ $default_config = array(
     // Whether to redirect all HTTP requests to HTTPS.
     "https" => false,
     "prettyURLs" => false,
+    "cookiePrefix" => "AtomicBlog_",
     // Whether to allow people to create accounts.
     "allowRegistration" => true,
     // "approval", "email", "open"

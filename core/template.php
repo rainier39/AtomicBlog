@@ -37,7 +37,19 @@ function render_template($filename, $variables, $echo=true) {
     }
     
     // Don't display HTML comments.
-    $template = preg_replace("/<!-- .+ -->/", "", $template);
+    $template = preg_replace("/<!--.*?-->/s", "", $template);
+    
+    // Support basic if conditionals.
+    $matches = array();
+    preg_match_all("/{% if \((.+?)\) %}.*?{% endif %}/s", $template, $matches);
+    for ($match = 0; $match < count($matches[0]); $match++) {
+        if (array_key_exists($matches[1][$match], $variables) and $variables[$matches[1][$match]]) {
+            $template = preg_replace("/{% if \(" . $matches[1][$match] . "\) %}(.*?){% endif %}/s", "$1", $template);
+        }
+        else {
+            $template = preg_replace("/{% if \(" . $matches[1][$match] . "\) %}.*?{% endif %}/s", "", $template);
+        }
+    }
     
     // Template variables.
     foreach ($variables as $k=>$v) {

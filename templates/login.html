@@ -6,8 +6,10 @@
    <input type='text' name='username' id='username' autocomplete='username' maxlength='32' required value='{{ username }}'>
    <label for='password'>[[ global.password: ]]</label>
    <input type='password' name='password' id='password' autocomplete='current-password' required value='{{ password }}'>
+   {% if (https) %}
    <label for='stayloggedin'>[[ login.stayloggedin ]]</label>
    <input type='checkbox' name='stayloggedin' id='stayloggedin' checked>
+   {% endif %}
    <br>
    <input type='submit' value='[[ global.login ]]' class='button'>
   </form>

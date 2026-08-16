@@ -26,7 +26,7 @@ if (!defined('INDEX')) exit;
 function logout($redirect=false) {
     global $db;
     // Remove any login cookies and purge the database of them too.
-    setcookie("AtomicBlog_login", "0", array("expires" => 1));
+    setcookie($config["cookiePrefix"] . "login", "0", array("expires" => 1));
     $id = $_SESSION["id"] ?? 0;
     // For the weird case of a user being logged in, but no database connection.
     if ($db) {

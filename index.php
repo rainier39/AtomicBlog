@@ -97,7 +97,7 @@ foreach (scandir("themes") as $theme) {
 $url = explode('/', ($_GET['url'] ?? ""));
 
 // Initialize the session.
-session_name("AtomicBlog");
+session_name($config["cookiePrefix"] . "session");
 session_start([
     'cookie_httponly' => true,
     'cookie_samesite' => "strict",
@@ -122,8 +122,8 @@ if (isset($_SESSION["messages"])) {
 }
 
 // If a user is logged out, but has a login cookie, try to log them in.
-if ((!$_SESSION["logged_in"]) and isset($_COOKIE["AtomicBlog_login"])) {
-    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE["AtomicBlog_login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
+if ((!$_SESSION["logged_in"]) and isset($_COOKIE[$config["cookiePrefix"] . "login"])) {
+    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE[$config["cookiePrefix"] . "login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
     
     if ($cookieValid->num_rows > 0) {
         while ($c = $cookieValid->fetch_assoc()) {
@@ -133,7 +133,7 @@ if ((!$_SESSION["logged_in"]) and isset($_COOKIE["AtomicBlog_login"])) {
     }
     // Otherwise destroy the invalid cookie.
     else {
-        setcookie("AtomicBlog_login", "0", array("expires" => 1));
+        setcookie($config["cookiePrefix"] . "login", "0", array("expires" => 1));
     }
 }
 

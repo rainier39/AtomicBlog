@@ -24,8 +24,6 @@ if (!defined('INDEX')) exit;
 
 $success = false;
 $title = lang("global.login");
-$loginvars = array("username" => "",
-"password" => "");
 
 function handleLogin() {
     global $db, $config, $success, $ishttps, $messages;
@@ -95,17 +93,17 @@ function handleLogin() {
         $_SESSION["messages"][] = success("Successfully logged in. Welcome, " . $r["name"] . ".");
         $success = true;
                             
-        if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on")) {
+        if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on") and ($ishttps == "on")) {
             $cookie = hash("sha256", random_bytes(64));
             // Also give the user their login cookie.
             $cookieoptions = array(
                 // Expires in a week.
                 "expires" => time() + 60*60*24*7,
-                "secure" => (($ishttps == "on") ? true : false), // TODO force secure always
+                "secure" => true,
                 "httponly" => true,
                 "samesite" => "Strict"
             );
-            setcookie("AtomicBlog_login", $cookie, $cookieoptions);
+            setcookie($config["cookiePrefix"] . "login", $cookie, $cookieoptions);
         }
         else {
             $cookie = "NULL";
@@ -119,7 +117,7 @@ function handleLogin() {
 // If the user is already logged in, don't let them into the page.
 if (($_SESSION["logged_in"] ?? "") === true) {
    $messages[] = error("You're already logged in.");
-   render_page("", $loginvars, $title);
+   render_page("", array(), $title);
 }
 // Otherwise, proceed as normal.
 else {
@@ -131,7 +129,9 @@ else {
     if (!$success) {
         $loginvars = array("token" => $_SESSION["csrf_token"],
         "username" => $_POST["username"] ?? "",
-        "password" => $_POST["password"] ?? "");
+        "password" => $_POST["password"] ?? "",
+        "https" => ($ishttps == "on"),
+        "test" => true);
         render_page("login.html", $loginvars, $title);
     }
     // Otherwise redirect the successfully logged-in user.
