@@ -220,6 +220,22 @@ if (!$config["installed"]) {
     "repeatpassword" => $_POST["repeatpassword"] ?? "",
     "overwrite" => (isset($_POST["overwrite"]) ? " checked" : ""));
     
+    if (!is_writable("./config/")) {
+        $messages[] = error("Config directory isn't writable.");
+    }
+    if (!is_writable("./images/")) {
+        $messages[] = info("Images directory isn't writable.");
+    }
+    if (!extension_loaded("gd")) {
+        $messages[] = info("PHP GD is not enabled.");
+    }
+    if (!extension_loaded("mysqli")) {
+        $messages[] = error("PHP MySQLI is not enabled.");
+    }
+    if (function_exists("apache_get_modules") and !in_array("mod_rewrite", apache_get_modules())) {
+        $messages[] = info("Apache2 mod rewrite is not enabled.");
+    }
+    
     render_page("install.html", $installvars, $title);
 }
 

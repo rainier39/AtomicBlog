@@ -122,7 +122,7 @@ if (isset($_SESSION["messages"])) {
 }
 
 // If a user is logged out, but has a login cookie, try to log them in.
-if ((!$_SESSION["logged_in"]) and isset($_COOKIE[$config["cookiePrefix"] . "login"])) {
+if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$config["cookiePrefix"] . "login"])) {
     $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE[$config["cookiePrefix"] . "login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
     
     if ($cookieValid->num_rows > 0) {
