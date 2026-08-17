@@ -60,6 +60,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($_POST["email"] != $email) {
                 $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
             }
+            
+            // Make sure the password is correct.
+            if (!password_verify($_POST["password1"], $password)) {
+                $errors[] = "Incorrect password.";
+            }
         
             if (count($errors) !== 0) {
                 foreach ($errors as $e) {
@@ -73,19 +78,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 else {
                     $db->query("UPDATE `accounts` SET `name`='" . $db->real_escape_string($_POST["name"]) . "', `username`='" . $db->real_escape_string($_POST["username"]) . "', `email`='" . $db->real_escape_string($_POST["email"]) . "' WHERE `id`='" . $_SESSION["id"] . "'");
                     $messages[] = success("Successfully changed account settings.");
+                    $_POST["password1"] = "";
                 }
             }
         }
-        elseif (isset($_POST["password"]) or isset($_POST["newpassword"]) or isset($_POST["repeatpassword"])) {
+        elseif (isset($_POST["password2"]) or isset($_POST["newpassword"]) or isset($_POST["repeatpassword"])) {
             // Make sure the password is correct.
-            if (!password_verify($_POST["password"], $password)) {
+            if (!password_verify($_POST["password2"], $password)) {
                 $errors[] = "Incorrect password.";
             }
             $errors = array_merge($errors, validatePassword($_POST["newpassword"]));
             if ($_POST["newpassword"] != $_POST["repeatpassword"]) {
                 $errors[] = "Your passwords don't match. Please try again.";
             }
-            if ($_POST["password"] == $_POST["newpassword"]) {
+            if ($_POST["password2"] == $_POST["newpassword"]) {
                 $errors[] = "Your new password can't be the same as your old password.";
             }
             if (count($errors) !== 0) {
@@ -96,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             else {
                 $db->query("UPDATE `accounts` SET `password`='" . $db->real_escape_string(password_hash($_POST["newpassword"], PASSWORD_DEFAULT)) . "' WHERE `id`='" . $_SESSION["id"] . "'");
                 $messages[] = success("Successfully changed password.");
-                $_POST["password"] = "";
+                $_POST["password2"] = "";
                 $_POST["newpassword"] = "";
                 $_POST["repeatpassword"] = "";
             }
@@ -108,7 +114,8 @@ $settingsVars = array("token" => $_SESSION["csrf_token"],
 "name" => $_POST["name"] ?? $name,
 "username" => $_POST["username"] ?? $username,
 "email" => $_POST["email"] ?? $email,
-"password" => $_POST["password"] ?? "",
+"password1" => $_POST["password1"] ?? "",
+"password2" => $_POST["password2"] ?? "",
 "newpassword" => $_POST["newpassword"] ?? "",
 "repeatpassword" => $_POST["repeatpassword"] ?? "");
 

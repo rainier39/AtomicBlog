@@ -8,14 +8,16 @@
    <input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='{{{ username }}}' required>
    <label for='email'>[[ global.email: ]]</label>
    <input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='{{{ email }}}' required>
+   <label for='password1'>[[ global.password: ]]</label>
+   <input type='password' name='password1' id='password1' autocomplete='password' value='{{{ password1 }}}' required>
    <br>
    <input type='submit' value='Change settings' class='button'>
   </form>
   <h2>Change Password</h2>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
-   <label for='password'>[[ global.password: ]]</label>
-   <input type='password' name='password' id='password' autocomplete='password' value='{{{ password }}}' required>
+   <label for='password2'>[[ global.password: ]]</label>
+   <input type='password' name='password2' id='password2' autocomplete='password' value='{{{ password2 }}}' required>
    <label for='newpassword'>New Password: </label>
    <input type='password' name='newpassword' id='newpassword' autocomplete='new-password' value='{{{ newpassword }}}' required>
    <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
