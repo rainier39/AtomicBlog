@@ -441,8 +441,16 @@ elseif (($url[2] ?? "") == "uploads") {
                 $messages[] = error("Specified icon doesn't exist.");
             }
             else {
+                $size = filesize("images/" . $target);
                 $deleted = unlink("images/" . $target);
                 if ($deleted) {
+                    $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
+                    // Make sure the quota is never less than 0.
+                    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+                    $uq = (int)$userQuota->fetch_assoc()["quota"];
+                    if ($uq < 0) {
+                        $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
+                    }
                     $messages[] = success("Successfully deleted icon.");
                 }
                 else {
@@ -463,8 +471,16 @@ elseif (($url[2] ?? "") == "uploads") {
                 $messages[] = error("Specified attachment doesn't exist.");
             }
             else {
+                $size = filesize("images/" . $target);
                 $deleted = unlink("images/" . $target);
                 if ($deleted) {
+                    $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
+                    // Make sure the quota is never less than 0.
+                    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+                    $uq = (int)$userQuota->fetch_assoc()["quota"];
+                    if ($uq < 0) {
+                        $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
+                    }
                     $messages[] = success("Successfully deleted attachment.");
                 }
                 else {

@@ -140,6 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `cookie` char(64) DEFAULT NULL,
             `cookietime` bigint NOT NULL DEFAULT '0',
             `color` char(6) NOT NULL DEFAULT 'e0e0e0',
+            `quota` bigint NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`),
             UNIQUE KEY `username` (`username`),
             UNIQUE KEY `email` (`email`)

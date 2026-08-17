@@ -70,6 +70,12 @@ if ($config["version"] != VERSION) {
         // Bump the version.
         $config["version"] = "v2.0.0-beta";
     }
+    if ($config["version"] == "v2.0.0-beta") {
+        $db->query("ALTER TABLE `accounts` ADD COLUMN IF NOT EXISTS `quota` bigint NOT NULL DEFAULT '0'");
+    
+        // Bump the version.
+        $config["version"] = "v2.1.0-beta";
+    }
     
     // Write the new config to a file.
     flushConfig();

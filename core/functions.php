@@ -401,7 +401,7 @@ function checkOutrank($actinguserid, $targetuserid) {
 
 // Upload an image given its name in $_FILES, and what it should be named.
 function upload($file, $name) {
-    global $config;
+    global $config, $db;
     
     $upload_dir = "images/";
     
@@ -433,6 +433,21 @@ function upload($file, $name) {
         return "Upload failed, didn't recognize image type.";
     }
     
+    // Get the current user's disk quota.
+    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+    $uq = (int)$userQuota->fetch_assoc()["quota"];
+
+    $globalQuota = $db->query("SELECT SUM(`quota`) AS `total` FROM `accounts`");
+    $gq = (int)$globalQuota->fetch_assoc()["total"];
+    
+    // Enforce disk quotas.
+    if (($uq + $_FILES[$file]["size"]) > $config["perUserDiskQuota"]) {
+        return "Upload failed, your disk quota would be exceeded.";
+    }
+    if (($gq + $_FILES[$file]["size"]) > $config["totalDiskQuota"]) {
+        return "Upload failed, the total disk quota would be exceeded.";
+    }
+    
     // GIFs.
     if (str_starts_with($bytes, hex2bin("474946383761")) or str_starts_with($bytes, hex2bin("474946383961"))) {
         //$image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
@@ -444,18 +459,19 @@ function upload($file, $name) {
         //    return "Upload failed, invalid GIF image.";
         //}
         
-        // TODO: enforce disk quotas, rate limits.
+        // TODO: enforce rate limits.
         
         //$success = imagegif($image, $target);
         // Just accepting the file as-is may have security implications. Though it allows users to upload animated GIFs.
         $success = move_uploaded_file($_FILES[$file]["tmp_name"], $target);
     
-        if ($success) {
-            return "";
-        }
-        else {
+        if (!$success) {
             return "Failed to write GIF image to file.";
         }
+        // We don't do a final disk quota check here because we just took the GIF wholesale so the size hasn't changed since the initial check.
+        // Add the new filesize to the user's quota.
+        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        return "";
     }
     // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
     elseif (str_starts_with($bytes, hex2bin("FFD8FF"))) {
@@ -468,16 +484,22 @@ function upload($file, $name) {
             return "Upload failed, invalid JPEG image.";
         }
         
-        // TODO: enforce disk quotas, rate limits.
+        // TODO: enforce rate limits.
         
         $success = imagejpeg($image, $target);
     
-        if ($success) {
-            return "";
-        }
-        else {
+        if (!$success) {
             return "Failed to write JPEG image to file.";
         }
+        // We do these checks in case the filesize grows after the image has been processed.
+        elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+            return "Upload failed, your disk quota would be exceeded.";
+        }
+        elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+            return "Upload failed, the total disk quota would be exceeded.";
+        }
+        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        return "";
     }
     // PNGs.
     elseif (str_starts_with($bytes, hex2bin("89504E470D0A1A0A"))) {
@@ -490,16 +512,22 @@ function upload($file, $name) {
             return "Upload failed, invalid PNG image.";
         }
         
-        // TODO: enforce disk quotas, rate limits.
+        // TODO: enforce rate limits.
         
         $success = imagepng($image, $target);
     
-        if ($success) {
-            return "";
-        }
-        else {
+        if (!$success) {
             return "Failed to write PNG image to file.";
         }
+        // We do these checks in case the filesize grows after the image has been processed.
+        elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+            return "Upload failed, your disk quota would be exceeded.";
+        }
+        elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+            return "Upload failed, the total disk quota would be exceeded.";
+        }
+        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        return "";
     }
     // WEBPs.
     elseif (str_starts_with($bytes, hex2bin("52494646")) and str_ends_with($bytes, hex2bin("57454250"))) {
@@ -512,16 +540,22 @@ function upload($file, $name) {
             return "Upload failed, invalid WEBP image.";
         }
         
-        // TODO: enforce disk quotas, rate limits.
+        // TODO: enforce rate limits.
         
         $success = imagewebp($image, $target);
     
-        if ($success) {
-            return "";
-        }
-        else {
+        if (!$success) {
             return "Failed to write WEBP image to file.";
         }
+        // We do these checks in case the filesize grows after the image has been processed.
+        elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+            return "Upload failed, your disk quota would be exceeded.";
+        }
+        elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+            return "Upload failed, the total disk quota would be exceeded.";
+        }
+        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        return "";
     }
     else {
         return "Upload failed, unsupported or unrecognized image type.";
