@@ -702,10 +702,101 @@ function redactIP($ip) {
 }
 
 // Return a human-readable version of a user agent string.
+// This is a best-effort function, it relies on some regular expressions and is imperfect. It aims to cover most but not all cases.
 function parseUserAgent($ua) {
     $result = array("os" => "Unknown", "browser" => "Unknown");
     
-    // TODO
+    // ----- OS -----
+    // -- Desktop OSes --
+    // - Windows -
+    if (preg_match("/^Mozilla\/5\.0 \(Windows NT 10\.0(\)|;)/m", $ua)) {
+        $result["os"] = "Windows 10/11";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Windows NT 6\.3(\)|;)/m", $ua)) {
+        $result["os"] = "Windows 8.1";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Windows NT 6\.2(\)|;)/m", $ua)) {
+        $result["os"] = "Windows 8";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Windows NT 6\.1(\)|;)/m", $ua)) {
+        $result["os"] = "Windows 7";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Windows NT 6\.0(\)|;)/m", $ua)) {
+        $result["os"] = "Windows Vista";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Windows NT 5\.(1|2)(\)|;)/m", $ua)) {
+        $result["os"] = "Windows XP";
+    }
+    // Generic Windows.
+    elseif (preg_match("/^Mozilla\/5\.0 \(Windows(\)|;)/m", $ua)) {
+        $result["os"] = "Windows";
+    }
+    // - Linux -
+    elseif (preg_match("/^Mozilla\/5\.0 \(X11; Linux x86_64(\)|;)/m", $ua)) {
+        $result["os"] = "Linux x86_64";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(X11; Linux i686(\)|;)/m", $ua)) {
+        $result["os"] = "Linux i686";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(X11; Ubuntu; Linux x86_64(\)|;)/m", $ua)) {
+        $result["os"] = "Ubuntu x86_64";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(X11; Ubuntu; Linux i686(\)|;)/m", $ua)) {
+        $result["os"] = "Ubuntu i686";
+    }
+    // - Macintosh -
+    elseif (preg_match("/^Mozilla\/5\.0 \(Macintosh;/m", $ua)) {
+        $result["os"] = "Macintosh";
+    }
+    // -- Mobile OSes --
+    // - Android -
+    elseif (preg_match("/^Mozilla\/5\.0 \(Android/m", $ua)) {
+        $result["os"] = "Android";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Linux; Android/m", $ua)) {
+        $result["os"] = "Android";
+    }
+    elseif (preg_match("/^Mozilla\/5\.0 \(Linux; U; Android/m", $ua)) {
+        $result["os"] = "Android";
+    }
+    // - iPad -
+    elseif (preg_match("/^Mozilla\/5\.0 \(iPad;/m", $ua)) {
+        $result["os"] = "iPad";
+    }
+    // - iPhone -
+    elseif (preg_match("/^Mozilla\/5\.0 \(iPhone;/m", $ua)) {
+        $result["os"] = "iPhone";
+    }
+    
+    // ----- Browser -----
+    // - Firefox -
+    if (preg_match("/Gecko\/[0-9.]+ Firefox\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Firefox";
+    }
+    // - Chrome Desktop -
+    elseif (preg_match("/Chrome\/[0-9.]+ Safari\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Google Chrome";
+    }
+    // - Samsung Browser -
+    elseif (preg_match("/SamsungBrowser\/[0-9.]+ Chrome\/[0-9.]+( Mobile | )Safari\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Samsung Browser";
+    }
+    // - Chrome Mobile -
+    elseif (preg_match("/Chrome\/[0-9.]+ Mobile Safari\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Google Chrome (Mobile)";
+    }
+    // - Microsoft Edge -
+    elseif (preg_match("/Chrome\/[0-9.]+ Safari\/[0-9.]+ Edge\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Microsoft Edge";
+    }
+    // - Safari -
+    elseif (preg_match("/Version\/[0-9.]+ Safari\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Safari";
+    }
+    // - Opera -
+    elseif (preg_match("/OPR\/[0-9.]+$/m", $ua)) {
+        $result["browser"] = "Opera";
+    }
     
     return $result;
 }

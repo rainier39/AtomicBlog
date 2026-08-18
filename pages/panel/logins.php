@@ -40,8 +40,8 @@ while ($a = $attempts->fetch_assoc()) {
     $date = date("F jS, Y", $a["timestamp"]);
     $time = date("g:i:sa", $a["timestamp"]);
     $ip = htmlspecialchars(redactIP($a["ip"]));
-    // TODO parseUserAgent function.
-    $ua = htmlspecialchars($a["useragent"]);
+    $ua = parseUserAgent($a["useragent"]);
+    $ua = "<span class='date' title='" . htmlspecialchars($a["useragent"]) . "'>{$ua["os"]}, {$ua["browser"]}</span>";
     $loginsVars["logins"] .= "<div class='loginLog'>$type on <small>$date</small> at <small>$time</small> from <b>$ip</b>, <i>$ua</i></div>";
 }
 
