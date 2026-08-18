@@ -22,7 +22,7 @@
 // Define a constant to ensure pages are only loaded through this index file.
 define("INDEX", "1");
 // Define the software's current version.
-define("VERSION", "v2.1.0-beta");
+define("VERSION", "v2.1.1-beta");
 // Generally this should not change, and so is not in the config.
 // Updates to the software may raise this depending on relevant advances in computing hardware.
 define("MIN_PASSWORD_LENGTH", 12);

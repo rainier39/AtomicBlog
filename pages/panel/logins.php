@@ -26,7 +26,29 @@ if (!defined('INDEX')) exit;
 
 $title = "Login Logs";
 
-$loginsVars = array();
+$loginsVars = array("logins" => "");
+
+$attempts = $db->query("SELECT `logtype`, `ip`, `useragent`, `timestamp` FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `targetid`='" . $_SESSION["id"] . "' ORDER BY `timestamp` DESC");
+
+while ($a = $attempts->fetch_assoc()) {
+    if ($a["logtype"] == "login_success") {
+        $type = "<span class='loginSuccess'>Successful login</span>";
+    }
+    else {
+        $type = "<span class='loginFail'>Failed login</span>";
+    }
+    $date = date("F jS, Y", $a["timestamp"]);
+    $time = date("g:i:sa", $a["timestamp"]);
+    $ip = htmlspecialchars(redactIP($a["ip"]));
+    // TODO parseUserAgent function.
+    $ua = htmlspecialchars($a["useragent"]);
+    $loginsVars["logins"] .= "<div class='loginLog'>$type on <small>$date</small> at <small>$time</small> from <b>$ip</b>, <i>$ua</i></div>";
+}
+
+// If there are no login attempts.
+if ($loginsVars["logins"] == "") {
+    $loginsVars["logins"] = info("No logins to display.");
+}
 
 render_page("panel/logins.html", $loginsVars, $title);
 

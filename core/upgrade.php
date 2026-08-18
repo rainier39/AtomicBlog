@@ -76,6 +76,23 @@ if ($config["version"] != VERSION) {
         // Bump the version.
         $config["version"] = "v2.1.0-beta";
     }
+    if ($config["version"] == "v2.1.0-beta") {
+        // Add new logs table.
+        $db->query("CREATE TABLE IF NOT EXISTS `logs` (
+            `logtype` varchar(64) NOT NULL,
+            `targetid` int unsigned DEFAULT NULL,
+            `perpid` int unsigned DEFAULT NULL,
+            `content` varchar(4096) DEFAULT NULL,
+            `ip` varchar(45) NOT NULL,
+            `useragent` varchar(256) NOT NULL,
+            `timestamp` bigint NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        // Remove the deprecated logins table.
+        $db->query("DROP TABLE IF EXISTS `logins`");
+        
+        // Bump the version.
+        $config["version"] = "v2.1.1-beta";
+    }
     
     // Write the new config to a file.
     flushConfig();

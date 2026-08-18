@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $db->query("DROP TABLE IF EXISTS `posts`");
             $db->query("DROP TABLE IF EXISTS `comments`");
             $db->query("DROP TABLE IF EXISTS `views`");
-            $db->query("DROP TABLE IF EXISTS `logins`");
+            $db->query("DROP TABLE IF EXISTS `logs`");
         }
 
         // Write the database.
@@ -144,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             PRIMARY KEY (`id`),
             UNIQUE KEY `username` (`username`),
             UNIQUE KEY `email` (`email`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         $db->query("CREATE TABLE IF NOT EXISTS `posts` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -158,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `published` tinyint(1) NOT NULL DEFAULT '0',
             `starred` tinyint(1) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         $db->query("CREATE TABLE IF NOT EXISTS `comments` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -169,18 +169,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `timestamp` bigint NOT NULL,
             `content` text NOT NULL,
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         $db->query("CREATE TABLE IF NOT EXISTS `views` (
             `ip` varchar(45) NOT NULL,
             `timestamp` bigint NOT NULL,
             `post` int unsigned NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         
-        $db->query("CREATE TABLE IF NOT EXISTS `logins` (
+        $db->query("CREATE TABLE IF NOT EXISTS `logs` (
+            `logtype` varchar(64) NOT NULL,
+            `targetid` int unsigned DEFAULT NULL,
+            `perpid` int unsigned DEFAULT NULL,
+            `content` varchar(4096) DEFAULT NULL,
             `ip` varchar(45) NOT NULL,
+            `useragent` varchar(256) NOT NULL,
             `timestamp` bigint NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         // Write the administrator account. Will replace any existing account with the same username or email (if there is an old install of the software).
         $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");

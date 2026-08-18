@@ -668,6 +668,7 @@ function clamp($number, $min, $max) {
     return max($min, min($max, $number));
 }
 
+// TODO: make sure this function is being used in a secure manner.
 function sendEmail($address, $subject, $message) {
     // If there are already CRLFs change them so we don't end up duplicating the CR's.
     $message = str_replace("\r\n", "\n", $message);
@@ -675,6 +676,38 @@ function sendEmail($address, $subject, $message) {
     $message = str_replace("\n", "\r\n", $message);
 
     return mail($address, $subject, $message);
+}
+
+// On the login logs page we want to redact IPs for privacy reasons.
+function redactIP($ip) {
+    // If it's an IPv4 address, redact the last octet.
+    if (preg_match("/[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/", $ip)) {
+        $ip = explode(".", $ip);
+        $ip[3] = "0";
+        return implode(".", $ip);
+    }
+    // Otherwise it's IPv6 or perhaps invalid.
+    else {
+        $raw = inet_pton($ip);
+        if ($raw !== false) {
+            // Redact the host part of the IPv6 address.
+            // See: https://en.wikipedia.org/wiki/IPv6#Addressing
+            $raw = $raw & inet_pton("ffff:ffff:ffff:ffff:0000:0000:0000:0000");
+            $ip = inet_ntop($raw);
+            return $ip;
+        }
+    }
+    // By default, it must be an invalid IP address.
+    return "invalid";
+}
+
+// Return a human-readable version of a user agent string.
+function parseUserAgent($ua) {
+    $result = array("os" => "Unknown", "browser" => "Unknown");
+    
+    // TODO
+    
+    return $result;
 }
 
 // --- PHP 7.* Compatibility ---

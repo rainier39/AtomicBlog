@@ -377,6 +377,22 @@ code, .codeblock {
  padding: 3px 6px;
  text-align: right;
 }
+/* Login logs page */
+.loginLogs {
+ display: grid;
+ gap: 6px;
+}
+.loginLog {
+ display: block;
+ padding: 3px 6px;
+ box-shadow: 0px 0px 2px #0008;
+}
+.loginSuccess{
+ color: #0a6c0a;
+}
+.loginFail {
+ color: #c01414;
+}
 
 /** Phone/Tablet **/
 @media only screen and (max-width: 768px) {
