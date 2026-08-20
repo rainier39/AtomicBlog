@@ -1,5 +1,5 @@
 # AtomicBlog
-<img src="https://img.shields.io/github/languages/code-size/rainier39/AtomicBlog"> <img src="https://img.shields.io/github/license/rainier39/AtomicBlog"> <img src="https://validator.w3.org/feed/images/valid-atom.png">
+<img src="https://img.shields.io/github/languages/code-size/rainier39/AtomicBlog"> <img src="https://img.shields.io/github/license/rainier39/AtomicBlog">
 
 AtomicBlog is a simple, lightweight blogging software written purely in PHP (backend), along with plain HTML, CSS, and JavaScript (frontend). No libraries, no frameworks, minimal JavaScript. I originally wrote it while taking a communication studies class at college. I was supposed to create a blog as part of a semester-long project. It was expected that I would use some online service such as Weebly for the task. But I decided to challenge myself and create my very own blogging software from scratch. It turned out to be a great decision, resulting in AtomicBlog existing now, and helping me gain experience and skills as a full-stack web developer.
 
@@ -18,3 +18,6 @@ Requires PHP 7+.
 Requires php-mysql and php-gd.
 
 As of Beta 1.0.1, AtomicBlog has been tested on PHP 7.4 and PHP 8.4.
+
+## 
+<img src="https://validator.w3.org/feed/images/valid-atom.png">
