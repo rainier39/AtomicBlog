@@ -42,7 +42,7 @@ echo('<?xml version="1.0" encoding="utf-8"?>
 
   <title>' . htmlspecialchars($config["title"], ENT_NOQUOTES) . '</title>
   <subtitle>' . htmlspecialchars($config["description"], ENT_NOQUOTES) . '</subtitle>
-  <link href="' . $uri . makeURL("feed") . '"/>
+  <link rel="self" href="' . $uri . makeURL("feed") . '" type="application/atom+xml"/>
   <updated>' . date("Y-m-d\\TH:i:sP", $lastPostTime) . '</updated>
   <icon>' . $uri . makeURL("themes/" . $config["theme"] . "/icon.png") . '</icon>
   <author>
@@ -59,7 +59,7 @@ while ($l = $latest->fetch_assoc()) {
 }
 
 echo('  </author>
-  <id>' . $uri . '</id>
+  <id>' . $uri . '/' . ($config["dir"] ? $config["dir"] . "/" : "") . '</id>
   <generator uri="https://github.com/rainier39/AtomicBlog/releases/tag/' . $config["version"] . '" version="' . $config["version"] . '">
     AtomicBlog
   </generator>
