@@ -514,7 +514,7 @@ elseif (($url[2] ?? "") == "uploads") {
         
         foreach ($icons as $icon) {
             $postuploadsvars["icons"] .= "<div class='uploadTile'>
-              <img src='" . makeURL("images/{$icon}") . "'>
+              <img src='" . makeURL("images/{$icon}") . "?" . time() . "'>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this icon?\");'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
@@ -525,7 +525,7 @@ elseif (($url[2] ?? "") == "uploads") {
         }
         foreach ($attachments as $attachment) {
             $postuploadsvars["attachments"] .= "<div class='uploadTile'>
-              <img src='" . makeURL("images/{$attachment}") . "'>
+              <img src='" . makeURL("images/{$attachment}") . "?" . time() . "'>
               URL: <a onclick='copy(\"" . (($ishttps == "on") ? "https://" : "http://") . $_SERVER["SERVER_NAME"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
@@ -614,7 +614,7 @@ if ($displayPost) {
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
         if (str_starts_with($u, $p_id . ".")) {
-            $postvars["icon"] = "<p><img src='" . makeURL("images/{$u}") . "' class='pIcon'></p>";
+            $postvars["icon"] = "<p><img src='" . makeURL("images/{$u}") . "?" . time() . "' class='pIcon'></p>";
             // Just use the first icon we find.
             break;
         }

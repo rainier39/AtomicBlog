@@ -86,7 +86,7 @@ function displayPost($id, $title, $account, $starred, $published) {
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
         if (str_starts_with($u, $id . ".")) {
-            $postTilevars["image"] = "<img src='" . makeURL("images/{$u}") . "'>";
+            $postTilevars["image"] = "<img src='" . makeURL("images/{$u}") . "?" . time() . "'>";
             // Just use the first icon we find.
             break;
         }
@@ -408,21 +408,20 @@ function upload($file, $name) {
     if (!extension_loaded("gd")) {
         return "PHP GD is not enabled.";
     }
-    
     if (!is_writable($upload_dir)) {
         return "Upload failed, image directory isn't writable.";
     }
-    elseif ($_FILES[$file]["size"] < 1) {
+    if ($_FILES[$file]["size"] < 1) {
         return "Upload failed, content empty (file may be too large).";
     }
-    elseif (!file_exists($_FILES[$file]["tmp_name"])) {
+    if (!file_exists($_FILES[$file]["tmp_name"])) {
         return "Upload failed, file likely too large or non-existent.";
     }
-    elseif ($_FILES[$file]["size"] > $config["maxUploadSize"]) {
+    if ($_FILES[$file]["size"] > $config["maxUploadSize"]) {
         return "Upload failed, file too large.";
     }
     // Basic sanity check, not intended as a true security measure.
-    elseif (false === getimagesize($_FILES[$file]["tmp_name"])) {
+    if (false === getimagesize($_FILES[$file]["tmp_name"])) {
         return "Upload failed, invalid image.";
     }
     
@@ -448,12 +447,19 @@ function upload($file, $name) {
         return "Upload failed, the total disk quota would be exceeded.";
     }
     
+    $overwriting = false;
+    
     // GIFs.
     if (str_starts_with($bytes, hex2bin("474946383761")) or str_starts_with($bytes, hex2bin("474946383961"))) {
         //$image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
         
         // This is safe because we never use any user-supplied value in $name.
         $target = $upload_dir . $name . ".gif";
+        
+        if (is_file($target)) {
+            $overwriting = true;
+            $oldsize = filesize($target);
+        }
         
         //if ($image === false) {
         //    return "Upload failed, invalid GIF image.";
@@ -466,11 +472,14 @@ function upload($file, $name) {
         $success = move_uploaded_file($_FILES[$file]["tmp_name"], $target);
     
         if (!$success) {
-            return "Failed to write GIF image to file.";
+            return "Failed to write image to file.";
         }
         // We don't do a final disk quota check here because we just took the GIF wholesale so the size hasn't changed since the initial check.
         // Add the new filesize to the user's quota.
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        if ($overwriting) {
+            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+        }
         return "";
     }
     // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
@@ -478,7 +487,12 @@ function upload($file, $name) {
         $image = imagecreatefromjpeg($_FILES[$file]["tmp_name"]);
         
         // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".jpg";
+        $target = $upload_dir . $name . ".webp";
+        
+        if (is_file($target)) {
+            $overwriting = true;
+            $oldsize = filesize($target);
+        }
         
         if ($image === false) {
             return "Upload failed, invalid JPEG image.";
@@ -486,16 +500,23 @@ function upload($file, $name) {
         
         // TODO: enforce rate limits.
         
-        $success = imagejpeg($image, $target);
+        $success = imagewebp($image, $target);
+        
+        // We do this here in case the later checks erase the new file.
+        if ($success and $overwriting) {
+            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+        }
     
         if (!$success) {
-            return "Failed to write JPEG image to file.";
+            return "Failed to write image to file.";
         }
         // We do these checks in case the filesize grows after the image has been processed.
         elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+            unlink($target);
             return "Upload failed, your disk quota would be exceeded.";
         }
         elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+            unlink($target);
             return "Upload failed, the total disk quota would be exceeded.";
         }
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
@@ -506,7 +527,12 @@ function upload($file, $name) {
         $image = imagecreatefrompng($_FILES[$file]["tmp_name"]);
         
         // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".png";
+        $target = $upload_dir . $name . ".webp";
+        
+        if (is_file($target)) {
+            $overwriting = true;
+            $oldsize = filesize($target);
+        }
         
         if ($image === false) {
             return "Upload failed, invalid PNG image.";
@@ -514,16 +540,23 @@ function upload($file, $name) {
         
         // TODO: enforce rate limits.
         
-        $success = imagepng($image, $target);
+        $success = imagewebp($image, $target);
+        
+        // We do this here in case the later checks erase the new file.
+        if ($success and $overwriting) {
+            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+        }
     
         if (!$success) {
-            return "Failed to write PNG image to file.";
+            return "Failed to write image to file.";
         }
         // We do these checks in case the filesize grows after the image has been processed.
         elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+            unlink($target);
             return "Upload failed, your disk quota would be exceeded.";
         }
         elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+            unlink($target);
             return "Upload failed, the total disk quota would be exceeded.";
         }
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
@@ -536,6 +569,11 @@ function upload($file, $name) {
         // This is safe because we never use any user-supplied value in $name.
         $target = $upload_dir . $name . ".webp";
         
+        if (is_file($target)) {
+            $overwriting = true;
+            $oldsize = filesize($target);
+        }
+        
         if ($image === false) {
             return "Upload failed, invalid WEBP image.";
         }
@@ -543,15 +581,22 @@ function upload($file, $name) {
         // TODO: enforce rate limits.
         
         $success = imagewebp($image, $target);
+        
+        // We do this here in case the later checks erase the new file.
+        if ($success and $overwriting) {
+            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+        }
     
         if (!$success) {
-            return "Failed to write WEBP image to file.";
+            return "Failed to write image to file.";
         }
         // We do these checks in case the filesize grows after the image has been processed.
         elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+            unlink($target);
             return "Upload failed, your disk quota would be exceeded.";
         }
         elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+            unlink($target);
             return "Upload failed, the total disk quota would be exceeded.";
         }
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
@@ -561,6 +606,8 @@ function upload($file, $name) {
         return "Upload failed, unsupported or unrecognized image type.";
     }
 }
+
+// TODO: make a function for generating thumbnails of existing images.
 
 function generateCaptchaText(int $length) {
     $characters = "abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
