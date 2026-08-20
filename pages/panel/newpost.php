@@ -37,6 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Remove ampersands from tags because they can be used to inject URL parameters.
         $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
+        // Remove slashes because they can ruin a search.
+        $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
 
         $errors = validatePost();
         	
