@@ -649,7 +649,12 @@ if ($displayPost) {
             
             // Get author name.
             if ($c["account"] === "0") {
-                $authorname = "Guest";
+                if (checkPerm(PERM_MANAGE_USERS)) {
+                    $authorname = "Guest (" . htmlspecialchars($c["email"]) . ", " . htmlspecialchars($c["ip"]) . ")";
+                }
+                else {
+                    $authorname = "Guest";
+                }
                 $authorcolor = "";
             }
             else {
