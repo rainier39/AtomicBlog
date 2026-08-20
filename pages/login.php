@@ -76,7 +76,15 @@ elseif (isset($_POST["username"]) and isset($_POST["password"])
             // Make sure the account is allowed to be logged into.
             elseif (!checkRolePerm(PERM_LOGIN, $r["role"])) {
                 if ($r["role"] == "Unapproved") {
-                    $messages[] = error("Your account must be approved before you can log in.");
+                    switch ($config["registrationMode"]) {
+                        case "email":
+                            $messages[] = error("You must click the link that you were emailed before you can log in.");
+                            break;
+                        case "approval":
+                        default:
+                            $messages[] = error("Your account must be approved before you can log in.");
+                            break;
+                    }
                 }
                 else {
                     $messages[] = error("This account cannot be logged into.");

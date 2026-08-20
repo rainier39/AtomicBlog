@@ -42,7 +42,7 @@ while ($a = $attempts->fetch_assoc()) {
     $ip = htmlspecialchars(redactIP($a["ip"]));
     $ua = parseUserAgent($a["useragent"]);
     $ua = "<span class='date' title='" . htmlspecialchars($a["useragent"]) . "'>{$ua["os"]}, {$ua["browser"]}</span>";
-    $loginsVars["logins"] .= "<div class='loginLog'>$type on <small>$date</small> at <small>$time</small> from <b>$ip</b>, <i>$ua</i></div>";
+    $loginsVars["logins"] .= "<div class='loginLog'>$type <b>on</b> <small>$date</small> <b>at</b> <small>$time</small> <b>from</b> $ip, $ua</div>";
 }
 
 // If there are no login attempts.

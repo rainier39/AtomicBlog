@@ -146,6 +146,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
             }
             $registerSuccess = true;
+            // Log the registration.
+            $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $db->insert_id . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . time() . "')");
         }
         // Otherwise, display the errors.
         else {
