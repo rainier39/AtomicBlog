@@ -24,6 +24,7 @@ if (!defined('INDEX')) exit;
 
 $title = "";
 $uid = $url[1] ?? "";
+if ($uid != "") $uid = (int)$uid;
 
 if (!checkPerm(PERM_VIEW_PROFILE)) {
     $messages[] = error("You don't have permission to view profiles.");
@@ -68,8 +69,23 @@ $lastactiveHTML = "<small><span class='date' title='" . date("g:i:sa", $p["lasta
 
 $title = htmlspecialchars($name) . "'s Profile";
 
+$avatar = "";
+$uploads = scandir("images/");
+$avatars = array();
+// Get all avatars.
+foreach ($uploads as $u) {
+    if (str_starts_with($u, "a_" . $uid . ".")) {
+        $avatars[] = $u;
+    }
+}
+// Just use the first avatar we find.
+if (count($avatars) > 0) {
+    $avatar = "<img src='" . makeURL("images/" . $avatars[0]) . "?" . time() . "'>";
+}
+
 $profilevars = array("color" => $p["color"],
 "name" => $name,
+"avatar" => $avatar,
 "bio" => $bio,
 "lastactive" => $lastactiveHTML,
 "role" => $p["role"],

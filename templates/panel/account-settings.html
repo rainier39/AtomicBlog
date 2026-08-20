@@ -25,3 +25,11 @@
    <br>
    <input type='submit' value='Change password' class='button'>
   </form>
+  <h2>Avatar</h2>
+   {{ avatars }}
+   <h3>Upload a new avatar</h3>
+   <form method='post' enctype='multipart/form-data'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <input type='file' name='avatar'>
+    <input type='submit' value='Upload avatar'>
+   </form>

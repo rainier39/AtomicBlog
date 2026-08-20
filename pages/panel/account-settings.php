@@ -107,6 +107,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_POST["repeatpassword"] = "";
             }
         }
+        // Handle uploading an avatar.
+        elseif (isset($_FILES["avatar"])) {
+            $upload = upload("avatar", "a_" . $_SESSION["id"]);
+            if ($upload == "") {
+                $messages[] = success("Successfully uploaded avatar.");
+            }
+            else {
+                $messages[] = error($upload);
+            }
+        }
+        // Handle deleting an avatar.
+        elseif (isset($_POST["deleteAvatar"]) and isset($_POST["davatar"])) {
+            // Filepath sanitization.
+            $target = basename($_POST["davatar"]);
+            // Make sure that this avatar actually belongs to this user.
+            if (!str_starts_with($target, "a_" . $_SESSION["id"])) {
+                $messages[] = error("Nice try.");
+            }
+            // Make sure that the target attachment exists.
+            elseif (!is_file("images/" . $target)) {
+                $messages[] = error("Specified avatar doesn't exist.");
+            }
+            else {
+                $size = filesize("images/" . $target);
+                $deleted = unlink("images/" . $target);
+                if ($deleted) {
+                    $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
+                    // Make sure the quota is never less than 0.
+                    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+                    $uq = (int)$userQuota->fetch_assoc()["quota"];
+                    if ($uq < 0) {
+                        $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
+                    }
+                    $messages[] = success("Successfully deleted avatar.");
+                }
+                else {
+                    $messages[] = error("Failed to delete avatar.");
+                }
+            }
+        }
     }
 }
 
@@ -117,7 +157,28 @@ $settingsVars = array("token" => $_SESSION["csrf_token"],
 "password1" => $_POST["password1"] ?? "",
 "password2" => $_POST["password2"] ?? "",
 "newpassword" => $_POST["newpassword"] ?? "",
-"repeatpassword" => $_POST["repeatpassword"] ?? "");
+"repeatpassword" => $_POST["repeatpassword"] ?? "",
+"avatars" => "");
+
+$uploads = scandir("images/");
+$avatars = array();
+// Get all avatars.
+foreach ($uploads as $u) {
+    if (str_starts_with($u, "a_" . $_SESSION["id"] . ".")) {
+        $avatars[] = $u;
+    }
+}
+foreach ($avatars as $avatar) {
+    $settingsVars["avatars"] .= "<div class='uploadTile'>
+     <img src='" . makeURL("images/{$avatar}") . "?" . time() . "'>
+     <hr>
+     <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this avatar?\");'>
+      <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
+      <input type='hidden' value='{$avatar}' name='davatar'>
+      <input type='submit' value='Delete' name='deleteAvatar' class='button'>
+     </form>
+    </div>";
+}
 
 render_page("panel/account-settings.html", $settingsVars, $title);
 
