@@ -22,7 +22,8 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$footervars = array("footercontent" => $config["footer"]);
+$footervars = array("footercontent" => $config["footer"],
+"feedlink" => makeURL("feed"));
 
 render_template("footer.html", $footervars);
 

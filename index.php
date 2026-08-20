@@ -181,6 +181,10 @@ elseif ($url[0] == "profile")
 {
     require "pages/profile.php";
 }
+elseif ($url[0] == "feed")
+{
+    require "pages/feed.php";
+}
 elseif ($url[0] == "")
 {
     require "pages/home.php";
