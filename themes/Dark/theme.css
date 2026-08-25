@@ -94,9 +94,25 @@ input, textarea {
  background: #111;
  border: none;
 }
+.commentHeaderItems {
+ background: black;
+}
 .commentContent {
  background: #2d2d2d;
 }
 .date:hover {
  color: #888;
+}
+.profile h1, .profile img, .profileContent {
+ background: black;
+}
+.profileLink {
+ color: white;
+}
+.profileLink:hover {
+ color: #bbb;
+}
+.loginLog {
+ box-shadow: none;
+ background: #282828;
 }
