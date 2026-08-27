@@ -57,8 +57,9 @@ elseif (in_array($url[1], $panelActions)) {
 }
 // Display an error page.
 else {
-    $messages[] = error("The page you requested doesn't exist.");
-    render_page("", array(), $title);
+    http_response_code(404);
+    $messages[] = error("Page not found.");
+    render_page("", array(), "Page not found");
 }
 
 ?>

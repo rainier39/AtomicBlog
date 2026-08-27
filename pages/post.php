@@ -53,8 +53,8 @@ while ($p = $post->fetch_assoc()) {
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
     http_response_code(404);
-    $messages[] = error("The requested post doesn't exist.");
-    render_page("", array());
+    $messages[] = error("Post not found.");
+    render_page("", array(), "Post not found");
     exit();
 }
 // Handle star toggling.

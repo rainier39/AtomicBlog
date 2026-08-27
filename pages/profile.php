@@ -36,8 +36,9 @@ $profileinfo = $db->query("SELECT `name`, `color`, `bio`, `email`, `lastactive`,
 $p = $profileinfo->fetch_assoc();
 
 if ($profileinfo->num_rows < 1) {
-    $messages[] = error("Profile does not exist.");
-    render_page("", array(), $title);
+    http_response_code(404);
+    $messages[] = error("Profile not found.");
+    render_page("", array(), "Profile not found");
     exit();
 }
 

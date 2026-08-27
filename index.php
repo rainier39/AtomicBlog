@@ -194,7 +194,7 @@ else
 {
     http_response_code(404);
     $messages[] = error("Page not found.");
-    render_page("", array(), $config["title"]);
+    render_page("", array(), "Page not found");
 }
 
 ?>
