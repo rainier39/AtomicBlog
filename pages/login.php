@@ -31,11 +31,7 @@ if ($_SESSION["logged_in"]) {
    render_page("", array(), $title);
 }
 // Handle requests.
-elseif (isset($_POST["username"]) and isset($_POST["password"])
-        and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
-    // Generate a new token.
-    generateCSRFToken();
-    
+elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRFToken()) {    
     $errors = array();
     
     if (strlen($_POST["username"]) < 1) {

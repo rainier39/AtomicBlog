@@ -120,242 +120,236 @@ foreach ($modes as $m) {
 }
 
 // Handle requests.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // If the CSRF token is sent and valid.
-    if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-        // Generate a new token.
-        generateCSRFToken();
+if (validateCSRFToken()) {    
+    $errors = array();
+    $changes = 0;
         
-        $errors = array();
-        $changes = 0;
-        
-        // --- Blog Configuration ---
-        if (isset($_POST["ctitle"])) {
-            if (strlen($_POST["ctitle"]) < 1) {
-                $errors[] = "Title cannot be blank.";
-            }
-            elseif (strlen($_POST["ctitle"]) > 32) {
-                $errors[] = "Title cannot be longer than 32 characters.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["ctitle"] != $config["title"]) {
-                $config["title"] = $_POST["ctitle"];
-                $changes++;
-            }
+    // --- Blog Configuration ---
+    if (isset($_POST["ctitle"])) {
+        if (strlen($_POST["ctitle"]) < 1) {
+            $errors[] = "Title cannot be blank.";
         }
-        if (isset($_POST["cdescription"])) {
-            if (strlen($_POST["cdescription"]) < 1) {
-                $errors[] = "Description cannot be blank.";
-            }
-            elseif (strlen($_POST["cdescription"]) > 128) {
-                $errors[] = "Description cannot be longer than 128 characters.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["cdescription"] != $config["description"]) {
-                $config["description"] = $_POST["cdescription"];
-                $changes++;
-            }
-        }
-        if (isset($_POST["cfooter"])) {
-            if (strlen($_POST["cfooter"]) < 1) {
-                $errors[] = "Footer cannot be blank.";
-            }
-            elseif (strlen($_POST["cfooter"]) > 4096) {
-                $errors[] = "Footer cannot be longer than 4096 characters.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["cfooter"] != $config["footer"]) {
-                $config["footer"] = $_POST["cfooter"];
-                $changes++;
-            }
-        }
-        if (isset($_POST["timezone"])) {
-            if (!in_array($_POST["timezone"], $timezones)) {
-                $errors[] = "Invalid timezone.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["timezone"] != $config["timezone"]) {
-                $config["timezone"] = $_POST["timezone"];
-                $changes++;
-            }
-        }
-        if (isset($_POST["clanguage"])) {
-            if (!in_array($_POST["clanguage"], $languages)) {
-                $errors[] = "Invalid language.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["clanguage"] != $config["language"]) {
-                $config["language"] = $_POST["clanguage"];
-                $language = $_POST["clanguage"];
-                updateLang();
-                $changes++;
-            }
-        }
-        if (isset($_POST["theme"])) {
-            if (!in_array($_POST["theme"], $themes)) {
-                $errors[] = "Invalid theme.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["theme"] != $config["theme"]) {
-                $config["theme"] = $_POST["theme"];
-                $changes++;
-            }
-        }
-        // --- Customization ---
-        if (isset($_POST["customCSS"])) {
-            if (strlen($_POST["customCSS"]) > 4096) {
-                $errors[] = "Custom CSS cannot be longer than 4096 characters.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["customCSS"] != $config["customCSS"]) {
-                $config["customCSS"] = $_POST["customCSS"];
-                $changes++;
-            }
-        }
-        // --- User Management ---
-        if (($_POST["registration"] ?? "") == "on") {
-            $tz = true;
-        }
-        else {
-            $tz = false;
+        elseif (strlen($_POST["ctitle"]) > 32) {
+            $errors[] = "Title cannot be longer than 32 characters.";
         }
         // Only write to the config if the value is actually being changed.
-        if ($tz != $config["allowRegistration"]) {
-            $config["allowRegistration"] = $tz;
+        elseif ($_POST["ctitle"] != $config["title"]) {
+            $config["title"] = $_POST["ctitle"];
             $changes++;
         }
-        if (isset($_POST["registrationMode"])) {
-            if (!in_array($_POST["registrationMode"], $modes)) {
-                $errors[] = "Invalid registration mode.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($_POST["registrationMode"] != $config["registrationMode"]) {
-                $config["registrationMode"] = $_POST["registrationMode"];
-                $changes++;
-            }
+    }
+    if (isset($_POST["cdescription"])) {
+        if (strlen($_POST["cdescription"]) < 1) {
+            $errors[] = "Description cannot be blank.";
         }
-        if (($_POST["comments"] ?? "") == "on") {
-            $ec = true;
-        }
-        else {
-            $ec = false;
+        elseif (strlen($_POST["cdescription"]) > 128) {
+            $errors[] = "Description cannot be longer than 128 characters.";
         }
         // Only write to the config if the value is actually being changed.
-        if ($ec != $config["enableComments"]) {
-            $config["enableComments"] = $ec;
+        elseif ($_POST["cdescription"] != $config["description"]) {
+            $config["description"] = $_POST["cdescription"];
             $changes++;
         }
-        if (($_POST["captcha"] ?? "") == "on") {
-            $eca = true;
+    }
+    if (isset($_POST["cfooter"])) {
+        if (strlen($_POST["cfooter"]) < 1) {
+            $errors[] = "Footer cannot be blank.";
         }
-        else {
-            $eca = false;
+        elseif (strlen($_POST["cfooter"]) > 4096) {
+            $errors[] = "Footer cannot be longer than 4096 characters.";
         }
         // Only write to the config if the value is actually being changed.
-        if ($eca != $config["captchaEnabled"]) {
-            $config["captchaEnabled"] = $eca;
+        elseif ($_POST["cfooter"] != $config["footer"]) {
+            $config["footer"] = $_POST["cfooter"];
             $changes++;
         }
-        if (isset($_POST["captchaLength"])) {
-            $captchaLength = (int)$_POST["captchaLength"];
-            if ($captchaLength < 1) {
-                $errors[] = "CAPTCHA length cannot be less than 1.";
-            }
-            elseif ($captchaLength > 16) {
-                $errors[] = "CAPTCHA length cannot be greater than 16.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($captchaLength != $config["captchaLength"]) {
-                $config["captchaLength"] = $captchaLength;
-                $changes++;
-            }
+    }
+    if (isset($_POST["timezone"])) {
+        if (!in_array($_POST["timezone"], $timezones)) {
+            $errors[] = "Invalid timezone.";
         }
-        // --- Rate Limits ---
-        if (isset($_POST["logins"])) {
-            $logins = (int)$_POST["logins"];
-            if ($logins < 1) {
-                $errors[] = "Logins per hour cannot be less than 1.";
-            }
-            elseif ($logins > 32767) {
-                $errors[] = "Logins per hour cannot be greater than 32,767.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($logins != $config["loginsPerHour"]) {
-                $config["loginsPerHour"] = $logins;
-                $changes++;
-            }
+        // Only write to the config if the value is actually being changed.
+        elseif ($_POST["timezone"] != $config["timezone"]) {
+            $config["timezone"] = $_POST["timezone"];
+            $changes++;
         }
-        if (isset($_POST["accounts"])) {
-            $accounts = (int)$_POST["accounts"];
-            if ($accounts < 1) {
-                $errors[] = "Accounts per IP cannot be less than 1.";
-            }
-            elseif ($accounts > 32767) {
-                $errors[] = "Accounts per IP cannot be greater than 32,767.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($accounts != $config["accountsPerIP"]) {
-                $config["accountsPerIP"] = $accounts;
-                $changes++;
-            }
+    }
+    if (isset($_POST["clanguage"])) {
+        if (!in_array($_POST["clanguage"], $languages)) {
+            $errors[] = "Invalid language.";
         }
-        if (isset($_POST["accountcooldown"])) {
-            $accountcooldown = (int)$_POST["accountcooldown"];
-            if ($accountcooldown < 1) {
-                $errors[] = "Account cooldown cannot be less than 1.";
-            }
-            elseif ($accountcooldown > 32767) {
-                $errors[] = "Account cooldown cannot be greater than 32,767.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($accountcooldown != $config["accountCooldown"]) {
-                $config["accountCooldown"] = $accountcooldown;
-                $changes++;
-            }
+        // Only write to the config if the value is actually being changed.
+        elseif ($_POST["clanguage"] != $config["language"]) {
+            $config["language"] = $_POST["clanguage"];
+            $language = $_POST["clanguage"];
+            updateLang();
+            $changes++;
         }
-        if (isset($_POST["postdelay"])) {
-            $postdelay = (int)$_POST["postdelay"];
-            if ($postdelay < 1) {
-                $errors[] = "Post delay cannot be less than 1.";
-            }
-            elseif ($postdelay > 32767) {
-                $errors[] = "Post delay cannot be greater than 32,767.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($postdelay != $config["postDelay"]) {
-                $config["postDelay"] = $postdelay;
-                $changes++;
-            }
+    }
+    if (isset($_POST["theme"])) {
+        if (!in_array($_POST["theme"], $themes)) {
+            $errors[] = "Invalid theme.";
         }
-        if (isset($_POST["editdelay"])) {
-            $editdelay = (int)$_POST["editdelay"];
-            if ($editdelay < 1) {
-                $errors[] = "Edit delay cannot be less than 1.";
-            }
-            elseif ($editdelay > 32767) {
-                $errors[] = "Edit delay cannot be greater than 32,767.";
-            }
-            // Only write to the config if the value is actually being changed.
-            elseif ($editdelay != $config["editDelay"]) {
-                $config["editDelay"] = $editdelay;
-                $changes++;
-            }
+        // Only write to the config if the value is actually being changed.
+        elseif ($_POST["theme"] != $config["theme"]) {
+            $config["theme"] = $_POST["theme"];
+            $changes++;
         }
+    }
+    // --- Customization ---
+    if (isset($_POST["customCSS"])) {
+        if (strlen($_POST["customCSS"]) > 4096) {
+            $errors[] = "Custom CSS cannot be longer than 4096 characters.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($_POST["customCSS"] != $config["customCSS"]) {
+            $config["customCSS"] = $_POST["customCSS"];
+            $changes++;
+        }
+    }
+    // --- User Management ---
+    if (($_POST["registration"] ?? "") == "on") {
+        $tz = true;
+    }
+    else {
+        $tz = false;
+    }
+    // Only write to the config if the value is actually being changed.
+    if ($tz != $config["allowRegistration"]) {
+        $config["allowRegistration"] = $tz;
+        $changes++;
+    }
+    if (isset($_POST["registrationMode"])) {
+        if (!in_array($_POST["registrationMode"], $modes)) {
+            $errors[] = "Invalid registration mode.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($_POST["registrationMode"] != $config["registrationMode"]) {
+            $config["registrationMode"] = $_POST["registrationMode"];
+            $changes++;
+        }
+    }
+    if (($_POST["comments"] ?? "") == "on") {
+        $ec = true;
+    }
+    else {
+        $ec = false;
+    }
+    // Only write to the config if the value is actually being changed.
+    if ($ec != $config["enableComments"]) {
+        $config["enableComments"] = $ec;
+        $changes++;
+    }
+    if (($_POST["captcha"] ?? "") == "on") {
+        $eca = true;
+    }
+    else {
+        $eca = false;
+    }
+    // Only write to the config if the value is actually being changed.
+    if ($eca != $config["captchaEnabled"]) {
+        $config["captchaEnabled"] = $eca;
+        $changes++;
+    }
+    if (isset($_POST["captchaLength"])) {
+        $captchaLength = (int)$_POST["captchaLength"];
+        if ($captchaLength < 1) {
+            $errors[] = "CAPTCHA length cannot be less than 1.";
+        }
+        elseif ($captchaLength > 16) {
+            $errors[] = "CAPTCHA length cannot be greater than 16.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($captchaLength != $config["captchaLength"]) {
+            $config["captchaLength"] = $captchaLength;
+            $changes++;
+        }
+    }
+    // --- Rate Limits ---
+    if (isset($_POST["logins"])) {
+        $logins = (int)$_POST["logins"];
+        if ($logins < 1) {
+            $errors[] = "Logins per hour cannot be less than 1.";
+        }
+        elseif ($logins > 32767) {
+            $errors[] = "Logins per hour cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($logins != $config["loginsPerHour"]) {
+            $config["loginsPerHour"] = $logins;
+            $changes++;
+        }
+    }
+    if (isset($_POST["accounts"])) {
+        $accounts = (int)$_POST["accounts"];
+        if ($accounts < 1) {
+            $errors[] = "Accounts per IP cannot be less than 1.";
+        }
+        elseif ($accounts > 32767) {
+            $errors[] = "Accounts per IP cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($accounts != $config["accountsPerIP"]) {
+            $config["accountsPerIP"] = $accounts;
+            $changes++;
+        }
+    }
+    if (isset($_POST["accountcooldown"])) {
+        $accountcooldown = (int)$_POST["accountcooldown"];
+        if ($accountcooldown < 1) {
+            $errors[] = "Account cooldown cannot be less than 1.";
+        }
+        elseif ($accountcooldown > 32767) {
+            $errors[] = "Account cooldown cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($accountcooldown != $config["accountCooldown"]) {
+            $config["accountCooldown"] = $accountcooldown;
+            $changes++;
+        }
+    }
+    if (isset($_POST["postdelay"])) {
+        $postdelay = (int)$_POST["postdelay"];
+        if ($postdelay < 1) {
+            $errors[] = "Post delay cannot be less than 1.";
+        }
+        elseif ($postdelay > 32767) {
+            $errors[] = "Post delay cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($postdelay != $config["postDelay"]) {
+            $config["postDelay"] = $postdelay;
+            $changes++;
+        }
+    }
+    if (isset($_POST["editdelay"])) {
+        $editdelay = (int)$_POST["editdelay"];
+        if ($editdelay < 1) {
+            $errors[] = "Edit delay cannot be less than 1.";
+        }
+        elseif ($editdelay > 32767) {
+            $errors[] = "Edit delay cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($editdelay != $config["editDelay"]) {
+            $config["editDelay"] = $editdelay;
+            $changes++;
+        }
+    }
         
-        // If there are errors, display them.
-        if (count($errors) > 0) {
-            foreach ($errors as $e) {
-                $messages[] = error($e);
-            }
+    // If there are errors, display them.
+    if (count($errors) > 0) {
+        foreach ($errors as $e) {
+            $messages[] = error($e);
         }
-        // Display a message if we changed the config.
-        if ($changes > 0) {
-            flushConfig();
-            $messages[] = success("Successfully updated the blog configuration.");
-        }
-        else {
-            $messages[] = success("Successfully did nothing.");
-        }
+    }
+    // Display a message if we changed the config.
+    if ($changes > 0) {
+        flushConfig();
+        $messages[] = success("Successfully updated the blog configuration.");
+    }
+    else {
+        $messages[] = info("Nothing to change.");
     }
 }
 

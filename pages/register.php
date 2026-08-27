@@ -62,98 +62,92 @@ if (isset($url[1]) and ($config["registrationMode"] == "email")) {
 $registerSuccess = false;
 
 // Handle requests.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // If the CSRF token is sent and valid.
-    if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-        // Generate a new token.
-        generateCSRFToken();
-            
-        $errors = array();
+if (validateCSRFToken()) {
+    $errors = array();
 
-        // Make sure there aren't too many accounts from this IP.
-        $ipCheck = $db->query("SELECT `jointime` FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
-        if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
-            $errors[] = "You've made too many accounts.";
+    // Make sure there aren't too many accounts from this IP.
+    $ipCheck = $db->query("SELECT `jointime` FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
+    if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
+        $errors[] = "You've made too many accounts.";
+    }
+    // Enforce a time based rate limit.
+    while ($r = $ipCheck->fetch_assoc()) {
+        if ((time()-$r["jointime"]) <= $config["accountCooldown"]) {
+            $errors[] = "You've made an account too recently. Wait a while and try again.";
         }
-        // Enforce a time based rate limit.
-        while ($r = $ipCheck->fetch_assoc()) {
-            if ((time()-$r["jointime"]) <= $config["accountCooldown"]) {
-                $errors[] = "You've made an account too recently. Wait a while and try again.";
-            }
-        }
+    }
             
-        // Validate their name.
-        $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
+    // Validate their name.
+    $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
            
-        // Validate their username.
-        $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
+    // Validate their username.
+    $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
             
-        // Validate their email.
-        $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
+    // Validate their email.
+    $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
         
-        // Validate their password.
-        $errors = array_merge($errors, validatePassword($_POST["password"] ?? ""));
+    // Validate their password.
+    $errors = array_merge($errors, validatePassword($_POST["password"] ?? ""));
         
-        // Make sure their password entries match.
-        if ($_POST["password"] != $_POST["repeatpassword"]) {
-            $errors[] = "Your passwords don't match. Please try again.";
+    // Make sure their password entries match.
+    if ($_POST["password"] != $_POST["repeatpassword"]) {
+        $errors[] = "Your passwords don't match. Please try again.";
+    }
+        
+    // Make sure the CAPTCHA was filled out correctly.
+    if (extension_loaded("gd") and $config["captchaEnabled"]) {
+        if (strtolower($_POST["captcha"] ?? "") != strtolower($_SESSION["captcha"])) {
+            $errors[] = "CAPTCHA was not filled out correctly.";
         }
-        
-        // Make sure the CAPTCHA was filled out correctly.
-        if (extension_loaded("gd") and $config["captchaEnabled"]) {
-            if (strtolower($_POST["captcha"]?? "") != strtolower($_SESSION["captcha"])) {
-                $errors[] = "CAPTCHA was not filled out correctly.";
-            }
-        }
+    }
             
-        // If everything checks out, make the account.
-        if (count($errors) == 0) {
-            $cookie = "NULL";
-            // Decide what role to assign.
-            switch ($config["registrationMode"]) {
-                case "open":
-                    $role = "Member";
-                    break;
-                // Fallthrough intentional.
-                case "approval":
-                case "email":
-                    $cookie = hash("sha256", random_bytes(64));
-                // Default to approval.
-                default:
-                    $role = "Unapproved";
-            }
-            $now = time();
-            $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "', '" . $cookie . "')");
+    // If everything checks out, make the account.
+    if (count($errors) == 0) {
+        $cookie = "NULL";
+        // Decide what role to assign.
+        switch ($config["registrationMode"]) {
+            case "open":
+                $role = "Member";
+                break;
+            // Fallthrough intentional.
+            case "email":
+                $cookie = hash("sha256", random_bytes(64));
+            case "approval":
+            // Default to approval.
+            default:
+                $role = "Unapproved";
+        }
+        $now = time();
+        $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "', '" . $cookie . "')");
 
-            // Inform the user that they've successfully registered.
-            if ($role == "Unapproved") {
-                switch ($config["registrationMode"]) {
-                    case "approval":
-                        $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
-                        break;
-                    case "email":
-                        $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . makeURL("register/" . $cookie)));
-                        if ($emailSuccess) {
-                            $messages[] = success("You've successfully registered for an account. Click the link provided to the email you specified to activate your account.");
-                        }
-                        else {
-                            $messages[] = error("Failed to send activation email. Please contact the blog owner/administrator(s).");
-                        }
-                        break;
-                }
+        // Inform the user that they've successfully registered.
+        if ($role == "Unapproved") {
+            switch ($config["registrationMode"]) {
+                case "approval":
+                    $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
+                    break;
+                case "email":
+                    $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . makeURL("register/" . $cookie)));
+                    if ($emailSuccess) {
+                        $messages[] = success("You've successfully registered for an account. Click the link provided to the email you specified to activate your account.");
+                    }
+                    else {
+                        $messages[] = error("Failed to send activation email. Please contact the blog owner/administrator(s).");
+                    }
+                    break;
             }
-            elseif ($role == "Member") {
-                $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
-            }
-            $registerSuccess = true;
-            // Log the registration.
-            $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $db->insert_id . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . time() . "')");
         }
-        // Otherwise, display the errors.
-        else {
-            foreach ($errors as $e) {
-                $messages[] = error($e);
-            }
+        elseif ($role == "Member") {
+            $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
+        }
+        $registerSuccess = true;
+        // Log the registration.
+        $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $db->insert_id . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . time() . "')");
+    }
+    // Otherwise, display the errors.
+    else {
+        foreach ($errors as $e) {
+            $messages[] = error($e);
         }
     }
 }

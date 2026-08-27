@@ -58,162 +58,140 @@ if ($post->num_rows < 1) {
     exit();
 }
 // Handle star toggling.
-elseif (isset($_POST["toggleStar"])) {
+elseif (isset($_POST["toggleStar"]) and validateCSRFToken()) {
     // Make sure the user is allowed to star/unstar the post.
-    if ((($id == $p_account) and checkPerm(PERM_STAR_POST)) or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
-        // If the CSRF token is sent and valid.
-        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-            // Generate a new token.
-            generateCSRFToken();
-            
-            // Star.
-            if ($_POST["toggleStar"] == "Star") {
-                $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
-            }
-            // Unstar.
-            else {
-                $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
-            }
-            $updatePost = true;
+    if ((($id == $p_account) and checkPerm(PERM_STAR_POST))
+    or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
+        // Star.
+        if ($_POST["toggleStar"] == "Star") {
+            $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
         }
+        // Unstar.
+        else {
+            $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
+        }
+        $updatePost = true;
     }
     else {
         $messages[] = error("You don't have permission to do this.");
     }
 }
 // Handle published toggling.
-elseif (isset($_POST["togglePublished"])) {
+elseif (isset($_POST["togglePublished"]) and validateCSRFToken()) {
     // Make sure the user is allowed to publish/unpublish the post.
-    if (($id == $p_account) and checkPerm(PERM_NEW_POST)) {
-        // If the CSRF token is sent and valid.
-        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-            // Generate a new token.
-            generateCSRFToken();
-                
-            // Star.
-            if ($_POST["togglePublished"] == "Publish") {
-                $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
-            }
-            // Unstar.
-            else {
-                $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
-            }
-            $updatePost = true;
+    if (($id == $p_account) and checkPerm(PERM_NEW_POST)) { 
+        // Star.
+        if ($_POST["togglePublished"] == "Publish") {
+            $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
         }
+        // Unstar.
+        else {
+            $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
+        }
+        $updatePost = true;
     }
     else {
         $messages[] = error("You don't have permission to do this.");
     }
 }
 // Handle deletions.
-elseif (isset($_POST["delete"])) {
+elseif (isset($_POST["delete"]) and validateCSRFToken()) {
     // Make sure the user is allowed to delete the post.
-    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
-        // If the CSRF token is sent and valid.
-        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-            // Generate a new token.
-            generateCSRFToken();
-                
-            // Delete the post.
-            $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p_id) . "'");
-            // Delete all of the post's views.
-            $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
-            // Delete all of the post's comments.
-            $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
-            // Delete all icons and attachments.
-            $uploads = scandir("images/");
-            foreach ($uploads as $u) {
-                if (str_starts_with($u, $p_id . ".") or str_starts_with($u, $p_id . "_")) {
-                    unlink("images/" . $u);
-                }
+    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST))
+    or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
+        // Delete the post.
+        $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p_id) . "'");
+        // Delete all of the post's views.
+        $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+        // Delete all of the post's comments.
+        $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+        // Delete all icons and attachments.
+        $uploads = scandir("images/");
+        foreach ($uploads as $u) {
+            if (str_starts_with($u, $p_id . ".") or str_starts_with($u, $p_id . "_")) {
+                unlink("images/" . $u);
             }
-                
-            $_SESSION["messages"][] = success("Successfully deleted the post.");
-            $displayPost = false;
-            redirect("");
         }
+                
+        $_SESSION["messages"][] = success("Successfully deleted the post.");
+        $displayPost = false;
+        redirect("");
     }
     else {
         $messages[] = error("You don't have permission to do this.");
     }
 }
 // Handle new comments.
-elseif (isset($_POST["newcomment"])) {
+elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
     // Make sure the user is allowed to comment.
     if (checkPerm(PERM_COMMENT)) {
-        // If the CSRF token is sent and valid.
-        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-            // Generate a new token.
-            generateCSRFToken();
+        $rateLimited = false;
             
-            $rateLimited = false;
+        // Get comments from this IP.
+        $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
             
-            // Get comments from this IP.
-            $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
+        if ($ipCheck->num_rows > 0) {
+            $rateLimited = true;
+        }
             
-            if ($ipCheck->num_rows > 0) {
+        // If it's a user with an account.
+        if ($_SESSION["logged_in"]) {
+            $emailquery = $db->query("SELECT `email` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+                
+            while ($e = $emailquery->fetch_assoc()) {
+                $email = $e["email"];
+            }
+                
+            $commentid = $id;
+                
+            // Get comments from this account too.
+            $accCheck = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $id . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
+            
+            if ($accCheck->num_rows > 0) {
                 $rateLimited = true;
             }
+        }
+        // Guests.
+        else {
+            $commentid = 0;
+            $email = $_POST["email"] ?? "";
+        }
             
-            // If it's a user with an account.
-            if ($_SESSION["logged_in"]) {
-                $emailquery = $db->query("SELECT `email` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-                
-                while ($e = $emailquery->fetch_assoc()) {
-                    $email = $e["email"];
-                }
-                
-                $commentid = $id;
-                
-                // Get comments from this account too.
-                $accCheck = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $id . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
+        $content = $_POST["content"] ?? "";
             
-                if ($accCheck->num_rows > 0) {
-                    $rateLimited = true;
-                }
-            }
-            // Guests.
-            else {
-                $commentid = 0;
-                $email = $_POST["email"] ?? "";
-            }
+        $errors = array();
             
-            $content = $_POST["content"] ?? "";
+        if ($rateLimited) {
+            $errors[] = "You must wait a little bit before making another comment.";
+        }
             
-            $errors = array();
+        if (strlen($email) < 1) {
+            $errors[] = "Email cannot be blank.";
+        }
+        elseif (strlen($email) > 64) {
+            $errors[] = "Email too long.";
+        }
+        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Your email address is invalid. Please try entering a valid email address.";
+        }
             
-            if ($rateLimited) {
-                $errors[] = "You must wait a little bit before making another comment.";
-            }
+        if (strlen($content) < 1) {
+            $errors[] = "Comment cannot be blank.";
+        }
+        elseif (strlen($content) > $config["commentMaxLength"]) {
+            $errors[] = "Comment is too long.";
+        }
             
-            if (strlen($email) < 1) {
-                $errors[] = "Email cannot be blank.";
+        if (count($errors) != 0) {
+            foreach ($errors as $e) {
+                $messages[] = error($e);
             }
-            elseif (strlen($email) > 64) {
-                $errors[] = "Email too long.";
-            }
-            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = "Your email address is invalid. Please try entering a valid email address.";
-            }
-            
-            if (strlen($content) < 1) {
-                $errors[] = "Comment cannot be blank.";
-            }
-            elseif (strlen($content) > $config["commentMaxLength"]) {
-                $errors[] = "Comment is too long.";
-            }
-            
-            if (count($errors) != 0) {
-                foreach ($errors as $e) {
-                    $messages[] = error($e);
-                }
-            }
-            else {
-                // Make the commment.
-                $db->query("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES ('" . $commentid . "', '" . $p_id . "', '" . $db->real_escape_string($email) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($content) . "')");
-                $messages[] = success("Successfully made comment.");
-                $_POST["content"] = "";
-            }
+        }
+        else {
+            // Make the commment.
+            $db->query("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES ('" . $commentid . "', '" . $p_id . "', '" . $db->real_escape_string($email) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($content) . "')");
+            $messages[] = success("Successfully made comment.");
+            $_POST["content"] = "";
         }
     }
     else {
@@ -221,7 +199,7 @@ elseif (isset($_POST["newcomment"])) {
     }
 }
 // Handle deleting a comment.
-elseif (isset($_POST["deletecomment"])) {
+elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
     if (isset($_POST["commentid"])) {
         $commentinfo = $db->query("SELECT `id`, `account`, `ip` FROM `comments` WHERE `id`='" . $db->real_escape_string($_POST["commentid"]) . "'");
         
@@ -239,16 +217,10 @@ elseif (isset($_POST["deletecomment"])) {
             // Guest with same IP.
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
-                // If the CSRF token is sent and valid.
-                if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-                    // Generate a new token.
-                    generateCSRFToken();
+                // Delete the comment.
+                $db->query("DELETE FROM `comments` WHERE `id`='" . $c_id . "'");
                     
-                    // Delete the comment.
-                    $db->query("DELETE FROM `comments` WHERE `id`='" . $c_id . "'");
-                    
-                    $messages[] = success("Successfully deleted comment.");
-                }
+                $messages[] = success("Successfully deleted comment.");
             }
         }
     }
@@ -257,7 +229,7 @@ elseif (isset($_POST["deletecomment"])) {
     }
 }
 // Handle editing a comment.
-elseif (isset($_POST["editcomment"])) {
+elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
     if (isset($_POST["commentid"])) {
         $commentinfo = $db->query("SELECT `id`, `account`, `ip`, `content` FROM `comments` WHERE `id`='" . $db->real_escape_string($_POST["commentid"]) . "'");
         
@@ -276,49 +248,43 @@ elseif (isset($_POST["editcomment"])) {
             // Guest with same IP.
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
-                // If the CSRF token is sent and valid.
-                if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-                    // Generate a new token.
-                    generateCSRFToken();
+                $content = $_POST["newcontent"] ?? "";
                     
-                    $content = $_POST["newcontent"] ?? "";
+                $errors = array();
                     
-                    $errors = array();
+                $rateLimited = false;
                     
-                    $rateLimited = false;
-                    
-                    $rlcheck = $db->query("SELECT 1 FROM `comments` WHERE (`account`='" . $id . "' OR `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "') AND `timestamp`>" . time()-$config["editDelay"]);
-                    
-                    if ($rlcheck->num_rows > 0) {
-                        $rateLimited = true;
-                    }
+                $rlcheck = $db->query("SELECT 1 FROM `comments` WHERE (`account`='" . $id . "' OR `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "') AND `timestamp`>" . time()-$config["editDelay"]);
+                
+                if ($rlcheck->num_rows > 0) {
+                    $rateLimited = true;
+                }
             
-                    if ($rateLimited) {
-                        $errors[] = "You must wait a few seconds before making another edit.";
-                    }
+                if ($rateLimited) {
+                    $errors[] = "You must wait a few seconds before making another edit.";
+                }
                     
-                    if (strlen($content) < 1) {
-                        $errors[] = "Comment cannot be blank.";
-                    }
-                    elseif (strlen($content) > $config["commentMaxLength"]) {
-                        $errors[] = "Comment is too long.";
-                    }
-                    elseif ($content == $c_content) {
-                        $errors[] = "Nothing to change.";
-                    }
+                if (strlen($content) < 1) {
+                    $errors[] = "Comment cannot be blank.";
+                }
+                elseif (strlen($content) > $config["commentMaxLength"]) {
+                    $errors[] = "Comment is too long.";
+                }
+                elseif ($content == $c_content) {
+                    $errors[] = "Nothing to change.";
+                }
             
-                    if (count($errors) != 0) {
-                        foreach ($errors as $e) {
-                            $messages[] = error($e);
-                        }
+                if (count($errors) != 0) {
+                    foreach ($errors as $e) {
+                        $messages[] = error($e);
                     }
-                    else {
-                        // Edit the comment.
-                        $db->query("UPDATE `comments` SET `content`='" . $db->real_escape_string($content) . "', `timestamp`='" . time() . "' WHERE `id`='" . $c_id . "'");
-                    
-                        $_SESSION["messages"][] = success("Successfully edited comment.");
-                        redirect("post/" . $p_id);
-                    }
+                }
+                else {
+                    // Edit the comment.
+                    $db->query("UPDATE `comments` SET `content`='" . $db->real_escape_string($content) . "', `timestamp`='" . time() . "' WHERE `id`='" . $c_id . "'");
+                
+                    $_SESSION["messages"][] = success("Successfully edited comment.");
+                    redirect("post/" . $p_id);
                 }
             }
         }
@@ -328,7 +294,7 @@ elseif (isset($_POST["editcomment"])) {
     }
 }
 // Handle cancelling editing a comment.
-elseif (isset($_POST["canceleditcomment"])) {
+elseif (isset($_POST["canceleditcomment"]) and validateCSRFToken()) {
     redirect("post/" . $p_id);
 }
 // Handle editing.
@@ -337,11 +303,9 @@ elseif (($url[2] ?? "") == "edit") {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to edit the post.
-    if ((($id === $p_account) and checkPerm(PERM_NEW_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
-        if (isset($_POST["edit"]) and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
-            // Generate a new token.
-            generateCSRFToken();
-            
+    if ((($id === $p_account) and checkPerm(PERM_NEW_POST))
+    or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
+        if (isset($_POST["edit"]) and validateCSRFToken()) {
             // Remove ampersands from tags because they can be used to inject URL parameters.
             $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
             // Remove slashes because they can ruin a search.
@@ -368,9 +332,7 @@ elseif (($url[2] ?? "") == "edit") {
             }
         }
         // If the user pressed the cancel button, fallthrough to the redirect.
-        elseif (isset($_POST["cancel"]) and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
-            // Generate a new token.
-            generateCSRFToken();
+        elseif (isset($_POST["cancel"]) and validateCSRFToken()) {
             $success = true;
         }
         if (!$success) {
@@ -401,11 +363,7 @@ elseif (($url[2] ?? "") == "uploads") {
     if ((($id === $p_account) and checkPerm(PERM_UPLOAD))
     or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
         // Token check.
-        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-            // Generate a new token.
-            generateCSRFToken();
-        }
-        else {
+        if (!validateCSRFToken()) {
             unset($_POST);
             unset($_FILES);
         }
@@ -580,15 +538,18 @@ if ($displayPost) {
     
     $title = $p_title;
     
-    if ((($id == $p_account) and checkPerm(PERM_NEW_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p_account) and checkPerm(PERM_NEW_POST))
+    or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/edit") . "' class='button postButton'>Edit</a>";
     }
-    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST)) or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST))
+    or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= 
             "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
     }
-    if ((($id == $p_account) and checkPerm(PERM_STAR_POST)) or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p_account) and checkPerm(PERM_STAR_POST))
+    or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p_starred == "1") ? "Unstar" : "Star") . "'></form>";
     }
@@ -596,7 +557,8 @@ if ($displayPost) {
         $postvars["postbuttons"] .=
             "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p_published == "1") ? "Unpublish" : "Publish") . "'></form>";
     }
-    if ((($id == $p_account) and checkPerm(PERM_UPLOAD)) or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
+    if ((($id == $p_account) and checkPerm(PERM_UPLOAD))
+    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
         $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p_id}/uploads") . "' class='button postButton'>Manage Uploads</a>";
     }
@@ -715,7 +677,7 @@ if ($displayPost) {
                 </div>";
             }
             else {
-                $postvars["comments"] .= "</div>
+                $postvars["comments"] .= "</div></div>
                 <div class='commentContent'>
                 <form method='post' class='form'>
                  <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>

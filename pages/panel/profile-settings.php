@@ -27,10 +27,7 @@ if (!defined('INDEX')) exit;
 $title = "Profile Settings";
 
 // Handle requests.
-if (isset($_POST["csrf_token"]) and ($_POST["csrf_token"] == $_SESSION["csrf_token"])) {
-    // Generate a new token.
-    generateCSRFToken();
-    
+if (validateCSRFToken()) {
     // Get the information for this account.
     $accountInfo = $db->query("SELECT `color`, `bio`, `namevisible`, `emailvisible` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
 

@@ -29,39 +29,33 @@ if (!checkPerm(PERM_NEW_POST)) {
 }
 $title = "New Post";
 // Handle requests.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // If the CSRF token is sent and valid.
-    if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-        // Generate a new token.
-        generateCSRFToken();
-        
-        // Remove ampersands from tags because they can be used to inject URL parameters.
-        $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
-        // Remove slashes because they can ruin a search.
-        $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
+if (validateCSRFToken()) {
+    // Remove ampersands from tags because they can be used to inject URL parameters.
+    $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
+    // Remove slashes because they can ruin a search.
+    $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
 
-        $errors = validatePost();
-        	
-        // If there are no errors, make the post.
-        if (count($errors) === 0) {
-            if (isset($_POST["unpublished"]) and ($_POST["unpublished"] == "on")) {
-                $published = "0";
-            }
-            else {
-                $published = "1";
-            }
-        
-            // Add the new post to the database.
-            $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
-            // Print a message.
-            $_SESSION["messages"][] = unsafe_success("Successfully made new post.");
-            redirect("post/{$db->insert_id}");
+    $errors = validatePost();
+    	
+    // If there are no errors, make the post.
+    if (count($errors) === 0) {
+        if (isset($_POST["unpublished"]) and ($_POST["unpublished"] == "on")) {
+            $published = "0";
         }
-        // Otherwise, print the errors.
         else {
-            foreach ($errors as $e) {
-                $messages[] = error($e);
-            }
+            $published = "1";
+        }
+        
+        // Add the new post to the database.
+        $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
+        // Print a message.
+        $_SESSION["messages"][] = unsafe_success("Successfully made new post.");
+        redirect("post/{$db->insert_id}");
+    }
+    // Otherwise, print the errors.
+    else {
+        foreach ($errors as $e) {
+            $messages[] = error($e);
         }
     }
 }

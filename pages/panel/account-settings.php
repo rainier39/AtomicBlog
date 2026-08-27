@@ -37,114 +37,108 @@ while ($a = $accountInfo->fetch_assoc()) {
 }
 
 // Handle requests.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // If the CSRF token is sent and valid.
-    if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-        // Generate a new token.
-        generateCSRFToken();
+if (validateCSRFToken()) {
+    $errors = array();
         
-        $errors = array();
+    if (isset($_POST["name"]) or isset($_POST["username"]) or isset($_POST["email"])) {
+        // Validate their name.
+        if ($_POST["name"] != $name) {
+            $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
+        }
         
-        if (isset($_POST["name"]) or isset($_POST["username"]) or isset($_POST["email"])) {
-            // Validate their name.
-            if ($_POST["name"] != $name) {
-                $errors = array_merge($errors, validateName($_POST["name"] ?? ""));
-            }
+        // Validate their username.
+        if ($_POST["username"] != $username) {
+            $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
+        }
         
-            // Validate their username.
-            if ($_POST["username"] != $username) {
-                $errors = array_merge($errors, validateUsername($_POST["username"] ?? ""));
-            }
-        
-            // Validate their email.
-            if ($_POST["email"] != $email) {
-                $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
-            }
+        // Validate their email.
+        if ($_POST["email"] != $email) {
+            $errors = array_merge($errors, validateEmail($_POST["email"] ?? "", true));
+        }
             
-            // Make sure the password is correct.
-            if (!password_verify($_POST["password1"], $password)) {
-                $errors[] = "Incorrect password.";
-            }
+        // Make sure the password is correct.
+        if (!password_verify($_POST["password1"], $password)) {
+            $errors[] = "Incorrect password.";
+        }
         
-            if (count($errors) !== 0) {
-                foreach ($errors as $e) {
-                    $messages[] = error($e);
-                }
-            }
-            else {
-                if (($_POST["name"] == $name) and ($_POST["username"] == $username) and ($_POST["email"] == $email)) {
-                    $messages[] = success("Successfully did nothing.");
-                }
-                else {
-                    $db->query("UPDATE `accounts` SET `name`='" . $db->real_escape_string($_POST["name"]) . "', `username`='" . $db->real_escape_string($_POST["username"]) . "', `email`='" . $db->real_escape_string($_POST["email"]) . "' WHERE `id`='" . $_SESSION["id"] . "'");
-                    $messages[] = success("Successfully changed account settings.");
-                    $_POST["password1"] = "";
-                }
+        if (count($errors) !== 0) {
+            foreach ($errors as $e) {
+                $messages[] = error($e);
             }
         }
-        elseif (isset($_POST["password2"]) or isset($_POST["newpassword"]) or isset($_POST["repeatpassword"])) {
-            // Make sure the password is correct.
-            if (!password_verify($_POST["password2"], $password)) {
-                $errors[] = "Incorrect password.";
-            }
-            $errors = array_merge($errors, validatePassword($_POST["newpassword"]));
-            if ($_POST["newpassword"] != $_POST["repeatpassword"]) {
-                $errors[] = "Your passwords don't match. Please try again.";
-            }
-            if ($_POST["password2"] == $_POST["newpassword"]) {
-                $errors[] = "Your new password can't be the same as your old password.";
-            }
-            if (count($errors) !== 0) {
-                foreach ($errors as $e) {
-                    $messages[] = error($e);
-                }
+        else {
+            if (($_POST["name"] == $name) and ($_POST["username"] == $username) and ($_POST["email"] == $email)) {
+                $messages[] = success("Successfully did nothing.");
             }
             else {
-                $db->query("UPDATE `accounts` SET `password`='" . $db->real_escape_string(password_hash($_POST["newpassword"], PASSWORD_DEFAULT)) . "' WHERE `id`='" . $_SESSION["id"] . "'");
-                $messages[] = success("Successfully changed password.");
-                $_POST["password2"] = "";
-                $_POST["newpassword"] = "";
-                $_POST["repeatpassword"] = "";
+                $db->query("UPDATE `accounts` SET `name`='" . $db->real_escape_string($_POST["name"]) . "', `username`='" . $db->real_escape_string($_POST["username"]) . "', `email`='" . $db->real_escape_string($_POST["email"]) . "' WHERE `id`='" . $_SESSION["id"] . "'");
+                $messages[] = success("Successfully changed account settings.");
+                $_POST["password1"] = "";
             }
         }
-        // Handle uploading an avatar.
-        elseif (isset($_FILES["avatar"])) {
-            $upload = upload("avatar", "a_" . $_SESSION["id"]);
-            if ($upload == "") {
-                $messages[] = success("Successfully uploaded avatar.");
-            }
-            else {
-                $messages[] = error($upload);
+    }
+    elseif (isset($_POST["password2"]) or isset($_POST["newpassword"]) or isset($_POST["repeatpassword"])) {
+        // Make sure the password is correct.
+        if (!password_verify($_POST["password2"], $password)) {
+            $errors[] = "Incorrect password.";
+        }
+        $errors = array_merge($errors, validatePassword($_POST["newpassword"]));
+        if ($_POST["newpassword"] != $_POST["repeatpassword"]) {
+            $errors[] = "Your passwords don't match. Please try again.";
+        }
+        if ($_POST["password2"] == $_POST["newpassword"]) {
+            $errors[] = "Your new password can't be the same as your old password.";
+        }
+        if (count($errors) !== 0) {
+            foreach ($errors as $e) {
+                $messages[] = error($e);
             }
         }
-        // Handle deleting an avatar.
-        elseif (isset($_POST["deleteAvatar"]) and isset($_POST["davatar"])) {
-            // Filepath sanitization.
-            $target = basename($_POST["davatar"]);
-            // Make sure that this avatar actually belongs to this user.
-            if (!str_starts_with($target, "a_" . $_SESSION["id"])) {
-                $messages[] = error("Nice try.");
-            }
-            // Make sure that the target attachment exists.
-            elseif (!is_file("images/" . $target)) {
-                $messages[] = error("Specified avatar doesn't exist.");
+        else {
+            $db->query("UPDATE `accounts` SET `password`='" . $db->real_escape_string(password_hash($_POST["newpassword"], PASSWORD_DEFAULT)) . "' WHERE `id`='" . $_SESSION["id"] . "'");
+            $messages[] = success("Successfully changed password.");
+            $_POST["password2"] = "";
+            $_POST["newpassword"] = "";
+            $_POST["repeatpassword"] = "";
+        }
+    }
+    // Handle uploading an avatar.
+    elseif (isset($_FILES["avatar"])) {
+        $upload = upload("avatar", "a_" . $_SESSION["id"]);
+        if ($upload == "") {
+            $messages[] = success("Successfully uploaded avatar.");
+        }
+        else {
+            $messages[] = error($upload);
+        }
+    }
+    // Handle deleting an avatar.
+    elseif (isset($_POST["deleteAvatar"]) and isset($_POST["davatar"])) {
+        // Filepath sanitization.
+        $target = basename($_POST["davatar"]);
+        // Make sure that this avatar actually belongs to this user.
+        if (!str_starts_with($target, "a_" . $_SESSION["id"])) {
+            $messages[] = error("Nice try.");
+        }
+        // Make sure that the target attachment exists.
+        elseif (!is_file("images/" . $target)) {
+            $messages[] = error("Specified avatar doesn't exist.");
+        }
+        else {
+            $size = filesize("images/" . $target);
+            $deleted = unlink("images/" . $target);
+            if ($deleted) {
+                $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
+                // Make sure the quota is never less than 0.
+                $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+                $uq = (int)$userQuota->fetch_assoc()["quota"];
+                if ($uq < 0) {
+                    $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
+                }
+                $messages[] = success("Successfully deleted avatar.");
             }
             else {
-                $size = filesize("images/" . $target);
-                $deleted = unlink("images/" . $target);
-                if ($deleted) {
-                    $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
-                    // Make sure the quota is never less than 0.
-                    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-                    $uq = (int)$userQuota->fetch_assoc()["quota"];
-                    if ($uq < 0) {
-                        $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
-                    }
-                    $messages[] = success("Successfully deleted avatar.");
-                }
-                else {
-                    $messages[] = error("Failed to delete avatar.");
-                }
+                $messages[] = error("Failed to delete avatar.");
             }
         }
     }

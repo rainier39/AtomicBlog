@@ -848,6 +848,19 @@ function parseUserAgent($ua) {
     return $result;
 }
 
+function validateCSRFToken() {
+    if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
+        // Generate a new token.
+        generateCSRFToken();
+        return true;
+    }
+    else {
+        // Generate a new token.
+        generateCSRFToken();
+        return false;
+    }
+}
+
 // --- PHP 7.* Compatibility ---
 if (!function_exists("str_starts_with")) {
     function str_starts_with(string $haystack, string $needle) {

@@ -39,16 +39,7 @@ if (function_exists("apache_get_modules") and in_array("mod_rewrite", apache_get
 }
 
 // Handle requests.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Hard stop if this is a CSRF attack.
-    if (($_POST["csrf_token"] ?? "") != $_SESSION["csrf_token"]) {
-        exit();
-    }
-    // If not, generate a fresh new token for additional security.
-    else {
-        generateCSRFToken();
-    }
-    
+if (validateCSRFToken()) {
     $errors = array();
     
     // Stop if the core directory isn't writable. We need this for the config.
@@ -186,6 +177,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             `useragent` varchar(256) NOT NULL,
             `timestamp` bigint NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        
+        // TODO: uploads table, store who uploaded an image and when.
 
         // Write the administrator account. Will replace any existing account with the same username or email (if there is an old install of the software).
         $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");

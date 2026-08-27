@@ -31,52 +31,46 @@ if (!checkPerm(PERM_MANAGE_USERS)) {
 $title = "Manage Users";
 
 // Handle requests.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // If the CSRF token is sent and valid.
-    if ((isset($_POST["csrf_token"])) and ($_POST["csrf_token"] === $_SESSION["csrf_token"])) {
-        // Generate a new token.
-        generateCSRFToken();
-        
-        // Change a user's role.
-        if (isset($_POST["changerole"]) and isset($_POST["id"])) {
-            $_POST["id"] = (int)$_POST["id"];
-            $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-            $crole = $rolequery->fetch_assoc()["role"];
-            $userquery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_POST["id"]) . "'");
-            $urole = $userquery->fetch_assoc();
-            // Does the user exist?
-            if ($userquery->num_rows != 1) {
-                $messages[] = error("Specified user does not exist.");
-            }
-            // Is the user us?
-            elseif ($_POST["id"] === (int)$_SESSION["id"]) {
-                $messages[] = error("You don't have permission to do this.");
-            }
-            // Does the role exist?
-            elseif (!array_key_exists($_POST["changerole"], $permissions)) {
-                $messages[] = error("Specified role does not exist.");
-            }
-            // Is the role Guest?
-            elseif ($_POST["changerole"] == "Guest") {
-                $messages[] = error("Specified role does not exist.");
-            }
-            // Does the role have less permissions than our own?
-            elseif ($permissions[$_POST["changerole"]] >= $permissions[$crole]) {
-                $messages[] = error("You don't have permission to do this.");
-            }
-            // Does the other user outrank or have the same role as us?
-            elseif ($permissions[$urole["role"]] >= $permissions[$crole]) {
-                $messages[] = error("You don't have permission to do this.");
-            }
-            // Is the role actually different from the role they already have?
-            elseif ($_POST["changerole"] == $urole["role"]) {
-                $messages[] = success("Successfully did nothing.");
-            }
-            // Change the role.
-            else {
-                $db->query("UPDATE `accounts` SET `role`='" . $db->real_escape_string($_POST["changerole"]) . "' WHERE `id`='" . $_POST["id"] . "'");
-                $messages[] = success("Successfully changed role.");
-            }
+if (validateCSRFToken()) {
+    // Change a user's role.
+    if (isset($_POST["changerole"]) and isset($_POST["id"])) {
+        $_POST["id"] = (int)$_POST["id"];
+        $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+        $crole = $rolequery->fetch_assoc()["role"];
+        $userquery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_POST["id"]) . "'");
+        $urole = $userquery->fetch_assoc();
+        // Does the user exist?
+        if ($userquery->num_rows != 1) {
+            $messages[] = error("Specified user does not exist.");
+        }
+        // Is the user us?
+        elseif ($_POST["id"] === (int)$_SESSION["id"]) {
+            $messages[] = error("You don't have permission to do this.");
+        }
+        // Does the role exist?
+        elseif (!array_key_exists($_POST["changerole"], $permissions)) {
+            $messages[] = error("Specified role does not exist.");
+        }
+        // Is the role Guest?
+        elseif ($_POST["changerole"] == "Guest") {
+            $messages[] = error("Specified role does not exist.");
+        }
+        // Does the role have less permissions than our own?
+        elseif ($permissions[$_POST["changerole"]] >= $permissions[$crole]) {
+            $messages[] = error("You don't have permission to do this.");
+        }
+        // Does the other user outrank or have the same role as us?
+        elseif ($permissions[$urole["role"]] >= $permissions[$crole]) {
+            $messages[] = error("You don't have permission to do this.");
+        }
+        // Is the role actually different from the role they already have?
+        elseif ($_POST["changerole"] == $urole["role"]) {
+            $messages[] = info("Nothing to change.");
+        }
+        // Change the role.
+        else {
+            $db->query("UPDATE `accounts` SET `role`='" . $db->real_escape_string($_POST["changerole"]) . "' WHERE `id`='" . $_POST["id"] . "'");
+            $messages[] = success("Successfully changed role.");
         }
     }
 }
