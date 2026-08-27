@@ -400,10 +400,16 @@ elseif (($url[2] ?? "") == "uploads") {
     $success = false;
     // Make sure the user is allowed to upload.
     if ((($id === $p_account) and checkPerm(PERM_UPLOAD))
-    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))
-    and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
-        // Generate a new token.
-        generateCSRFToken();
+    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
+        // Token check.
+        if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
+            // Generate a new token.
+            generateCSRFToken();
+        }
+        else {
+            unset($_POST);
+            unset($_FILES);
+        }
         
         // Handle uploading icon.
         if (isset($_FILES["icon"])) {
@@ -419,7 +425,7 @@ elseif (($url[2] ?? "") == "uploads") {
         elseif (isset($_FILES["attachment"])) {
             // We will need to generate a value that isn't already being used.
             $a_id = rand();
-            while (file_exists("images/" . $p_id . "_" . $a_id . ".webp")) {
+            while (file_exists("images/" . $p_id . "_" . $a_id . ".webp") or file_exists("images/" . $p_id . "_" . $a_id . ".gif")) {
                 $a_id = rand();
             }
             $upload = upload("attachment", $p_id . "_" . $a_id);
