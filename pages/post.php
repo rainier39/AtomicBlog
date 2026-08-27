@@ -338,40 +338,39 @@ elseif (($url[2] ?? "") == "edit") {
     $success = false;
     // Make sure the user is allowed to edit the post.
     if ((($id === $p_account) and checkPerm(PERM_NEW_POST)) or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
-        if (isset($_POST["edit"])) {
-            // If the CSRF token is sent and valid.
-            if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-                // Generate a new token.
-                generateCSRFToken();
-                
-                // Remove ampersands from tags because they can be used to inject URL parameters.
-                $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
-                // Remove slashes because they can ruin a search.
-                $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
+        if (isset($_POST["edit"]) and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
+            // Generate a new token.
+            generateCSRFToken();
+            
+            // Remove ampersands from tags because they can be used to inject URL parameters.
+            $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
+            // Remove slashes because they can ruin a search.
+            $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
 
-                $errors = validatePost(true);
-                
-                if (($_POST["title"] == $p_title) and ($_POST["tags"] == $p_tags) and ($_POST["content"] == $p_content)) {
-                    $errors[] = "Nothing has been changed.";
-                }
+            $errors = validatePost(true);
+
+            if (($_POST["title"] == $p_title) and ($_POST["tags"] == $p_tags) and ($_POST["content"] == $p_content)) {
+                $errors[] = "Nothing has been changed.";
+            }
         	
-    	        // If there are no errors, edit the post.
-    	        if (count($errors) === 0) {
-    	            $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($p_id) . "'");
-    	            $success = true;
-     	            $updatePost = true;
-     	            $_SESSION["messages"][] = success("Successfully edited post.");
-       	        }
-       	        // Otherwise, print the errors.
-       	        else {
-       	            foreach ($errors as $e) {
-       	                $messages[] = error($e);
-       	            }
+            // If there are no errors, edit the post.
+            if (count($errors) === 0) {
+                $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($p_id) . "'");
+                $success = true;
+                $updatePost = true;
+                $_SESSION["messages"][] = success("Successfully edited post.");
+            }
+            // Otherwise, print the errors.
+            else {
+                foreach ($errors as $e) {
+                    $messages[] = error($e);
        	        }
             }
         }
         // If the user pressed the cancel button, fallthrough to the redirect.
-        elseif (isset($_POST["cancel"])) {
+        elseif (isset($_POST["cancel"]) and (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"])) {
+            // Generate a new token.
+            generateCSRFToken();
             $success = true;
         }
         if (!$success) {
