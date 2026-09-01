@@ -177,8 +177,6 @@ if (validateCSRFToken()) {
             `useragent` varchar(256) NOT NULL,
             `timestamp` bigint NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-        
-        // TODO: uploads table, store who uploaded an image and when.
 
         // Write the administrator account. Will replace any existing account with the same username or email (if there is an old install of the software).
         $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");

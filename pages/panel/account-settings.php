@@ -135,6 +135,8 @@ if (validateCSRFToken()) {
                 if ($uq < 0) {
                     $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
                 }
+                // Log the deletion.
+                $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
                 $messages[] = success("Successfully deleted avatar.");
             }
             else {

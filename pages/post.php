@@ -416,6 +416,8 @@ elseif (($url[2] ?? "") == "uploads") {
                     if ($uq < 0) {
                         $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
                     }
+                    // Log the deletion.
+                    $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
                     $messages[] = success("Successfully deleted icon.");
                 }
                 else {
@@ -446,6 +448,8 @@ elseif (($url[2] ?? "") == "uploads") {
                     if ($uq < 0) {
                         $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
                     }
+                    // Log the deletion.
+                    $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
                     $messages[] = success("Successfully deleted attachment.");
                 }
                 else {
@@ -476,8 +480,16 @@ elseif (($url[2] ?? "") == "uploads") {
         "attachments" => "");
         
         foreach ($icons as $icon) {
+            // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$icon}" . "' ORDER BY `timestamp` LIMIT 1");
+            if ($uploadTime->num_rows > 0) {
+                $ut = $uploadTime->fetch_assoc()["timestamp"];
+            }
+            else {
+                $ut = time();
+            }
             $postuploadsvars["icons"] .= "<div class='uploadTile'>
-              <img src='" . makeURL("images/{$icon}") . "?" . time() . "'>
+              <img src='" . makeURL("images/{$icon}") . "?{$ut}'>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this icon?\");'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
@@ -487,8 +499,16 @@ elseif (($url[2] ?? "") == "uploads") {
             </div>";
         }
         foreach ($attachments as $attachment) {
+            // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$attachment}" . "' ORDER BY `timestamp` LIMIT 1");
+            if ($uploadTime->num_rows > 0) {
+                $ut = $uploadTime->fetch_assoc()["timestamp"];
+            }
+            else {
+                $ut = time();
+            }
             $postuploadsvars["attachments"] .= "<div class='uploadTile'>
-              <img src='" . makeURL("images/{$attachment}") . "?" . time() . "'>
+              <img src='" . makeURL("images/{$attachment}") . "?{$ut}'>
               URL: <a onclick='copy(\"" . (($ishttps == "on") ? "https://" : "http://") . $_SERVER["SERVER_NAME"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
@@ -581,7 +601,15 @@ if ($displayPost) {
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
         if (str_starts_with($u, $p_id . ".")) {
-            $postvars["icon"] = "<p><img src='" . makeURL("images/{$u}") . "?" . time() . "' class='pIcon'></p>";
+            // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` LIMIT 1");
+            if ($uploadTime->num_rows > 0) {
+                $ut = $uploadTime->fetch_assoc()["timestamp"];
+            }
+            else {
+                $ut = time();
+            }
+            $postvars["icon"] = "<p><img src='" . makeURL("images/{$u}") . "?{$ut}' class='pIcon'></p>";
             // Just use the first icon we find.
             break;
         }

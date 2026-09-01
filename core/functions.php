@@ -86,7 +86,15 @@ function displayPost($id, $title, $account, $starred, $published) {
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
         if (str_starts_with($u, $id . ".")) {
-            $postTilevars["image"] = "<img src='" . makeURL("images/{$u}") . "?" . time() . "'>";
+            // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` LIMIT 1");
+            if ($uploadTime->num_rows > 0) {
+                $ut = $uploadTime->fetch_assoc()["timestamp"];
+            }
+            else {
+                $ut = time();
+            }
+            $postTilevars["image"] = "<img src='" . makeURL("images/{$u}") . "?{$ut}'>";
             // Just use the first icon we find.
             break;
         }
@@ -447,6 +455,12 @@ function upload($file, $name) {
         return "Upload failed, the total disk quota would be exceeded.";
     }
     
+    // Enforce rate limits.
+    $rateLimit = $db->query("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND `perpid`='" . $_SESSION["id"] . "' AND `timestamp`>" . (time()-3600));
+    if ($rateLimit->num_rows >= $config["uploadsPerHour"]) {
+        return "Upload failed, rate limited. Try again later.";
+    }
+    
     $overwriting = false;
     
     // GIFs.
@@ -465,8 +479,6 @@ function upload($file, $name) {
         //    return "Upload failed, invalid GIF image.";
         //}
         
-        // TODO: enforce rate limits.
-        
         //$success = imagegif($image, $target);
         // Just accepting the file as-is may have security implications. Though it allows users to upload animated GIFs.
         $success = move_uploaded_file($_FILES[$file]["tmp_name"], $target);
@@ -480,6 +492,8 @@ function upload($file, $name) {
         if ($overwriting) {
             $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
         }
+        // Log the upload.
+        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
         return "";
     }
     // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
@@ -498,8 +512,6 @@ function upload($file, $name) {
             return "Upload failed, invalid JPEG image.";
         }
         
-        // TODO: enforce rate limits.
-        
         $success = imagewebp($image, $target);
         
         // We do this here in case the later checks erase the new file.
@@ -520,6 +532,8 @@ function upload($file, $name) {
             return "Upload failed, the total disk quota would be exceeded.";
         }
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        // Log the upload.
+        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
         return "";
     }
     // PNGs.
@@ -538,8 +552,6 @@ function upload($file, $name) {
             return "Upload failed, invalid PNG image.";
         }
         
-        // TODO: enforce rate limits.
-        
         $success = imagewebp($image, $target);
         
         // We do this here in case the later checks erase the new file.
@@ -560,6 +572,8 @@ function upload($file, $name) {
             return "Upload failed, the total disk quota would be exceeded.";
         }
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        // Log the upload.
+        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
         return "";
     }
     // WEBPs.
@@ -578,8 +592,6 @@ function upload($file, $name) {
             return "Upload failed, invalid WEBP image.";
         }
         
-        // TODO: enforce rate limits.
-        
         $success = imagewebp($image, $target);
         
         // We do this here in case the later checks erase the new file.
@@ -600,6 +612,8 @@ function upload($file, $name) {
             return "Upload failed, the total disk quota would be exceeded.";
         }
         $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+        // Log the upload.
+        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
         return "";
     }
     else {
