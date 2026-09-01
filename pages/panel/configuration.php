@@ -265,6 +265,60 @@ if (validateCSRFToken()) {
             $changes++;
         }
     }
+    if (($_POST["feedEnabled"] ?? "") == "on") {
+        $fe = true;
+    }
+    else {
+        $fe = false;
+    }
+    // Only write to the config if the value is actually being changed.
+    if ($fe != $config["feedEnabled"]) {
+        $config["feedEnabled"] = $fe;
+        $changes++;
+    }
+    // --- Uploads ---
+    if (isset($_POST["maxUploadSize"])) {
+        $maxUploadSize = readableToBytes($_POST["maxUploadSize"]);
+        if ($maxUploadSize < 1) {
+            $errors[] = "Max upload size cannot be less than 1.";
+        }
+        elseif ($maxUploadSize > 9223372036854775807) {
+            $errors[] = "Max upload size cannot be greater than 9,223,372,036,854,775,807.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($maxUploadSize != $config["maxUploadSize"]) {
+            $config["maxUploadSize"] = $maxUploadSize;
+            $changes++;
+        }
+    }
+    if (isset($_POST["totalDiskQuota"])) {
+        $totalDiskQuota = readableToBytes($_POST["totalDiskQuota"]);
+        if ($totalDiskQuota < 1) {
+            $errors[] = "Total disk quota cannot be less than 1.";
+        }
+        elseif ($totalDiskQuota > 9223372036854775807) {
+            $errors[] = "Total disk quota cannot be greater than 9,223,372,036,854,775,807.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($totalDiskQuota != $config["totalDiskQuota"]) {
+            $config["totalDiskQuota"] = $totalDiskQuota;
+            $changes++;
+        }
+    }
+    if (isset($_POST["perUserDiskQuota"])) {
+        $perUserDiskQuota = readableToBytes($_POST["perUserDiskQuota"]);
+        if ($perUserDiskQuota < 1) {
+            $errors[] = "Per user disk quota cannot be less than 1.";
+        }
+        elseif ($perUserDiskQuota > 9223372036854775807) {
+            $errors[] = "Per user disk quota cannot be greater than 9,223,372,036,854,775,807.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($perUserDiskQuota != $config["perUserDiskQuota"]) {
+            $config["perUserDiskQuota"] = $perUserDiskQuota;
+            $changes++;
+        }
+    }
     // --- Rate Limits ---
     if (isset($_POST["logins"])) {
         $logins = (int)$_POST["logins"];
@@ -336,6 +390,20 @@ if (validateCSRFToken()) {
             $changes++;
         }
     }
+    if (isset($_POST["uploadsPerHour"])) {
+        $uploadsPerHour = (int)$_POST["uploadsPerHour"];
+        if ($uploadsPerHour < 1) {
+            $errors[] = "Uploads per hour cannot be less than 1.";
+        }
+        elseif ($uploadsPerHour > 32767) {
+            $errors[] = "Uploads per hour cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($uploadsPerHour != $config["uploadsPerHour"]) {
+            $config["uploadsPerHour"] = $uploadsPerHour;
+            $changes++;
+        }
+    }
         
     // If there are errors, display them.
     if (count($errors) > 0) {
@@ -367,11 +435,16 @@ $configvars = array("token" => $_SESSION["csrf_token"],
 "comments" => $config["enableComments"] ? " checked" : "",
 "captcha" => $config["captchaEnabled"] ? " checked" : "",
 "captchalength" => $_POST["captchaLength"] ?? $config["captchaLength"],
+"feedEnabled" => $config["feedEnabled"] ? " checked" : "",
+"maxUploadSize" => bytesToReadable($_POST["maxUploadSize"] ?? $config["maxUploadSize"]),
+"totalDiskQuota" => bytesToReadable($_POST["totalDiskQuota"] ?? $config["totalDiskQuota"]),
+"perUserDiskQuota" => bytesToReadable($_POST["perUserDiskQuota"] ?? $config["perUserDiskQuota"]),
 "loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],
 "accountsperip" => $_POST["accounts"] ?? $config["accountsPerIP"],
 "accountcooldown" => $_POST["accountcooldown"] ?? $config["accountCooldown"],
 "postdelay" => $_POST["postdelay"] ?? $config["postDelay"],
-"editdelay" => $_POST["editdelay"] ?? $config["editDelay"]);
+"editdelay" => $_POST["editdelay"] ?? $config["editDelay"],
+"uploadsPerHour" => $_POST["uploadsPerHour"] ?? $config["uploadsPerHour"]);
 
 render_page("panel/configuration.html", $configvars, $title);
 

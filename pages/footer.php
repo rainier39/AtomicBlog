@@ -23,7 +23,8 @@
 if (!defined('INDEX')) exit;
 
 $footervars = array("footercontent" => $config["footer"],
-"feedlink" => makeURL("feed"));
+"feedlink" => makeURL("feed"),
+"feed" => $config["feedEnabled"]);
 
 render_template("footer.html", $footervars);
 

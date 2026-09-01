@@ -70,8 +70,10 @@ $default_config = array(
     "commentDelay" => 30,
     "captchaEnabled" => true,
     "captchaLength" => 6,
+    // Controls whether or not the site can be embedded in an iframe.
     "clickjackingPrevention" => true,
-    "customCSS" => ""
+    "customCSS" => "",
+    "feedEnabled" => true
 );
 
 ?>

@@ -22,6 +22,13 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+if (!$config["feedEnabled"]) {
+    http_response_code(404);
+    $messages[] = error("Page not found.");
+    render_page("", array(), "Page not found");
+    exit();
+}
+
 header("Content-Type: application/atom+xml");
 // This is here for debugging purposes.
 //header("Content-Type: text/plain");

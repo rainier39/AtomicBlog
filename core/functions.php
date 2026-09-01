@@ -875,6 +875,48 @@ function validateCSRFToken() {
     }
 }
 
+function bytesToReadable($bytes) {
+    $readable = (string)$bytes;
+    switch($bytes) {
+        case ($bytes > 999999999999):
+            $readable = ($bytes/1000000000000)."TB";
+            break;
+        case ($bytes > 999999999):
+            $readable = ($bytes/1000000000)."GB";
+            break;
+        case ($bytes > 999999):
+            $readable = ($bytes/1000000)."MB";
+            break;
+        case ($bytes > 999):
+            $readable = ($bytes/1000)."KB";
+            break;
+    }
+    return $readable;
+}
+
+function readableToBytes($readable) {
+    $readable = strtoupper($readable);
+    $bytes = 0;
+    switch($readable) {
+        case str_ends_with($readable, "KB"):
+            $bytes = (int)$readable*1000;
+            break;
+        case str_ends_with($readable, "MB"):
+            $bytes = (int)$readable*1000000;
+            break;
+        case str_ends_with($readable, "GB"):
+            $bytes = (int)$readable*1000000000;
+            break;
+        case str_ends_with($readable, "TB"):
+            $bytes = (int)$readable*1000000000000;
+            break;
+        default:
+            $bytes = (int)$readable;
+            break;
+    }
+    return $bytes;
+}
+
 // --- PHP 7.* Compatibility ---
 if (!function_exists("str_starts_with")) {
     function str_starts_with(string $haystack, string $needle) {

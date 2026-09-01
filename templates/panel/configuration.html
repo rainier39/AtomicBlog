@@ -36,6 +36,15 @@
    <input type='checkbox' id='captcha' name='captcha'{{ captcha }}>
    <label for='captchaLength' title='How many characters the CAPTCHA contains.'>CAPTCHA Length:</label>
    <input type='text' id='captchaLength' name='captchaLength' value='{{{ captchalength }}}'>
+   <label for='feedEnabled' title='Whether or not the Atom feed is enabled.'>Enable Feed:</label>
+   <input type='checkbox' id='feedEnabled' name='feedEnabled'{{ feedEnabled }}>
+   <h2>Uploads</h2><div></div>
+   <label for='maxUploadSize' title='Maximum size (in bytes) of a single upload.'>Max Upload Size:</label>
+   <input type='text' id='maxUploadSize' name='maxUploadSize' value='{{{ maxUploadSize }}}'>
+   <label for='totalDiskQuota' title='Maximum amount of file data (in bytes) that can be uploaded to the webserver.'>Total Disk Quota:</label>
+   <input type='text' id='totalDiskQuota' name='totalDiskQuota' value='{{{ totalDiskQuota }}}'>
+   <label for='perUserDiskQuota' title='Maximum amount of file data (in bytes) that any single user can upload.'>Per User Disk Quota:</label>
+   <input type='text' id='perUserDiskQuota' name='perUserDiskQuota' value='{{{ perUserDiskQuota }}}'>
    <h2>Rate Limits</h2><div></div>
    <label for='logins' title='Allowed logins/login attempts per hour from an IP.'>Logins Per Hour:</label>
    <input type='text' id='logins' name='logins' value='{{{ loginsperhour }}}'>
@@ -47,6 +56,8 @@
    <input type='text' id='postdelay' name='postdelay' value='{{{ postdelay }}}'>
    <label for='editdelay' title='Time (in seconds) one must wait in between making edits to blog posts.'>Edit Delay:</label>
    <input type='text' id='editdelay' name='editdelay' value='{{{ editdelay }}}'>
+   <label for='uploadsPerHour' title='Maximum number of images a user can upload in an hour.'>Uploads Per Hour:</label>
+   <input type='text' id='uploadsPerHour' name='uploadsPerHour' value='{{{ uploadsPerHour }}}'>
    <br>
    <input type='submit' value='Save changes' class='button'>
   </form>

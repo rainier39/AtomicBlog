@@ -3,9 +3,11 @@
 
 <div class='footer'>
  <span>{{{{ footercontent }}}}</span>
+ {% if (feed) %}
  <div>
   <a class='feed button' href='{{ feedlink }}'>Feed</a>
  </div>
+ {% endif %}
 </div>
 
 </body>
