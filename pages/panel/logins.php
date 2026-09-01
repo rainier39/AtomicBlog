@@ -39,7 +39,14 @@ while ($a = $attempts->fetch_assoc()) {
     }
     $date = date("F jS, Y", $a["timestamp"]);
     $time = date("g:i:sa", $a["timestamp"]);
-    $ip = htmlspecialchars(redactIP($a["ip"]));
+    // Admins get to see IPs.
+    if (checkPerm(PERM_MANAGE_USERS)) {
+        $ip = htmlspecialchars($a["ip"]);
+    }
+    // Everyone else sees a redacted IP.
+    else {
+        $ip = htmlspecialchars(redactIP($a["ip"]));
+    }
     $ua = parseUserAgent($a["useragent"]);
     $ua = "<span class='date' title='" . htmlspecialchars($a["useragent"]) . "'>{$ua["os"]}, {$ua["browser"]}</span>";
     $loginsVars["logins"] .= "<div class='loginLog'>$type <b>on</b> <small>$date</small> <b>at</b> <small>$time</small> <b>from</b> $ip, $ua</div>";
