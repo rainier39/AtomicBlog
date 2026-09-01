@@ -93,6 +93,10 @@ if ($config["version"] != VERSION) {
         // Bump the version.
         $config["version"] = "v2.1.1-beta";
     }
+    if ($config["version"] == "v2.1.1-beta") {
+        // Bump the version.
+        $config["version"] = "v2.2.0-beta";
+    }
     
     // Write the new config to a file.
     flushConfig();
