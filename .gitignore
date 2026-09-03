@@ -1,5 +1,3 @@
-# Never commit a production configuration file.
-core/config.php
-
-# Never commit anything from the images directory.
+# Never commit anything from the images or config directory.
 images/*
+config/*
