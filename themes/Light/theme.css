@@ -4,10 +4,14 @@
  --main-border-color: #666;
  --button-border: #333;
 }
+html {
+ font-family: 'Helvetica', 'Arial', sans-serif;
+ text-rendering: optimizeLegibility;
+ font-size: larger;
+}
 body {
  max-width: 75%;
  margin: auto;
- font-family: 'Helvetica', 'Arial', sans-serif;
  background: #f2f2f2;
 }
 h1, h2, h3, h4, h5, h6 {

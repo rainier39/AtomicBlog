@@ -595,7 +595,7 @@ if ($displayPost) {
         }
     }
     if (!empty($p_edittime)) {
-        $postvars["edited"] .= " | <small>Modified: <span class='date' title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS, Y", $p_edittime) . "</span></small>";
+        $postvars["edited"] .= " | <small>Modified: <abbr class='date' title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS, Y", $p_edittime) . "</abbr></small>";
     }
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
@@ -676,7 +676,7 @@ if ($displayPost) {
             
             $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . "><div class='commentHeaderItems'><div>By: " . $authorname . "</div>";
             
-            $postvars["comments"] .= "<small><span class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</span></small>";
+            $postvars["comments"] .= "<small><abbr class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</abbr></small>";
             
             if (((checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id)
             // Guest with same IP.

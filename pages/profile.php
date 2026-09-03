@@ -66,7 +66,7 @@ else {
     $bio = info("No bio to display yet.");
 }
 
-$lastactiveHTML = "<small><span class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</span></small>";
+$lastactiveHTML = "<small><abbr class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</abbr></small>";
 
 $title = htmlspecialchars($name) . "'s Profile";
 
