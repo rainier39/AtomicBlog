@@ -123,13 +123,14 @@ if (isset($_SESSION["messages"])) {
 
 // If a user is logged out, but has a login cookie, try to log them in.
 if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$config["cookiePrefix"] . "login"])) {
-    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($_COOKIE[$config["cookiePrefix"] . "login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
+    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . hash("sha256", $_COOKIE[$config["cookiePrefix"] . "login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
     
     if ($cookieValid->num_rows > 0) {
-        while ($c = $cookieValid->fetch_assoc()) {
-            $_SESSION["logged_in"] = true;
-            $_SESSION["id"] = $c["id"];
-        }
+        $c = $cookieValid->fetch_assoc();
+        // Prevent possible session fixation attacks.
+        session_regenerate_id(true);
+        $_SESSION["logged_in"] = true;
+        $_SESSION["id"] = $c["id"];
     }
     // Otherwise destroy the invalid cookie.
     else {

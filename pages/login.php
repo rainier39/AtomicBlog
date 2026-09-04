@@ -88,6 +88,9 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
             }
             // Finally, log the user in.
             else {
+                // Prevent possible session fixation attacks.
+                session_regenerate_id(true);
+                
                 $_SESSION["logged_in"] = true;
                 $_SESSION["id"] = $r["id"];
 
@@ -95,7 +98,7 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
                 $success = true;
                             
                 if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on") and ($ishttps == "on")) {
-                    $cookie = hash("sha256", random_bytes(64));
+                    $cookie = bin2hex(random_bytes(32));
                     // Also give the user their login cookie.
                     $cookieoptions = array(
                         // Expires in a week.
@@ -111,7 +114,7 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
                 }
         
                 // Update the user's lastactive time, IP, and login cookie.
-                $db->query("UPDATE `accounts` SET `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', `lastactive`='" . time() . "', `cookie`='" . $cookie . "', `cookietime`='" . time() . "' WHERE `id`='" . $r["id"] . "'");
+                $db->query("UPDATE `accounts` SET `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', `lastactive`='" . time() . "', `cookie`='" . hash("sha256", $cookie) . "', `cookietime`='" . time() . "' WHERE `id`='" . $r["id"] . "'");
                 // Log the successful login.
                 $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('login_success', '" . $r["id"] . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
             }
