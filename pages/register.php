@@ -19,6 +19,8 @@
 // register.php
 // Allow a user to sign up for an account.
 
+// TODO: make emailed login link expire, allow resending email (with strict limits)
+
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
@@ -41,7 +43,7 @@ if (!$config["allowRegistration"]) {
 }
 
 if (isset($url[1]) and ($config["registrationMode"] == "email")) {
-    $account = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string($url[1]) . "' AND `role`='Unapproved'");
+    $account = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string(hash("sha256", $url[1])) . "' AND `role`='Unapproved'");
     
     if ($account->num_rows < 1) {
         $messages[] = error("Invalid account activation link.");
@@ -111,14 +113,14 @@ if (validateCSRFToken()) {
                 break;
             // Fallthrough intentional.
             case "email":
-                $cookie = hash("sha256", random_bytes(64));
+                $cookie = bin2hex(random_bytes(32));
             case "approval":
             // Default to approval.
             default:
                 $role = "Unapproved";
         }
         $now = time();
-        $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "', '" . $cookie . "')");
+        $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "', '" . hash("sha256", $cookie) . "')");
 
         // Inform the user that they've successfully registered.
         if ($role == "Unapproved") {
@@ -142,7 +144,7 @@ if (validateCSRFToken()) {
         }
         $registerSuccess = true;
         // Log the registration.
-        $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $db->insert_id . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["HTTP_USER_AGENT"]) . "', '" . time() . "')");
+        $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $db->insert_id . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
     }
     // Otherwise, display the errors.
     else {
@@ -165,7 +167,7 @@ if (!$registerSuccess) {
     if (extension_loaded("gd") and $config["captchaEnabled"]) {
         $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='CAPTCHA image'>";
         $registervars["captcha"] .= "<label for='captcha'>CAPTCHA:</label>
-        <input id='captcha' name='captcha' type='text' value='" . htmlspecialchars($_POST["captcha"] ?? "") . "'>";
+        <input id='captcha' name='captcha' type='text'>";
     }
 }
 else {

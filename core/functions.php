@@ -22,11 +22,17 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
+
+function clearLoginCookie() {
+    global $config;
+    setcookie($config["cookiePrefix"] . "login", "0", array("expires" => 1));
+}
+
 // Log a user out.
 function logout($redirect=false) {
     global $db;
     // Remove any login cookies and purge the database of them too.
-    setcookie($config["cookiePrefix"] . "login", "0", array("expires" => 1));
+    clearLoginCookie();
     $id = $_SESSION["id"] ?? 0;
     // For the weird case of a user being logged in, but no database connection.
     if ($db) {

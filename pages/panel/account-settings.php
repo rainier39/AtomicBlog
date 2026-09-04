@@ -95,7 +95,9 @@ if (validateCSRFToken()) {
             }
         }
         else {
-            $db->query("UPDATE `accounts` SET `password`='" . $db->real_escape_string(password_hash($_POST["newpassword"], PASSWORD_DEFAULT)) . "' WHERE `id`='" . $_SESSION["id"] . "'");
+            // Change the password and invalidate the login cookie.
+            $db->query("UPDATE `accounts` SET `password`='" . $db->real_escape_string(password_hash($_POST["newpassword"], PASSWORD_DEFAULT)) . "', `cookie`=NULL WHERE `id`='" . $_SESSION["id"] . "'");
+            clearLoginCookie();
             $messages[] = success("Successfully changed password.");
             $_POST["password2"] = "";
             $_POST["newpassword"] = "";
