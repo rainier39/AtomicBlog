@@ -49,7 +49,7 @@ if ($posts->num_rows > 0) {
     $tags = array();
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
-        $postsvars["posts"] .= displayPost($p["id"], $p["title"], $p["account"], $p["starred"], $p["published"]);
+        $postsvars["posts"] .= displayPost($p);
         $tagsTemp = parseTags($p["tags"]);
         foreach ($tagsTemp as $tag) {
             if (!array_key_exists($tag, $tags)) {

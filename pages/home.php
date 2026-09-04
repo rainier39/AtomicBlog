@@ -42,7 +42,7 @@ if ($starred->num_rows > 0) {
     $homevars["starred"] .= "<div class='postTiles'>";
     // Display the starred posts themselves.
     while ($s = $starred->fetch_assoc()) {
-        $homevars["starred"] .= displayPost($s["id"], $s["title"], $s["account"], $s["starred"], $s["published"]);
+        $homevars["starred"] .= displayPost($s);
     }
     // Add placeholder divs if needed to prevent one or two giant tiles.
     for ($extra = 0; $extra < 5-$starred->num_rows; $extra++) {
@@ -63,7 +63,7 @@ if ($recent->num_rows > 0) {
     $homevars["recent"] .= "<div class='postTiles'>";
     // Display the posts.
     while ($r = $recent->fetch_assoc()) {
-        $homevars["recent"] .= displayPost($r["id"], $r["title"], $r["account"], $r["starred"], $r["published"]);
+        $homevars["recent"] .= displayPost($r);
     }
     // Add placeholder divs if needed to prevent one or two giant tiles.
     for ($extra = 0; $extra < 5-$recent->num_rows; $extra++) {
@@ -76,54 +76,18 @@ else {
     $homevars["recent"] .= info("No posts yet.");
 }
 
-// Create an array to store every postid and later how many views each one has.
-$views = array();
-
 // Get all of the views, and just get their post ids.
-$posts = $db->query("SELECT `post` FROM `views` ORDER BY `post` DESC");
-
-// Fill the array with the proper amount of views per post.
-while ($p = $posts->fetch_assoc()) {
-    if (array_key_exists($p["post"], $views)) {
-        $views[$p["post"]] += 1;
-    }
-    else {
-        $views[$p["post"]] = 1;
-    }
-}
-
-// Make a second array consisting of the 5 highest viewed posts, namely their ids.
-$mostViewed = array();
-
-// Populate the array.
-for ($i = 0; (($i < 5) and (count($views) != 0)); $i++) {
-    // Find the highest viewed post.
-    $value = max($views);
-
-    // Get its key.
-    $key = array_search($value, $views);
-
-    // Remove it from the array.
-    unset($views[$key]);
-
-    // Add the postid to the new array.
-    $mostViewed[$key] = $value;
-}
+$mostViewedPosts = $db->query("SELECT `id`,`title`,`account`,`starred`,`published`,COUNT(`views`.`post`) FROM `posts` LEFT JOIN `views` ON `views`.`post`=`posts`.`id` GROUP BY `posts`.`id` ORDER BY COUNT(`views`.`post`) DESC, `id` ASC LIMIT 5");
 
 // Only try to display posts if there are any.
-if (count($mostViewed) > 0) {
+if ($mostViewedPosts->num_rows > 0) {
     $homevars["viewed"] .= "<div class='postTiles'>";
-    foreach ($mostViewed as $mv=>$views) {
-        // Get the posts we wish to display.
-        $mostViewedPosts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE `id`='" . $db->real_escape_string($mv) . "'");
-
-        // Display the posts.
-        while ($m = $mostViewedPosts->fetch_assoc()) {
-            $homevars["viewed"] .= displayPost($m["id"], $m["title"], $m["account"], $m["starred"], $m["published"]);
-        }
+    // Display the posts.
+    while ($m = $mostViewedPosts->fetch_assoc()) {
+        $homevars["viewed"] .= displayPost($m);
     }
     // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 5-count($mostViewed); $extra++) {
+    for ($extra = 0; $extra < 5-$mostViewedPosts->num_rows; $extra++) {
         $homevars["viewed"] .= "<div class='postTile postTileUnpublished'></div>";
     }
     $homevars["viewed"] .= "</div>";

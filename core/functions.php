@@ -22,7 +22,7 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-
+// Delete the login cookie on the client end.
 function clearLoginCookie() {
     global $config;
     setcookie($config["cookiePrefix"] . "login", "0", array("expires" => 1));
@@ -69,29 +69,26 @@ function flushConfig() {
 }
 
 // Display a blog post tile.
-function displayPost($id, $title, $account, $starred, $published) {
+function displayPost($p) {
     global $db;
     
-    $id = (int)$id;
-    $account = (int)$account;
-    
-    $postTilevars = array("url" => makeURL("post/" . $id),
+    $postTilevars = array("url" => makeURL("post/" . $p["id"]),
     "image" => "",
-    "title" => $title,
+    "title" => $p["title"],
     "author" => "Nobody",
     "classes" => "");
     
-    if ($starred) {
+    if ($p["starred"]) {
         $postTilevars["classes"] = " postTileStarred";
     }
-    if (!$published) {
+    if (!$p["published"]) {
         $postTilevars["classes"] .= " postTileUnpublished";
     }
 
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
-        if (str_starts_with($u, $id . ".")) {
+        if (str_starts_with($u, $p["id"] . ".")) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
             $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` LIMIT 1");
             if ($uploadTime->num_rows > 0) {
@@ -107,15 +104,14 @@ function displayPost($id, $title, $account, $starred, $published) {
     }
 
     // Get the account information of the post author.
-    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($account) . "'");
+    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='{$p["account"]}'");
     if ($acc->num_rows > 0) {
-        while ($a = $acc->fetch_assoc()) {
-            if ($a["namevisible"]) {
-                $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $account) . "'>" . htmlspecialchars($a["name"]) . "</a>";
-            }
-            else {
-                $postTilevars["author"] = "Anonymous";
-            }
+        $a = $acc->fetch_assoc();
+        if ($a["namevisible"]) {
+            $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($a["name"]) . "</a>";
+        }
+        else {
+            $postTilevars["author"] = "Anonymous";
         }
     }
     
