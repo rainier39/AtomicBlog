@@ -477,84 +477,56 @@ function upload($file, $name) {
     
     $overwriting = false;
     
+    // This is safe because we never use any user-supplied value in $name.
+    $target = $upload_dir . $name . ".webp";
+    if (is_file($target)) {
+        $overwriting = true;
+        $oldsize = filesize($target);
+    }
+    
     // GIFs.
     if (str_starts_with($bytes, hex2bin("474946383761")) or str_starts_with($bytes, hex2bin("474946383961"))) {
         $image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
         
-        // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".webp";
-        
-        if (is_file($target)) {
-            $overwriting = true;
-            $oldsize = filesize($target);
-        }
-        
         if ($image === false) {
             return "Upload failed, invalid GIF image.";
         }
-        
-        $success = imagewebp($image, $target);
     }
     // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
     elseif (str_starts_with($bytes, hex2bin("FFD8FF"))) {
         $image = imagecreatefromjpeg($_FILES[$file]["tmp_name"]);
         
-        // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".webp";
-        
-        if (is_file($target)) {
-            $overwriting = true;
-            $oldsize = filesize($target);
-        }
-        
         if ($image === false) {
             return "Upload failed, invalid JPEG image.";
         }
-        
-        $success = imagewebp($image, $target);
     }
     // PNGs.
     elseif (str_starts_with($bytes, hex2bin("89504E470D0A1A0A"))) {
         $image = imagecreatefrompng($_FILES[$file]["tmp_name"]);
         
-        // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".webp";
-        
-        if (is_file($target)) {
-            $overwriting = true;
-            $oldsize = filesize($target);
-        }
-        
         if ($image === false) {
             return "Upload failed, invalid PNG image.";
         }
-        
-        $success = imagewebp($image, $target);
     }
     // WEBPs.
     elseif (str_starts_with($bytes, hex2bin("52494646")) and str_ends_with($bytes, hex2bin("57454250"))) {
         $image = imagecreatefromwebp($_FILES[$file]["tmp_name"]);
         
-        // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".webp";
-        
-        if (is_file($target)) {
-            $overwriting = true;
-            $oldsize = filesize($target);
-        }
-        
         if ($image === false) {
             return "Upload failed, invalid WEBP image.";
         }
-        
-        $success = imagewebp($image, $target);
     }
     else {
         return "Upload failed, unsupported or unrecognized image type.";
     }
+    
+    $success = imagewebp($image, $target, clamp($config["uploadQuality"], 0, 100));
+    
     // We do this here in case the later checks erase the new file.
     if ($success and $overwriting) {
         $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+        $uq = max($uq-$oldsize, 0);
+        $gq = max($gq-$oldsize, 0);
     }
 
     if (!$success) {

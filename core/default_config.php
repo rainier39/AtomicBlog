@@ -60,6 +60,8 @@ $default_config = array(
     "totalDiskQuota" => "5000000000",
     // Maximum amount of space (in bytes) that can be used by each user's uploads.
     "perUserDiskQuota" => "500000000",
+    // Upload quality of the WEBP images that every upload turns into. Valid range is 0-100.
+    "uploadQuality" => 80,
     "maxUploadWidth" => 3840,
     "maxUploadHeight" => 2160,
     // Server timezone. See: https://www.php.net/manual/en/timezones.php
