@@ -9,9 +9,9 @@ html {
  text-rendering: optimizeLegibility;
 }
 body {
- max-width: 75%;
  margin: auto;
  background: #f2f2f2;
+ max-width: 1400px;
 }
 h1, h2, h3, h4, h5, h6 {
  margin: 10px 0px 10px 0px;
@@ -337,6 +337,8 @@ code, .codeblock {
 }
 .uploadTile img {
  max-width: 100%;
+ max-height: 28vh;
+ height: auto;
 }
 /* Profiles */
 .profile {
@@ -356,6 +358,7 @@ code, .codeblock {
  background: white;
  padding: 10px;
  margin-bottom: 5px;
+ box-sizing: border-box;
 }
 .profileContent {
  background: white;
@@ -414,7 +417,7 @@ code, .codeblock {
 /** Phone/Tablet **/
 @media only screen and (max-width: 768px) {
  body {
-  max-width: 100%;
+  margin: 0;
  }
  .header {
   border-left: 0;

@@ -167,8 +167,16 @@ foreach ($uploads as $u) {
     }
 }
 foreach ($avatars as $avatar) {
+    // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+    $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$avatar}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+    if ($uploadTime->num_rows > 0) {
+        $ut = $uploadTime->fetch_assoc()["timestamp"];
+    }
+    else {
+        $ut = time();
+    }
     $settingsVars["avatars"] .= "<div class='uploadTile'>
-     <img src='" . makeURL("images/{$avatar}") . "?" . time() . "'>
+     <img src='" . makeURL("images/{$avatar}") . "?{$ut}'>
      <hr>
      <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this avatar?\");'>
       <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>

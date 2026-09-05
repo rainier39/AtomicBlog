@@ -479,7 +479,7 @@ elseif (($url[2] ?? "") == "uploads") {
         
         foreach ($icons as $icon) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$icon}" . "' ORDER BY `timestamp` LIMIT 1");
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$icon}" . "' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }
@@ -498,7 +498,7 @@ elseif (($url[2] ?? "") == "uploads") {
         }
         foreach ($attachments as $attachment) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$attachment}" . "' ORDER BY `timestamp` LIMIT 1");
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$attachment}" . "' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }
@@ -600,7 +600,7 @@ if ($displayPost) {
     foreach ($uploads as $u) {
         if (str_starts_with($u, $p_id . ".")) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` LIMIT 1");
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }

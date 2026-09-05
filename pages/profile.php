@@ -82,7 +82,7 @@ foreach ($uploads as $u) {
 // Just use the first avatar we find.
 if (count($avatars) > 0) {
     // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-    $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$avatars[0]}" . "' ORDER BY `timestamp` LIMIT 1");
+    $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$avatars[0]}" . "' ORDER BY `timestamp` DESC LIMIT 1");
     if ($uploadTime->num_rows > 0) {
         $ut = $uploadTime->fetch_assoc()["timestamp"];
     }
