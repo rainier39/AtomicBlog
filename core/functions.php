@@ -168,7 +168,10 @@ function validatePost($edit=false) {
     }
     // Tags.
     if (strlen($_POST["tags"] ?? "") > 128) {
-        $errors[] = "Post tags cannot be more than 128 characters long.";
+        $errors[] = "Post tags field cannot be more than 128 characters long.";
+    }
+    if (max(array_map("strlen", parseTags($_POST["tags"] ?? ""))) > 16) {
+        $errors[] = "Post tags cannot be longer than 16 characters.";
     }
     // Content.
     if (strlen($_POST["content"] ?? "") < 1) {
@@ -650,6 +653,10 @@ function parseTags($tagstring) {
     $tags = array_unique($tags);
     
     return $tags;
+}
+
+function unparseTags($tags) {
+    return implode(",", $tags);
 }
 
 // Make sure a number is within a specified range.

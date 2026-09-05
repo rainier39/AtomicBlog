@@ -107,6 +107,7 @@ if (validateCSRFToken()) {
             $db->query("DROP TABLE IF EXISTS `posts`");
             $db->query("DROP TABLE IF EXISTS `comments`");
             $db->query("DROP TABLE IF EXISTS `views`");
+            $db->query("DROP TABLE IF EXISTS `tags`");
             $db->query("DROP TABLE IF EXISTS `logs`");
         }
 
@@ -140,7 +141,6 @@ if (validateCSRFToken()) {
         $db->query("CREATE TABLE IF NOT EXISTS `posts` (
             `id` int unsigned NOT NULL AUTO_INCREMENT,
             `title` varchar(32) NOT NULL,
-            `tags` varchar(128) NOT NULL,
             `content` text NOT NULL,
             `account` int unsigned NOT NULL,
             `starttime` bigint NOT NULL,
@@ -165,6 +165,11 @@ if (validateCSRFToken()) {
         $db->query("CREATE TABLE IF NOT EXISTS `views` (
             `ip` varchar(45) NOT NULL,
             `timestamp` bigint NOT NULL,
+            `post` int unsigned NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        
+        $db->query("CREATE TABLE IF NOT EXISTS `tags` (
+            `tag` varchar(16) NOT NULL,
             `post` int unsigned NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         

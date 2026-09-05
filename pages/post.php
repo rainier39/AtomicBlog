@@ -37,18 +37,7 @@ $id = $_SESSION["id"] ?? 0;
 // Get the requested post.
 $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $id . "'))");
 
-while ($p = $post->fetch_assoc()) {
-    $p_id = $p["id"];
-    $p_title = $p["title"];
-    $p_tags = $p["tags"];
-    $p_content = $p["content"];
-    $p_account = $p["account"];
-    $p_starttime = $p["starttime"];
-    $p_editedby = $p["editedby"]; // unused, may remove later
-    $p_edittime = $p["edittime"];
-    $p_published = $p["published"];
-    $p_starred = $p["starred"];
-}
+$p = $post->fetch_assoc();
 
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
@@ -57,18 +46,26 @@ if ($post->num_rows < 1) {
     render_page("", array(), "Post not found");
     exit();
 }
+
+// Get the tags.
+$tagsquery = $db->query("SELECT `tag` FROM `tags` WHERE `post`='{$p["id"]}'");
+$tags = array();
+while ($t = $tagsquery->fetch_assoc()) {
+    $tags[] = $t["tag"];
+}
+
 // Handle star toggling.
-elseif (isset($_POST["toggleStar"]) and validateCSRFToken()) {
+if (isset($_POST["toggleStar"]) and validateCSRFToken()) {
     // Make sure the user is allowed to star/unstar the post.
-    if ((($id == $p_account) and checkPerm(PERM_STAR_POST))
-    or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p["account"]) and checkPerm(PERM_STAR_POST))
+    or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p["account"]))) {
         // Star.
         if ($_POST["toggleStar"] == "Star") {
-            $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
+            $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
         }
         // Unstar.
         else {
-            $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
+            $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
         }
         $updatePost = true;
     }
@@ -79,14 +76,14 @@ elseif (isset($_POST["toggleStar"]) and validateCSRFToken()) {
 // Handle published toggling.
 elseif (isset($_POST["togglePublished"]) and validateCSRFToken()) {
     // Make sure the user is allowed to publish/unpublish the post.
-    if (($id == $p_account) and checkPerm(PERM_NEW_POST)) { 
+    if (($id == $p["account"]) and checkPerm(PERM_NEW_POST)) { 
         // Star.
         if ($_POST["togglePublished"] == "Publish") {
-            $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($p_id) . "'");
+            $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
         }
         // Unstar.
         else {
-            $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($p_id) . "'");
+            $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
         }
         $updatePost = true;
     }
@@ -97,18 +94,18 @@ elseif (isset($_POST["togglePublished"]) and validateCSRFToken()) {
 // Handle deletions.
 elseif (isset($_POST["delete"]) and validateCSRFToken()) {
     // Make sure the user is allowed to delete the post.
-    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST))
-    or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p["account"]) and checkPerm(PERM_DELETE_POST))
+    or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p["account"]))) {
         // Delete the post.
-        $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p_id) . "'");
+        $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p["id"]) . "'");
         // Delete all of the post's views.
-        $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+        $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p["id"]) . "'");
         // Delete all of the post's comments.
-        $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p_id) . "'");
+        $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p["id"]) . "'");
         // Delete all icons and attachments.
         $uploads = scandir("images/");
         foreach ($uploads as $u) {
-            if (str_starts_with($u, $p_id . ".") or str_starts_with($u, $p_id . "_")) {
+            if (str_starts_with($u, $p["id"] . ".") or str_starts_with($u, $p["id"] . "_")) {
                 unlink("images/" . $u);
             }
         }
@@ -186,7 +183,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         }
         else {
             // Make the commment.
-            $db->query("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES ('" . $commentid . "', '" . $p_id . "', '" . $db->real_escape_string($email) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($content) . "')");
+            $db->query("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES ('" . $commentid . "', '" . $p["id"] . "', '" . $db->real_escape_string($email) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($content) . "')");
             $messages[] = success("Successfully made comment.");
             $_POST["content"] = "";
         }
@@ -282,7 +279,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
                     $db->query("UPDATE `comments` SET `content`='" . $db->real_escape_string($content) . "', `timestamp`='" . time() . "' WHERE `id`='" . $c_id . "'");
                 
                     $_SESSION["messages"][] = success("Successfully edited comment.");
-                    redirect("post/" . $p_id);
+                    redirect("post/" . $p["id"]);
                 }
             }
         }
@@ -293,7 +290,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
 }
 // Handle cancelling editing a comment.
 elseif (isset($_POST["canceleditcomment"]) and validateCSRFToken()) {
-    redirect("post/" . $p_id);
+    redirect("post/" . $p["id"]);
 }
 // Handle editing.
 elseif (($url[2] ?? "") == "edit") {
@@ -301,8 +298,8 @@ elseif (($url[2] ?? "") == "edit") {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to edit the post.
-    if ((($id === $p_account) and checkPerm(PERM_NEW_POST))
-    or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
+    if ((($id === $p["account"]) and checkPerm(PERM_NEW_POST))
+    or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p["account"]))) {
         if (isset($_POST["edit"]) and validateCSRFToken()) {
             // Remove ampersands from tags because they can be used to inject URL parameters.
             $_POST["tags"] = str_replace("&", "", $_POST["tags"] ?? "");
@@ -310,14 +307,24 @@ elseif (($url[2] ?? "") == "edit") {
             $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
 
             $errors = validatePost(true);
+            
+            $tagstring = unparseTags($tags);
 
-            if (($_POST["title"] == $p_title) and ($_POST["tags"] == $p_tags) and ($_POST["content"] == $p_content)) {
+            if (($_POST["title"] == $p["title"]) and (unparseTags(parseTags($_POST["tags"])) == $tagstring) and ($_POST["content"] == $p["content"])) {
                 $errors[] = "Nothing has been changed.";
             }
         	
             // If there are no errors, edit the post.
             if (count($errors) === 0) {
-                $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `tags`='" . $db->real_escape_string($_POST["tags"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='" . $db->real_escape_string($p_id) . "'");
+                $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='{$p["id"]}'");
+                // Add the tags.
+                $newtags = parseTags($_POST["tags"]);
+                if (count($newtags)) {
+                    $db->query("DELETE FROM `tags` WHERE `post`='{$p["id"]}'");
+                    foreach ($newtags as $tag) {
+                        $db->query("INSERT INTO `tags` (`tag`,`post`) VALUES ('" . $db->real_escape_string($tag) . "', '{$p["id"]}')");
+                    }
+                }
                 $success = true;
                 $updatePost = true;
                 $_SESSION["messages"][] = success("Successfully edited post.");
@@ -335,10 +342,10 @@ elseif (($url[2] ?? "") == "edit") {
         }
         if (!$success) {
             $posteditvars = array("token" => $_SESSION["csrf_token"],
-            "title" => $_POST["title"] ?? $p_title,
-            "tags" => $_POST["tags"] ?? $p_tags,
+            "title" => $_POST["title"] ?? $p["title"],
+            "tags" => $_POST["tags"] ?? unparseTags($tags),
             "buttons" => markdownButtons(),
-            "content" => $_POST["content"] ?? $p_content);
+            "content" => $_POST["content"] ?? $p["content"]);
             
             render_page("postEdit.html", $posteditvars, $title);
         }
@@ -358,8 +365,8 @@ elseif (($url[2] ?? "") == "uploads") {
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to upload.
-    if ((($id === $p_account) and checkPerm(PERM_UPLOAD))
-    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
+    if ((($id === $p["account"]) and checkPerm(PERM_UPLOAD))
+    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p["account"]))) {
         // Token check.
         if (!validateCSRFToken()) {
             unset($_POST);
@@ -368,7 +375,7 @@ elseif (($url[2] ?? "") == "uploads") {
         
         // Handle uploading icon.
         if (isset($_FILES["icon"])) {
-            $upload = upload("icon", $p_id);
+            $upload = upload("icon", $p["id"]);
             if ($upload == "") {
                 $messages[] = success("Successfully uploaded icon.");
             }
@@ -380,10 +387,10 @@ elseif (($url[2] ?? "") == "uploads") {
         elseif (isset($_FILES["attachment"])) {
             // We will need to generate a value that isn't already being used.
             $a_id = bin2hex(random_bytes(8));
-            while (file_exists("images/" . $p_id . "_" . $a_id . ".webp")) {
+            while (file_exists("images/" . $p["id"] . "_" . $a_id . ".webp")) {
                 $a_id = bin2hex(random_bytes(8));
             }
-            $upload = upload("attachment", $p_id . "_" . $a_id);
+            $upload = upload("attachment", $p["id"] . "_" . $a_id);
             if ($upload === "") {
                 $messages[] = success("Successfully uploaded attachment.");
             }
@@ -396,7 +403,7 @@ elseif (($url[2] ?? "") == "uploads") {
             // Filepath sanitization.
             $target = basename($_POST["dicon"]);
             // Make sure that this icon is actually from the same post.
-            if (!str_starts_with($target, $p_id . ".")) {
+            if (!str_starts_with($target, $p["id"] . ".")) {
                 $messages[] = error("Nice try.");
             }
             // Make sure that the target icon exists.
@@ -428,7 +435,7 @@ elseif (($url[2] ?? "") == "uploads") {
             // Filepath sanitization.
             $target = basename($_POST["dattachment"]);
             // Make sure that this attachment is actually from the same post.
-            if (!str_starts_with($target, $p_id . "_")) {
+            if (!str_starts_with($target, $p["id"] . "_")) {
                 $messages[] = error("Nice try.");
             }
             // Make sure that the target attachment exists.
@@ -460,18 +467,18 @@ elseif (($url[2] ?? "") == "uploads") {
         $attachments = array();
         // Get all icons.
         foreach ($uploads as $u) {
-            if (str_starts_with($u, $p_id . ".")) {
+            if (str_starts_with($u, $p["id"] . ".")) {
                 $icons[] = $u;
             }
         }
         // Get all attachments.
         foreach ($uploads as $u) {
-            if (str_starts_with($u, $p_id . "_")) {
+            if (str_starts_with($u, $p["id"] . "_")) {
                 $attachments[] = $u;
             }
         }
         // Display forms and images.
-        $postuploadsvars = array("back" => makeURL("post/{$p_id}"),
+        $postuploadsvars = array("back" => makeURL("post/{$p["id"]}"),
         "token" => $_SESSION["csrf_token"],
         "icons" => "",
         "script" => makeURL("javascript/uploads.js", true),
@@ -528,77 +535,72 @@ elseif (($url[2] ?? "") == "uploads") {
 if ($displayPost) {
     // Get the requested post again if the user edited it or starred it.
     if ($updatePost) {
-        $post = $db->query("SELECT * FROM `posts` WHERE `id`='" . $db->real_escape_string($url[1]) . "'");
-        while ($p = $post->fetch_assoc()) {
-            $p_id = $p["id"];
-            $p_title = $p["title"];
-            $p_tags = $p["tags"];
-            $p_content = $p["content"];
-            $p_account = $p["account"];
-            $p_starttime = $p["starttime"];
-            $p_editedby = $p["editedby"]; // unused, may remove later
-            $p_edittime = $p["edittime"];
-            $p_published = $p["published"];
-            $p_starred = $p["starred"];
+        $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $id . "'))");
+        $p = $post->fetch_assoc();
+        // Get the tags.
+        $tagsquery = $db->query("SELECT `tag` FROM `tags` WHERE `post`='{$p["id"]}'");
+        $tags = array();
+        while ($t = $tagsquery->fetch_assoc()) {
+            $tags[] = $t["tag"];
         }
     }
     
     $postvars = array("postbuttons" => "",
-    "title" => $p_title,
+    "title" => $p["title"],
     "author" => "Nobody",
-    "ptime" => date("g:i:sa", $p_starttime),
-    "pdate" => date("F jS, Y", $p_starttime),
+    "ptime" => date("g:i:sa", $p["starttime"]),
+    "pdate" => date("F jS, Y", $p["starttime"]),
     "edited" => "",
     "icon" => "",
     "tags" => "",
-    "content" => $p_content,
+    "content" => $p["content"],
     "comments" => "");
     
-    $title = $p_title;
+    $title = $p["title"];
     
-    if ((($id == $p_account) and checkPerm(PERM_NEW_POST))
-    or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p["account"]) and checkPerm(PERM_NEW_POST))
+    or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .= "
-            <a href='" . makeURL("post/{$p_id}/edit") . "' class='button postButton'>Edit</a>";
+            <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='button postButton'>Edit</a>";
     }
-    if ((($id == $p_account) and checkPerm(PERM_DELETE_POST))
-    or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p["account"]) and checkPerm(PERM_DELETE_POST))
+    or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .= 
             "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
     }
-    if ((($id == $p_account) and checkPerm(PERM_STAR_POST))
-    or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p_account))) {
+    if ((($id == $p["account"]) and checkPerm(PERM_STAR_POST))
+    or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .=
-            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p_starred == "1") ? "Unstar" : "Star") . "'></form>";
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
     }
-    if (($id == $p_account) and checkPerm(PERM_NEW_POST)) {
+    if (($id == $p["account"]) and checkPerm(PERM_NEW_POST)) {
         $postvars["postbuttons"] .=
-            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p_published == "1") ? "Unpublish" : "Publish") . "'></form>";
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "'></form>";
     }
-    if ((($id == $p_account) and checkPerm(PERM_UPLOAD))
-    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p_account))) {
+    if ((($id == $p["account"]) and checkPerm(PERM_UPLOAD))
+    or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .= "
-            <a href='" . makeURL("post/{$p_id}/uploads") . "' class='button postButton'>Manage Uploads</a>";
+            <a href='" . makeURL("post/{$p["id"]}/uploads") . "' class='button postButton'>Manage Uploads</a>";
     }
     // Get the account information of the post author.
-    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p_account) . "'");
+    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p["account"]) . "'");
     if ($acc->num_rows > 0) {
         while ($a = $acc->fetch_assoc()) {
             if ($a["namevisible"]) {
-                $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p_account) . "'>" . htmlspecialchars($a["name"]) . "</a>";
+                $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($a["name"]) . "</a>";
             }
             else {
                 $postvars["author"] = "Anonymous";
             }
         }
     }
-    if (!empty($p_edittime)) {
-        $postvars["edited"] .= " | <small>Modified: <abbr class='date' title='" . date("g:i:sa", $p_edittime) . "'>" . date("F jS, Y", $p_edittime) . "</abbr></small>";
+    if (!empty($p["edittime"])) {
+        $postvars["edited"] .= " | <small>Modified: <abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr></small>";
     }
     // Display the post's icon if it exists.
     $uploads = scandir("images/");
     foreach ($uploads as $u) {
-        if (str_starts_with($u, $p_id . ".")) {
+        if (str_starts_with($u, $p["id"] . ".")) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
             $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
@@ -612,7 +614,6 @@ if ($displayPost) {
             break;
         }
     }
-    $tags = parseTags($p_tags);
     foreach ($tags as $tag) {
         $postvars["tags"] .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag))) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
     }
@@ -631,7 +632,7 @@ if ($displayPost) {
             $postvars["comments"] .= error("You don't have permission to comment.");
         }
         // Next, display the existing comments.
-        $comments = $db->query("SELECT * FROM `comments` WHERE `post`='" . $p_id . "' ORDER BY `id` DESC");
+        $comments = $db->query("SELECT * FROM `comments` WHERE `post`='" . $p["id"] . "' ORDER BY `id` DESC");
         
         if ($comments->num_rows < 1) {
             $postvars["comments"] .= "<br>" . info("No comments to display yet.");
@@ -681,7 +682,7 @@ if ($displayPost) {
             or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS))
             and (!$editing)) {
-                $postvars["comments"] .= "<a href='" . makeURL("post/{$p_id}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
+                $postvars["comments"] .= "<a href='" . makeURL("post/{$p["id"]}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
             }
             
             if ((checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id)
@@ -724,11 +725,11 @@ if ($displayPost) {
     }
 
     // Get views from this IP on this post, if any.
-    $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($p_id) . "'");
+    $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($p["id"]) . "'");
 
     // If there are none, count this as a view.
     if ($views->num_rows < 1) {
-        $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($p_id) . "')");
+        $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($p["id"]) . "')");
     }
     
     render_page("post.html", $postvars, $title);

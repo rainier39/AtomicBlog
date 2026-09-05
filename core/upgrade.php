@@ -97,6 +97,24 @@ if ($config["version"] != VERSION) {
         // Bump the version.
         $config["version"] = "v2.2.0-beta";
     }
+    if ($config["version"] == "v2.2.0-beta") {
+        $db->query("CREATE TABLE IF NOT EXISTS `tags` (
+            `tag` varchar(16) NOT NULL,
+            `post` int unsigned NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        // Move all existing tags to the new tags table before dropping the column.
+        $posts = $db->query("SELECT `tags`, `id` FROM `posts`");
+        while ($p = $posts->fetch_assoc()) {
+            $tags = parseTags($p["tags"]);
+            foreach ($tags as $tag) {
+                $db->query("INSERT INTO `tags` (`tag`, `post`) VALUES ('" . $db->real_escape_string(substr($tag, 0, 16)) . "', '{$p["id"]}')");
+            }
+        }
+        $db->query("ALTER TABLE `posts` DROP COLUMN IF EXISTS `tags`");
+    
+        // Bump the version.
+        $config["version"] = "v3.0.0-beta";
+    }
     
     // Write the new config to a file.
     flushConfig();

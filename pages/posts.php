@@ -37,37 +37,29 @@ $id = $_SESSION["id"] ?? 0;
 $tagQuery = "";
 
 if (isset($_GET["tag"])) {
-    $tagQuery = " AND `tags` LIKE '%" . $db->real_escape_string($_GET["tag"]) . "%'";
+    $tagQuery = " AND EXISTS( SELECT * FROM `tags` WHERE `tags`.`post`=`posts`.`id` AND `tag` LIKE '%" . $db->real_escape_string($_GET["tag"]) . "%')";
 }
 
 // Get all of the blog posts.
-$posts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published`, `tags` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')){$tagQuery} ORDER BY `id` DESC");
+$posts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')){$tagQuery} ORDER BY `id` DESC");
+
+// TODO: tags from unpublished posts can show up, minor issue to fix later
+// TODO: pagination and an actual post searching/filtering system
 
 // If there are posts, display them.
 if ($posts->num_rows > 0) {
     $postsvars["posts"] .= "<div class='postTiles'>";
-    $tags = array();
     // Display the posts.
     while ($p = $posts->fetch_assoc()) {
         $postsvars["posts"] .= displayPost($p);
-        $tagsTemp = parseTags($p["tags"]);
-        foreach ($tagsTemp as $tag) {
-            if (!array_key_exists($tag, $tags)) {
-                $tags[$tag] = 1;
-            }
-            else {
-                $tags[$tag] += 1;
-            }
-        }
     }
     $postsvars["posts"] .= "</div>";
     // Display a tag cloud.
     // Only keep the top 100 tags.
-    $tags = array_slice($tags, 0, 100);
-    ksort($tags);
+    $tagQuery = $db->query("SELECT `tag`, COUNT(`post`) FROM `tags` GROUP BY `tag` ORDER BY COUNT(`post`) DESC LIMIT 100");
     $tagCloud = "<div class='tagCloud'>";
-    foreach ($tags as $tag=>$val) {
-        $tagCloud .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag))) . "' style='font-size:" . clamp($val+14, 14, 50) . "px'>" . htmlspecialchars($tag) . "</a>";
+    while ($tag = $tagQuery->fetch_assoc()) {
+        $tagCloud .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag["tag"]))) . "' style='font-size:" . clamp($tag["COUNT(`post`)"]+14, 14, 50) . "px'>" . htmlspecialchars($tag["tag"]) . "</a>";
     }
     $tagCloud .= "</div>";
     $postsvars["posts"] = $tagCloud . $postsvars["posts"];

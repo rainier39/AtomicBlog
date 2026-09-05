@@ -49,9 +49,17 @@ if (validateCSRFToken()) {
         }
         
         // Add the new post to the database.
-        $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
+        $db->query("INSERT INTO `posts` (`title`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
         $postid = $db->insert_id;
         $db->query("UNLOCK TABLES");
+        // Add the tags.
+        $newtags = parseTags($_POST["tags"]);
+        if (count($newtags)) {
+            $db->query("DELETE FROM `tags` WHERE `post`='{$postid}'");
+            foreach ($newtags as $tag) {
+                $db->query("INSERT INTO `tags` (`tag`,`post`) VALUES ('" . $db->real_escape_string($tag) . "', '{$postid}')");
+            }
+        }
         // Print a message.
         $_SESSION["messages"][] = unsafe_success("Successfully made new post.");
         redirect("post/{$postid}");
