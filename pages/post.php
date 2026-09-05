@@ -126,7 +126,9 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
     // Make sure the user is allowed to comment.
     if (checkPerm(PERM_COMMENT)) {
         $rateLimited = false;
-            
+        
+        // Lock to avoid race conditions.
+        $db->query("LOCK TABLES `comments` WRITE, `accounts` WRITE");
         // Get comments from this IP.
         $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
             
@@ -164,15 +166,10 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         if ($rateLimited) {
             $errors[] = "You must wait a little bit before making another comment.";
         }
-            
-        if (strlen($email) < 1) {
-            $errors[] = "Email cannot be blank.";
-        }
-        elseif (strlen($email) > 64) {
-            $errors[] = "Email too long.";
-        }
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Your email address is invalid. Please try entering a valid email address.";
+
+        // Only validate Guest emails.
+        if (!$commentid) {
+            $errors[] = validateEmail($email, true);
         }
             
         if (strlen($content) < 1) {
@@ -193,6 +190,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
             $messages[] = success("Successfully made comment.");
             $_POST["content"] = "";
         }
+        $db->query("UNLOCK TABLES");
     }
     else {
         $messages[] = error("You don't have permission to do this.");
@@ -381,9 +379,9 @@ elseif (($url[2] ?? "") == "uploads") {
         // Handle uploading attachment.
         elseif (isset($_FILES["attachment"])) {
             // We will need to generate a value that isn't already being used.
-            $a_id = rand();
-            while (file_exists("images/" . $p_id . "_" . $a_id . ".webp") or file_exists("images/" . $p_id . "_" . $a_id . ".gif")) {
-                $a_id = rand();
+            $a_id = bin2hex(random_bytes(8));
+            while (file_exists("images/" . $p_id . "_" . $a_id . ".webp")) {
+                $a_id = bin2hex(random_bytes(8));
             }
             $upload = upload("attachment", $p_id . "_" . $a_id);
             if ($upload === "") {

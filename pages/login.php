@@ -40,7 +40,9 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
     if (strlen($_POST["password"]) < 1) {
         $errors[] = error("Password cannot be blank.");
     }
-
+    
+    // Lock to avoid race conditions.
+    $db->query("LOCK TABLES `logs` WRITE, `accounts` WRITE");
     // Now see how many login attempts there are from the past hour.
     $attempts = $db->query("SELECT 1 FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-3600));
     
@@ -124,6 +126,7 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
             }
         }
     }
+    $db->query("UNLOCK TABLES");
 }
 
 // Display the login form.

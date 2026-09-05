@@ -60,6 +60,8 @@ $default_config = array(
     "totalDiskQuota" => "5000000000",
     // Maximum amount of space (in bytes) that can be used by each user's uploads.
     "perUserDiskQuota" => "500000000",
+    "maxUploadWidth" => 3840,
+    "maxUploadHeight" => 2160,
     // Server timezone. See: https://www.php.net/manual/en/timezones.php
     "timezone" => "America/Los_Angeles",
     // true/false, whether or not comments are enabled (globally).

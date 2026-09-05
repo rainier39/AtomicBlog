@@ -67,6 +67,8 @@ $registerSuccess = false;
 if (validateCSRFToken()) {
     $errors = array();
 
+    // Lock to avoid race conditions.
+    $db->query("LOCK TABLE `accounts` WRITE");
     // Make sure there aren't too many accounts from this IP.
     $ipCheck = $db->query("SELECT `jointime` FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
     if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
@@ -142,12 +144,15 @@ if (validateCSRFToken()) {
         elseif ($role == "Member") {
             $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
         }
+        $accountid = $db->insert_id;
+        $db->query("UNLOCK TABLES");
         $registerSuccess = true;
         // Log the registration.
-        $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $db->insert_id . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
+        $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $accountid . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
     }
     // Otherwise, display the errors.
     else {
+        $db->query("UNLOCK TABLES");
         foreach ($errors as $e) {
             $messages[] = error($e);
         }

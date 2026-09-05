@@ -35,10 +35,12 @@ if (validateCSRFToken()) {
     // Remove slashes because they can ruin a search.
     $_POST["tags"] = str_replace("/", "", $_POST["tags"] ?? "");
 
+    // Lock to avoid race conditions.
+    $db->query("LOCK TABLE `posts` WRITE");
     $errors = validatePost();
     	
     // If there are no errors, make the post.
-    if (count($errors) === 0) {
+    if (!count($errors)) {
         if (isset($_POST["unpublished"]) and ($_POST["unpublished"] == "on")) {
             $published = "0";
         }
@@ -48,12 +50,15 @@ if (validateCSRFToken()) {
         
         // Add the new post to the database.
         $db->query("INSERT INTO `posts` (`title`, `tags`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["tags"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
+        $postid = $db->insert_id;
+        $db->query("UNLOCK TABLES");
         // Print a message.
         $_SESSION["messages"][] = unsafe_success("Successfully made new post.");
-        redirect("post/{$db->insert_id}");
+        redirect("post/{$postid}");
     }
     // Otherwise, print the errors.
     else {
+        $db->query("UNLOCK TABLES");
         foreach ($errors as $e) {
             $messages[] = error($e);
         }

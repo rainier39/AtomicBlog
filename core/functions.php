@@ -185,7 +185,7 @@ function validatePost($edit=false) {
             $errors[] = "You edited a post too recently. Wait a few seconds and try again.";
         }
     }
-    else { 
+    else {
         $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `starttime`>=" . (time()-$config["postDelay"]) . "");
         if ($lastPost->num_rows > 0) {
             $errors[] = "You made a post too recently. Wait a little while and try again.";
@@ -304,20 +304,20 @@ function redirect($loc, int $delay=0) {
     // If no delay is specified, immediately redirect with the location header.
     if ($delay < 1) {
         if ($config["prettyURLs"]) {
-           header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+           header("Location: /" . $dir . ltrim($loc, "/"));
         }
         else {
-            header("Location: " . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . "index.php?url=" . ltrim($loc, "/"));
+            header("Location: /" . $dir . "index.php?url=" . ltrim($loc, "/"));
         }
         exit();
     }
     // If a delay is specified, use the delay with the refresh header.
     else {
         if ($config["prettyURLs"]) {
-           header("Refresh: " . $delay . "; url=" . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . ltrim($loc, "/"));
+           header("Refresh: " . $delay . "; url=/" . $dir . ltrim($loc, "/"));
         }
         else {
-            header("Refresh: " . $delay . "; url=" . $proto . $_SERVER["HTTP_HOST"] . "/" . $dir . "index.php?url=" . ltrim($loc, "/"));
+            header("Refresh: " . $delay . "; url=/" . $dir . "index.php?url=" . ltrim($loc, "/"));
         }
     }
 }
@@ -430,6 +430,16 @@ function upload($file, $name) {
     if ($_FILES[$file]["size"] > $config["maxUploadSize"]) {
         return "Upload failed, file too large.";
     }
+    $size = getimagesize($_FILES[$file]["tmp_name"]);
+    if ($size === false) {
+        return "Upload failed, couldn't get image size.";
+    }
+    $width = $size[0];
+    $height = $size[1];
+    // Impose a resolution limit.
+    if (($width > $config["maxUploadWidth"]) or ($height > $config["maxUploadHeight"])) {
+        return "Upload failed, the image's dimensions are too big.";
+    }
     // Basic sanity check, not intended as a true security measure.
     if (false === getimagesize($_FILES[$file]["tmp_name"])) {
         return "Upload failed, invalid image.";
@@ -443,6 +453,8 @@ function upload($file, $name) {
     }
     
     // Get the current user's disk quota.
+    // Lock to avoid race conditions.
+    $db->query("LOCK TABLES `accounts` WRITE, `logs` WRITE");
     $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
     $uq = (int)$userQuota->fetch_assoc()["quota"];
 
@@ -458,7 +470,7 @@ function upload($file, $name) {
     }
     
     // Enforce rate limits.
-    $rateLimit = $db->query("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND `perpid`='" . $_SESSION["id"] . "' AND `timestamp`>" . (time()-3600));
+    $rateLimit = $db->query("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND (`perpid`='" . $_SESSION["id"] . "' OR `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "') AND `timestamp`>" . (time()-3600));
     if ($rateLimit->num_rows >= $config["uploadsPerHour"]) {
         return "Upload failed, rate limited. Try again later.";
     }
@@ -467,36 +479,21 @@ function upload($file, $name) {
     
     // GIFs.
     if (str_starts_with($bytes, hex2bin("474946383761")) or str_starts_with($bytes, hex2bin("474946383961"))) {
-        //$image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
+        $image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
         
         // This is safe because we never use any user-supplied value in $name.
-        $target = $upload_dir . $name . ".gif";
+        $target = $upload_dir . $name . ".webp";
         
         if (is_file($target)) {
             $overwriting = true;
             $oldsize = filesize($target);
         }
         
-        //if ($image === false) {
-        //    return "Upload failed, invalid GIF image.";
-        //}
+        if ($image === false) {
+            return "Upload failed, invalid GIF image.";
+        }
         
-        //$success = imagegif($image, $target);
-        // Just accepting the file as-is may have security implications. Though it allows users to upload animated GIFs.
-        $success = move_uploaded_file($_FILES[$file]["tmp_name"], $target);
-    
-        if (!$success) {
-            return "Failed to write image to file.";
-        }
-        // We don't do a final disk quota check here because we just took the GIF wholesale so the size hasn't changed since the initial check.
-        // Add the new filesize to the user's quota.
-        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
-        if ($overwriting) {
-            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
-        }
-        // Log the upload.
-        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
-        return "";
+        $success = imagewebp($image, $target);
     }
     // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
     elseif (str_starts_with($bytes, hex2bin("FFD8FF"))) {
@@ -515,28 +512,6 @@ function upload($file, $name) {
         }
         
         $success = imagewebp($image, $target);
-        
-        // We do this here in case the later checks erase the new file.
-        if ($success and $overwriting) {
-            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
-        }
-    
-        if (!$success) {
-            return "Failed to write image to file.";
-        }
-        // We do these checks in case the filesize grows after the image has been processed.
-        elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
-            unlink($target);
-            return "Upload failed, your disk quota would be exceeded.";
-        }
-        elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
-            unlink($target);
-            return "Upload failed, the total disk quota would be exceeded.";
-        }
-        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
-        // Log the upload.
-        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
-        return "";
     }
     // PNGs.
     elseif (str_starts_with($bytes, hex2bin("89504E470D0A1A0A"))) {
@@ -555,28 +530,6 @@ function upload($file, $name) {
         }
         
         $success = imagewebp($image, $target);
-        
-        // We do this here in case the later checks erase the new file.
-        if ($success and $overwriting) {
-            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
-        }
-    
-        if (!$success) {
-            return "Failed to write image to file.";
-        }
-        // We do these checks in case the filesize grows after the image has been processed.
-        elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
-            unlink($target);
-            return "Upload failed, your disk quota would be exceeded.";
-        }
-        elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
-            unlink($target);
-            return "Upload failed, the total disk quota would be exceeded.";
-        }
-        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
-        // Log the upload.
-        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
-        return "";
     }
     // WEBPs.
     elseif (str_starts_with($bytes, hex2bin("52494646")) and str_ends_with($bytes, hex2bin("57454250"))) {
@@ -595,32 +548,33 @@ function upload($file, $name) {
         }
         
         $success = imagewebp($image, $target);
-        
-        // We do this here in case the later checks erase the new file.
-        if ($success and $overwriting) {
-            $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
-        }
-    
-        if (!$success) {
-            return "Failed to write image to file.";
-        }
-        // We do these checks in case the filesize grows after the image has been processed.
-        elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
-            unlink($target);
-            return "Upload failed, your disk quota would be exceeded.";
-        }
-        elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
-            unlink($target);
-            return "Upload failed, the total disk quota would be exceeded.";
-        }
-        $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
-        // Log the upload.
-        $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
-        return "";
     }
     else {
         return "Upload failed, unsupported or unrecognized image type.";
     }
+    // We do this here in case the later checks erase the new file.
+    if ($success and $overwriting) {
+        $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+    }
+
+    if (!$success) {
+        return "Failed to write image to file.";
+    }
+    // We do these checks in case the filesize grows after the image has been processed.
+    elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
+        unlink($target);
+        return "Upload failed, your disk quota would be exceeded.";
+    }
+    elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
+        unlink($target);
+        return "Upload failed, the total disk quota would be exceeded.";
+    }
+    $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+    // Log the upload.
+    $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
+    // Unlock.
+    $db->query("UNLOCK TABLES");
+    return "";
 }
 
 // TODO: make a function for generating thumbnails of existing images.
