@@ -49,19 +49,26 @@ if (validateCSRFToken()) {
         }
         
         // Add the new post to the database.
-        $db->query("INSERT INTO `posts` (`title`, `content`, `account`, `starttime`, `published`) VALUES ('" . $db->real_escape_string($_POST["title"]) . "', '" . $db->real_escape_string($_POST["content"]) . "', '" . $db->real_escape_string($_SESSION["id"]) . "', '" . time() . "', '" . $published . "')");
+        preparedQuery("INSERT INTO `posts` (`title`, `content`, `account`, `starttime`, `published`) VALUES (?, ?, ?, ?, ?)", array($_POST["title"], $_POST["content"], $_SESSION["id"], time(), $published));
         $postid = $db->insert_id;
         $db->query("UNLOCK TABLES");
         // Add the tags.
         $newtags = parseTags($_POST["tags"]);
         if (count($newtags)) {
-            $db->query("DELETE FROM `tags` WHERE `post`='{$postid}'");
+            // Construct a single INSERT query to add all of the tags.
+            $tagQuery = "INSERT INTO `tags` (`tag`,`post`) VALUES ";
+            $tagParams = array();
             foreach ($newtags as $tag) {
-                $db->query("INSERT INTO `tags` (`tag`,`post`) VALUES ('" . $db->real_escape_string($tag) . "', '{$postid}')");
+                // This is safe because $postid is not a user-supplied value.
+                $tagQuery .= "(?, {$postid}),";
+                $tagParams[] = $tag;
             }
+            // Remove the trailing comma.
+            $tagQuery = rtrim($tagQuery, ",");
+            preparedQuery($tagQuery, $tagParams);
         }
         // Print a message.
-        $_SESSION["messages"][] = unsafe_success("Successfully made new post.");
+        $_SESSION["messages"][] = success("Successfully made new post.");
         redirect("post/{$postid}");
     }
     // Otherwise, print the errors.

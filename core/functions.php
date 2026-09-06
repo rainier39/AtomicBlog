@@ -36,7 +36,7 @@ function logout($redirect=false) {
     $id = $_SESSION["id"] ?? 0;
     // For the weird case of a user being logged in, but no database connection.
     if ($db) {
-        $db->query("UPDATE `accounts` SET `cookie`=NULL WHERE `id`='" . $id . "'");
+        preparedQuery("UPDATE `accounts` SET `cookie`=NULL WHERE `id`=?", array($id));
     }
     session_unset();
     session_destroy();
@@ -90,7 +90,7 @@ function displayPost($p) {
     foreach ($uploads as $u) {
         if (str_starts_with($u, $p["id"] . ".")) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+            $uploadTime = preparedQuery("SELECT `timestamp` FROM `logs` WHERE `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$u}"));
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }
@@ -104,7 +104,7 @@ function displayPost($p) {
     }
 
     // Get the account information of the post author.
-    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='{$p["account"]}'");
+    $acc = preparedQuery("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`=?", array($p["account"]));
     if ($acc->num_rows > 0) {
         $a = $acc->fetch_assoc();
         if ($a["namevisible"]) {
@@ -170,7 +170,7 @@ function validatePost($edit=false) {
     if (strlen($_POST["tags"] ?? "") > 128) {
         $errors[] = "Post tags field cannot be more than 128 characters long.";
     }
-    if (max(array_map("strlen", parseTags($_POST["tags"] ?? ""))) > 16) {
+    if ((($_POST["tags"] ?? "") != "") and (max(array_map("strlen", parseTags($_POST["tags"]))) > 16)) {
         $errors[] = "Post tags cannot be longer than 16 characters.";
     }
     // Content.
@@ -183,13 +183,13 @@ function validatePost($edit=false) {
     
     // Rate limit.
     if ($edit) {
-        $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `edittime`>=" . (time()-$config["editDelay"]) . "");
+        $lastPost = preparedQuery("SELECT 1 FROM `posts` WHERE `account`=? AND `edittime`>=?", array($_SESSION["id"], (time()-$config["editDelay"])));
         if ($lastPost->num_rows > 0) {
             $errors[] = "You edited a post too recently. Wait a few seconds and try again.";
         }
     }
     else {
-        $lastPost = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $_SESSION["id"] . "' AND `starttime`>=" . (time()-$config["postDelay"]) . "");
+        $lastPost = preparedQuery("SELECT 1 FROM `posts` WHERE `account`=? AND `starttime`>=?", array($_SESSION["id"], (time()-$config["postDelay"])));
         if ($lastPost->num_rows > 0) {
             $errors[] = "You made a post too recently. Wait a little while and try again.";
         }
@@ -225,7 +225,7 @@ function validateUsername($username) {
     }
     
     if ($config["installed"]) {
-        $usernameCheck = $db->query("SELECT 1 FROM `accounts` WHERE `username`='" . $db->real_escape_string($username) . "'");
+        $usernameCheck = preparedQuery("SELECT 1 FROM `accounts` WHERE `username`=?", array($username));
         if ($usernameCheck->num_rows != 0) {
             $errors[] = "Your username is already taken.";
         }
@@ -254,7 +254,7 @@ function validateEmail($email, $takenCheck=false) {
     }
     // Make sure their email isn't taken.
     if ($config["installed"] and $takenCheck) {
-        $emailCheck = $db->query("SELECT 1 FROM `accounts` WHERE `email`='" . $db->real_escape_string($email) . "'");
+        $emailCheck = preparedQuery("SELECT 1 FROM `accounts` WHERE `email`=?", array($email));
         if ($emailCheck->num_rows != 0) {
             $errors[] = "Your email address is already taken.";
         }
@@ -336,7 +336,7 @@ function checkPerm($perm) {
     
     // If a user is logged in.
     if ($_SESSION["logged_in"]) {
-        $roleCheck = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_SESSION["id"]) . "'");
+        $roleCheck = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
         
         // If the account doesn't exist, deny.
         if ($roleCheck->num_rows < 1) {
@@ -394,8 +394,8 @@ function checkOutrank($actinguserid, $targetuserid) {
     $actinguserrole = "Guest";
     $targetuserrole = "Guest";
     
-    $actinguser = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($actinguserid) . "'");
-    $targetuser = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($targetuserid) . "'");
+    $actinguser = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($actinguserid));
+    $targetuser = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($targetuserid));
     
     while ($a = $actinguser->fetch_assoc()) {
         $actinguserrole = $a["role"];
@@ -458,7 +458,7 @@ function upload($file, $name) {
     // Get the current user's disk quota.
     // Lock to avoid race conditions.
     $db->query("LOCK TABLES `accounts` WRITE, `logs` WRITE");
-    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+    $userQuota = preparedQuery("SELECT `quota` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
     $uq = (int)$userQuota->fetch_assoc()["quota"];
 
     $globalQuota = $db->query("SELECT SUM(`quota`) AS `total` FROM `accounts`");
@@ -473,7 +473,7 @@ function upload($file, $name) {
     }
     
     // Enforce rate limits.
-    $rateLimit = $db->query("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND (`perpid`='" . $_SESSION["id"] . "' OR `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "') AND `timestamp`>" . (time()-3600));
+    $rateLimit = preparedQuery("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND (`perpid`=? OR `ip`=?) AND `timestamp`>?", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], (time()-3600)));
     if ($rateLimit->num_rows >= $config["uploadsPerHour"]) {
         return "Upload failed, rate limited. Try again later.";
     }
@@ -527,7 +527,7 @@ function upload($file, $name) {
     
     // We do this here in case the later checks erase the new file.
     if ($success and $overwriting) {
-        $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $oldsize . " WHERE `id`='" . $_SESSION["id"] . "'");
+        preparedQuery("UPDATE `accounts` SET `quota`=`quota`-? WHERE `id`=?", array($oldsize, $_SESSION["id"]));
         $uq = max($uq-$oldsize, 0);
         $gq = max($gq-$oldsize, 0);
     }
@@ -544,9 +544,9 @@ function upload($file, $name) {
         unlink($target);
         return "Upload failed, the total disk quota would be exceeded.";
     }
-    $db->query("UPDATE `accounts` SET `quota`=`quota`+" . filesize($target) . " WHERE `id`='" . $_SESSION["id"] . "'");
+    preparedQuery("UPDATE `accounts` SET `quota`=`quota`+? WHERE `id`=?", array(filesize($target), $_SESSION["id"]));
     // Log the upload.
-    $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
+    preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_upload', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
     // Unlock.
     $db->query("UNLOCK TABLES");
     return "";

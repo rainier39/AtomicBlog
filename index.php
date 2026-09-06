@@ -63,12 +63,15 @@ if (file_exists("config/permissions.php")) {
 }
 // Make sure roles are sorted properly (for cosmetic purposes).
 arsort($permissions);
+
+// Defines database related functions.
+require "core/database.php";
+
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
 
 // If the forum is installed, create a database connection.
-if ($config["installed"])
-{
+if ($config["installed"]) {
     // Establish a connection to the database.
     $db = mysqli_connect($config["SQLServer"], $config["SQLUsername"], $config["SQLPassword"], $config["SQLDatabase"]);
     // Run the upgrade script.
@@ -123,7 +126,7 @@ if (isset($_SESSION["messages"])) {
 
 // If a user is logged out, but has a login cookie, try to log them in.
 if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$config["cookiePrefix"] . "login"])) {
-    $cookieValid = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . hash("sha256", $_COOKIE[$config["cookiePrefix"] . "login"]) . "' AND `cookietime`>=" . (time()-60*60*24*7));
+    $cookieValid = preparedQuery("SELECT `id` FROM `accounts` WHERE `cookie`=? AND `cookietime`>=?", array(hash("sha256", $_COOKIE[$config["cookiePrefix"] . "login"]), time()-60*60*24*7));
     
     if ($cookieValid->num_rows > 0) {
         $c = $cookieValid->fetch_assoc();
@@ -145,7 +148,7 @@ if ($_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
 
 // Update a logged-in user's last action time.
 if ($_SESSION["logged_in"]) {
-    $db->query("UPDATE `accounts` SET `lastactive`='" . time() . "' WHERE `id`='" . $_SESSION["id"] . "'");
+    preparedQuery("UPDATE `accounts` SET `lastactive`=? WHERE `id`=?", array(time(), $_SESSION["id"]));
 }
 
 // If the software hasn't been installed yet, direct all requests to the install page.

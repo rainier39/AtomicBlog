@@ -184,7 +184,7 @@ if (validateCSRFToken()) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         // Write the administrator account. Will replace any existing account with the same username or email (if there is an old install of the software).
-        $db->query("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', 'Owner', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(time()) . "', '" . $db->real_escape_string(time()) . "')");
+        prepareQuery("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES (?, ?, ?, ?, 'Owner', ?, ?, ?, ?)", array($_POST["username"], $_POST["email"], password_hash($_POST["password"], PASSWORD_DEFAULT), $_POST["name"], $_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_ADDR"], time(), time()));
 
         // Create a new array of our new config values.
         $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
