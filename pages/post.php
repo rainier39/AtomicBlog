@@ -155,7 +155,8 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
 
         // Only validate Guest emails.
         if (!$commentid) {
-            $errors[] = validateEmail($email, true);
+            $emailerrors = validateEmail($email, true);
+            if (count($emailerrors)) $errors = array_merge($errors, $emailerrors);
         }
             
         if (strlen($content) < 1) {
