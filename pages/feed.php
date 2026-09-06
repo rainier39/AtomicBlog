@@ -42,7 +42,7 @@ while ($t = $lastPostTimeQuery->fetch_assoc()) {
 }
 
 // Get the latest 15 posts.
-$latest = $db->query("SELECT `title`, `id`, `account`, `starttime`, `edittime`, `content` FROM `posts` WHERE `published`='1' ORDER BY `starttime` DESC LIMIT 15");
+$latest = $db->query("SELECT `title`, `posts`.`id`, `accounts`.`name`, `starttime`, `edittime`, `content` FROM `posts` LEFT JOIN `accounts` ON `accounts`.`id`=`posts`.`account` WHERE `published`='1' ORDER BY `starttime` DESC LIMIT 15");
 
 echo('<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -52,27 +52,14 @@ echo('<?xml version="1.0" encoding="utf-8"?>
   <link rel="self" href="' . $uri . makeURL("feed") . '" type="application/atom+xml"/>
   <updated>' . date("Y-m-d\\TH:i:sP", $lastPostTime) . '</updated>
   <icon>' . $uri . makeURL("themes/" . $config["theme"] . "/icon.png") . '</icon>
-  <author>
 ');
 
-$names = array();
-while ($l = $latest->fetch_assoc()) {
-    $name = $db->query("SELECT `name` FROM `accounts` WHERE `id`='" . $l["account"] . "'");
-    $name = $name->fetch_assoc()["name"];
-    if (!in_array($name, $names)) {
-        $names[] = $name;
-        echo("    <name>" . htmlspecialchars($name, ENT_NOQUOTES) . "</name>\n");
-    }
-}
-
-echo('  </author>
-  <id>' . $uri . '/' . ($config["dir"] ? $config["dir"] . "/" : "") . '</id>
+echo('  <id>' . $uri . makeURL("feed") . '</id>
   <generator uri="https://github.com/rainier39/AtomicBlog/releases/tag/' . $config["version"] . '" version="' . $config["version"] . '">
     AtomicBlog
   </generator>
 ');
 
-mysqli_data_seek($latest,0);
 while ($l = $latest->fetch_assoc()) {
     echo('
   <entry>
@@ -80,6 +67,9 @@ while ($l = $latest->fetch_assoc()) {
     <link href="' . $uri . makeURL("post/{$l["id"]}") . '"/>
     <id>' . $uri . makeURL("post/{$l["id"]}") . '</id>
     <updated>' . date("Y-m-d\\TH:i:sP", ($l["edittime"] ?? $l["starttime"])) . '</updated>
+    <author>
+      <name>' . htmlspecialchars($l["name"], ENT_NOQUOTES) . '</name>
+    </author>
     <content>' . htmlspecialchars($l["content"], ENT_NOQUOTES) . '</content>
   </entry>');
 }

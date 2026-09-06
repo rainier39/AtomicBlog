@@ -14,7 +14,13 @@
   <span id='blogtitle'>{{{ blogtitle }}}</span>
   <span id='blogdesc'>{{{ description }}}</span>
  </div>
- {{ navbar }}
+ {% if (installed) %}
+ <div class='navbar'>
+  <a class='navbarButton' href='[[[]]]'>[[ navbar.home ]]</a>
+  <a class='navbarButton' href='[[[ posts ]]]'>[[ global.posts ]]</a>
+  {{ navbar }}
+ </div>
+ {% endif %}
  <div id='toasts'></div>
  <div class='content'>
   <div class='messages'>

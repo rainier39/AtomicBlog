@@ -35,7 +35,7 @@ if (!checkPerm(PERM_VIEW_POST)) {
 $id = $_SESSION["id"] ?? 0;
 
 // Get the requested post.
-$post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $id . "'))");
+$post = preparedQuery("SELECT `posts`.*,`accounts`.`name`,`accounts`.`namevisible` FROM `posts` LEFT JOIN `accounts` ON `accounts`.`id`=`posts`.`account` WHERE `posts`.`id`=? AND (published='1' OR (published='0' AND account=?))", array($url[1], $id));
 
 $p = $post->fetch_assoc();
 
@@ -48,7 +48,7 @@ if ($post->num_rows < 1) {
 }
 
 // Get the tags.
-$tagsquery = $db->query("SELECT `tag` FROM `tags` WHERE `post`='{$p["id"]}'");
+$tagsquery = preparedQuery("SELECT `tag` FROM `tags` WHERE `post`=?", array($p["id"]));
 $tags = array();
 while ($t = $tagsquery->fetch_assoc()) {
     $tags[] = $t["tag"];
@@ -59,15 +59,9 @@ if (isset($_POST["toggleStar"]) and validateCSRFToken()) {
     // Make sure the user is allowed to star/unstar the post.
     if ((($id == $p["account"]) and checkPerm(PERM_STAR_POST))
     or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p["account"]))) {
-        // Star.
-        if ($_POST["toggleStar"] == "Star") {
-            $db->query("UPDATE `posts` SET `starred`='1' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
-        }
-        // Unstar.
-        else {
-            $db->query("UPDATE `posts` SET `starred`='0' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
-        }
-        $updatePost = true;
+        preparedQuery("UPDATE `posts` SET `starred`=`starred`^1 WHERE id=?", array($p["id"]));
+        // Let's not update the whole post just for flipping 1 bit.
+        $p["starred"] = !$p["starred"];
     }
     else {
         $messages[] = error("You don't have permission to do this.");
@@ -77,15 +71,9 @@ if (isset($_POST["toggleStar"]) and validateCSRFToken()) {
 elseif (isset($_POST["togglePublished"]) and validateCSRFToken()) {
     // Make sure the user is allowed to publish/unpublish the post.
     if (($id == $p["account"]) and checkPerm(PERM_NEW_POST)) { 
-        // Star.
-        if ($_POST["togglePublished"] == "Publish") {
-            $db->query("UPDATE `posts` SET `published`='1' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
-        }
-        // Unstar.
-        else {
-            $db->query("UPDATE `posts` SET `published`='0' WHERE id='" . $db->real_escape_string($p["id"]) . "'");
-        }
-        $updatePost = true;
+        preparedQuery("UPDATE `posts` SET `published`=`published`^1 WHERE id=?", array($p["id"]));
+        // Let's not update the whole post just for flipping 1 bit.
+        $p["published"] = !$p["published"];
     }
     else {
         $messages[] = error("You don't have permission to do this.");
@@ -97,11 +85,13 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
     if ((($id == $p["account"]) and checkPerm(PERM_DELETE_POST))
     or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p["account"]))) {
         // Delete the post.
-        $db->query("DELETE FROM `posts` WHERE `id`='" . $db->real_escape_string($p["id"]) . "'");
+        preparedQuery("DELETE FROM `posts` WHERE `id`=?", array($p["id"]));
+        // Delete all of the post's tags.
+        preparedQuery("DELETE FROM `tags` WHERE `post`=?", array($p["id"]));
         // Delete all of the post's views.
-        $db->query("DELETE FROM `views` WHERE `post`='" . $db->real_escape_string($p["id"]) . "'");
+        preparedQuery("DELETE FROM `views` WHERE `post`=?", array($p["id"]));
         // Delete all of the post's comments.
-        $db->query("DELETE FROM `comments` WHERE `post`='" . $db->real_escape_string($p["id"]) . "'");
+        preparedQuery("DELETE FROM `comments` WHERE `post`=?", array($p["id"]));
         // Delete all icons and attachments.
         $uploads = scandir("images/");
         foreach ($uploads as $u) {
@@ -111,7 +101,6 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
         }
                 
         $_SESSION["messages"][] = success("Successfully deleted the post.");
-        $displayPost = false;
         redirect("");
     }
     else {
@@ -127,7 +116,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         // Lock to avoid race conditions.
         $db->query("LOCK TABLES `comments` WRITE, `accounts` WRITE");
         // Get comments from this IP.
-        $ipCheck = $db->query("SELECT 1 FROM `comments` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
+        $ipCheck = preparedQuery("SELECT 1 FROM `comments` WHERE `ip`=? AND `timestamp`>?", array($_SERVER["REMOTE_ADDR"], (time()-$config["commentDelay"])));
             
         if ($ipCheck->num_rows > 0) {
             $rateLimited = true;
@@ -135,7 +124,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
             
         // If it's a user with an account.
         if ($_SESSION["logged_in"]) {
-            $emailquery = $db->query("SELECT `email` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+            $emailquery = preparedQuery("SELECT `email` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
                 
             while ($e = $emailquery->fetch_assoc()) {
                 $email = $e["email"];
@@ -144,7 +133,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
             $commentid = $id;
                 
             // Get comments from this account too.
-            $accCheck = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $id . "' AND `timestamp`>" . (time()-$config["commentDelay"]));
+            $accCheck = preparedQuery("SELECT 1 FROM `comments` WHERE `account`=? AND `timestamp`>?", array($id, (time()-$config["commentDelay"])));
             
             if ($accCheck->num_rows > 0) {
                 $rateLimited = true;
@@ -183,7 +172,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         }
         else {
             // Make the commment.
-            $db->query("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES ('" . $commentid . "', '" . $p["id"] . "', '" . $db->real_escape_string($email) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($content) . "')");
+            preparedQuery("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES (?, ?, ?, ?, ?, ?)", array($commentid, $p["id"], $email, $_SERVER["REMOTE_ADDR"], time(), $content));
             $messages[] = success("Successfully made comment.");
             $_POST["content"] = "";
         }
@@ -196,7 +185,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
 // Handle deleting a comment.
 elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
     if (isset($_POST["commentid"])) {
-        $commentinfo = $db->query("SELECT `id`, `account`, `ip` FROM `comments` WHERE `id`='" . $db->real_escape_string($_POST["commentid"]) . "'");
+        $commentinfo = preparedQuery("SELECT `id`, `account`, `ip` FROM `comments` WHERE `id`=?", array($_POST["commentid"]));
         
         if ($commentinfo->num_rows < 1) {
             $messages[] = error("You don't have permission to do this.");
@@ -213,7 +202,7 @@ elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
             or (($c_account === "0") and ($c_ip == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
                 // Delete the comment.
-                $db->query("DELETE FROM `comments` WHERE `id`='" . $c_id . "'");
+                preparedQuery("DELETE FROM `comments` WHERE `id`=?", array($c_id));
                     
                 $messages[] = success("Successfully deleted comment.");
             }
@@ -226,7 +215,7 @@ elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
 // Handle editing a comment.
 elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
     if (isset($_POST["commentid"])) {
-        $commentinfo = $db->query("SELECT `id`, `account`, `ip`, `content` FROM `comments` WHERE `id`='" . $db->real_escape_string($_POST["commentid"]) . "'");
+        $commentinfo = preparedQuery("SELECT `id`, `account`, `ip`, `content` FROM `comments` WHERE `id`=?", array($_POST["commentid"]));
         
         if ($commentinfo->num_rows < 1) {
             $messages[] = error("You don't have permission to do this.");
@@ -249,7 +238,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
                     
                 $rateLimited = false;
                     
-                $rlcheck = $db->query("SELECT 1 FROM `comments` WHERE (`account`='" . $id . "' OR `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "') AND `timestamp`>" . time()-$config["editDelay"]);
+                $rlcheck = preparedQuery("SELECT 1 FROM `comments` WHERE (`account`=? OR `ip`=?) AND `timestamp`>?", array($id, $_SERVER["REMOTE_ADDR"], (time()-$config["editDelay"])));
                 
                 if ($rlcheck->num_rows > 0) {
                     $rateLimited = true;
@@ -276,7 +265,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
                 }
                 else {
                     // Edit the comment.
-                    $db->query("UPDATE `comments` SET `content`='" . $db->real_escape_string($content) . "', `timestamp`='" . time() . "' WHERE `id`='" . $c_id . "'");
+                    preparedQuery("UPDATE `comments` SET `content`=?, `timestamp`=? WHERE `id`=?", array($content, time(), $c_id));
                 
                     $_SESSION["messages"][] = success("Successfully edited comment.");
                     redirect("post/" . $p["id"]);
@@ -315,15 +304,23 @@ elseif (($url[2] ?? "") == "edit") {
             }
         	
             // If there are no errors, edit the post.
-            if (count($errors) === 0) {
-                $db->query("UPDATE `posts` SET `title`='" . $db->real_escape_string($_POST["title"]) . "', `content`='" . $db->real_escape_string($_POST["content"]) . "', `editedby`='" . $db->real_escape_string($_SESSION["id"]) . "', `edittime`='" . time() . "' WHERE `id`='{$p["id"]}'");
+            if (!count($errors)) {
+                preparedQuery("UPDATE `posts` SET `title`=?, `content`=?, `editedby`=?, `edittime`=? WHERE `id`=?", array($_POST["title"], $_POST["content"], $_SESSION["id"], time(), $p["id"]));
                 // Add the tags.
                 $newtags = parseTags($_POST["tags"]);
                 if (count($newtags)) {
-                    $db->query("DELETE FROM `tags` WHERE `post`='{$p["id"]}'");
+                    preparedQuery("DELETE FROM `tags` WHERE `post`=?", array($p["id"]));
+                    // Construct a single INSERT query to add all of the tags.
+                    $tagQuery = "INSERT INTO `tags` (`tag`,`post`) VALUES ";
+                    $tagParams = array();
                     foreach ($newtags as $tag) {
-                        $db->query("INSERT INTO `tags` (`tag`,`post`) VALUES ('" . $db->real_escape_string($tag) . "', '{$p["id"]}')");
+                        // This is safe because $p["id"] is not a user-supplied value.
+                        $tagQuery .= "(?, {$p["id"]}),";
+                        $tagParams[] = $tag;
                     }
+                    // Remove the trailing comma.
+                    $tagQuery = rtrim($tagQuery, ",");
+                    preparedQuery($tagQuery, $tagParams);
                 }
                 $success = true;
                 $updatePost = true;
@@ -356,7 +353,7 @@ elseif (($url[2] ?? "") == "edit") {
     }
     if ($success) {
         $displayPost = true;
-        redirect("post/" . $url[1]);
+        redirect("post/" . $p["id"]);
     }
 }
 // Handle uploading.
@@ -414,15 +411,10 @@ elseif (($url[2] ?? "") == "uploads") {
                 $size = filesize("images/" . $target);
                 $deleted = unlink("images/" . $target);
                 if ($deleted) {
-                    $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
-                    // Make sure the quota is never less than 0.
-                    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-                    $uq = (int)$userQuota->fetch_assoc()["quota"];
-                    if ($uq < 0) {
-                        $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
-                    }
+                    // Subtract from the quota, ensuring it never drops below zero.
+                    preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
                     // Log the deletion.
-                    $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
+                    preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                     $messages[] = success("Successfully deleted icon.");
                 }
                 else {
@@ -446,15 +438,10 @@ elseif (($url[2] ?? "") == "uploads") {
                 $size = filesize("images/" . $target);
                 $deleted = unlink("images/" . $target);
                 if ($deleted) {
-                    $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
-                    // Make sure the quota is never less than 0.
-                    $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-                    $uq = (int)$userQuota->fetch_assoc()["quota"];
-                    if ($uq < 0) {
-                        $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
-                    }
+                    // Subtract from the quota, ensuring it never drops below zero.
+                    preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
                     // Log the deletion.
-                    $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
+                    preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                     $messages[] = success("Successfully deleted attachment.");
                 }
                 else {
@@ -486,7 +473,7 @@ elseif (($url[2] ?? "") == "uploads") {
         
         foreach ($icons as $icon) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$icon}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='images/{$icon}' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }
@@ -505,7 +492,7 @@ elseif (($url[2] ?? "") == "uploads") {
         }
         foreach ($attachments as $attachment) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$attachment}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='images/{$attachment}' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }
@@ -535,10 +522,10 @@ elseif (($url[2] ?? "") == "uploads") {
 if ($displayPost) {
     // Get the requested post again if the user edited it or starred it.
     if ($updatePost) {
-        $post = $db->query("SELECT * FROM `posts` WHERE id='" . $db->real_escape_string($url[1]) . "' AND (published='1' OR (published='0' AND account='" . $id . "'))");
+        $post = preparedQuery("SELECT `posts`.*,`accounts`.`name`,`accounts`.`namevisible` FROM `posts` LEFT JOIN `accounts` ON `accounts`.`id`=`posts`.`account` WHERE `posts`.`id`=? AND (published='1' OR (published='0' AND account=?))", array($p["id"], $id));
         $p = $post->fetch_assoc();
         // Get the tags.
-        $tagsquery = $db->query("SELECT `tag` FROM `tags` WHERE `post`='{$p["id"]}'");
+        $tagsquery = preparedQuery("SELECT `tag` FROM `tags` WHERE `post`=?", array($p["id"]));
         $tags = array();
         while ($t = $tagsquery->fetch_assoc()) {
             $tags[] = $t["tag"];
@@ -582,17 +569,15 @@ if ($displayPost) {
         $postvars["postbuttons"] .= "
             <a href='" . makeURL("post/{$p["id"]}/uploads") . "' class='button postButton'>Manage Uploads</a>";
     }
-    // Get the account information of the post author.
-    $acc = $db->query("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`='" . $db->real_escape_string($p["account"]) . "'");
-    if ($acc->num_rows > 0) {
-        while ($a = $acc->fetch_assoc()) {
-            if ($a["namevisible"]) {
-                $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($a["name"]) . "</a>";
-            }
-            else {
-                $postvars["author"] = "Anonymous";
-            }
-        }
+    // Show the post author's name if applicable.
+    if ($p["namevisible"]) {
+        $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($p["name"], ENT_NOQUOTES) . "</a>";
+    }
+    elseif (!$p["name"]) {
+        $postvars["author"] = "Nobody";
+    }
+    else {
+        $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>Anonymous</a>";
     }
     if (!empty($p["edittime"])) {
         $postvars["edited"] .= " | <small>Modified: <abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr></small>";
@@ -602,7 +587,7 @@ if ($displayPost) {
     foreach ($uploads as $u) {
         if (str_starts_with($u, $p["id"] . ".")) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$u}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='images/{$u}' ORDER BY `timestamp` DESC LIMIT 1");
             if ($uploadTime->num_rows > 0) {
                 $ut = $uploadTime->fetch_assoc()["timestamp"];
             }
@@ -632,7 +617,7 @@ if ($displayPost) {
             $postvars["comments"] .= error("You don't have permission to comment.");
         }
         // Next, display the existing comments.
-        $comments = $db->query("SELECT * FROM `comments` WHERE `post`='" . $p["id"] . "' ORDER BY `id` DESC");
+        $comments = preparedQuery("SELECT `comments`.*,`accounts`.`namevisible`,`accounts`.`name`,`accounts`.`color` FROM `comments` LEFT JOIN `accounts` ON `comments`.`account`=`accounts`.`id` WHERE `post`=? ORDER BY `comments`.`id` DESC", array($p["id"]));
         
         if ($comments->num_rows < 1) {
             $postvars["comments"] .= "<br>" . info("No comments to display yet.");
@@ -642,7 +627,7 @@ if ($displayPost) {
             $postvars["comments"] .= "<div class='comment' id='comment_{$c["id"]}'>";
             
             // Get author name.
-            if ($c["account"] === "0") {
+            if ($c["account"] == 0) {
                 if (checkPerm(PERM_MANAGE_USERS)) {
                     $authorname = "Guest (" . htmlspecialchars($c["email"]) . ", " . htmlspecialchars($c["ip"]) . ")";
                 }
@@ -652,17 +637,14 @@ if ($displayPost) {
                 $authorcolor = "";
             }
             else {
-                $an = $db->query("SELECT `name`, `color`, `namevisible` FROM `accounts` WHERE `id`='" . $c["account"] . "'");
-                while ($a = $an->fetch_assoc()) {
-                    if ($a["namevisible"]) {
-                        $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>" . htmlspecialchars($a["name"]) . "</a>";
-                    }
-                    else {
-                        $authorname = "Anonymous";
-                    }
-                    // This is safe because the value of `color` is constrained.
-                    $authorcolor = " style='background: #" . $a["color"] . ";'";
+                if ($c["namevisible"]) {
+                    $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>" . htmlspecialchars($c["name"], ENT_NOQUOTES) . "</a>";
                 }
+                else {
+                    $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>Anonymous</a>";
+                }
+                // This is safe because the value of `color` is constrained.
+                $authorcolor = " style='background: #" . $c["color"] . ";'";
             }
             
             $url2 = $url[2] ?? "";
@@ -724,13 +706,16 @@ if ($displayPost) {
         $postvars["comments"] .= error("Comments are disabled.");
     }
 
+    // Lock to avoid race conditions.
+    $db->query("LOCK TABLE `views` WRITE");
     // Get views from this IP on this post, if any.
-    $views = $db->query("SELECT 1 FROM `views` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `post`='" . $db->real_escape_string($p["id"]) . "'");
+    $views = preparedQuery("SELECT 1 FROM `views` WHERE `ip`=? AND `post`=?", array($_SERVER["REMOTE_ADDR"], $p["id"]));
 
     // If there are none, count this as a view.
     if ($views->num_rows < 1) {
-        $db->query("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES ('" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . time() . "', '" . $db->real_escape_string($p["id"]) . "')");
+        preparedQuery("INSERT INTO `views` (`ip`, `timestamp`, `post`) VALUES (?, ?, ?)", array($_SERVER["REMOTE_ADDR"], time(), $p["id"]));
     }
+    $db->query("UNLOCK TABLES");
     
     render_page("post.html", $postvars, $title);
 }

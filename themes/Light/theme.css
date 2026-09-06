@@ -50,18 +50,20 @@ input, select {
  justify-content: space-evenly;
  flex-wrap: wrap;
 }
-.navbar a {
- margin-right: 5%;
- margin-left: 5%;
+.navbarButton {
  font-weight: bold;
  font-size: 20px;
  margin-bottom: 5px;
  margin-top: 5px;
- display: inline-block;
  color: white;
+ background: none;
+ border: none;
+ padding: 0;
 }
-.navbar a:hover {
+.navbarButton:hover {
  color: lightgray;
+ text-decoration: underline;
+ cursor: pointer;
 }
 .content {
  padding: 8px 16px;
@@ -430,7 +432,7 @@ code, .codeblock {
   border-right: 0;
   justify-content: space-between;
  }
- .navbar a {
+ .navbarButton {
   font-size: 16px;
  }
  .content {

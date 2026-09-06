@@ -29,10 +29,15 @@ $title = lang("global.login");
 if ($_SESSION["logged_in"]) {
    $messages[] = error("You're already logged in.");
    render_page("", array(), $title);
+   exit();
 }
+
 // Handle requests.
-elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRFToken()) {    
+if (validateCSRFToken()) {
     $errors = array();
+    
+    $_POST["username"] = $_POST["username"] ?? "";
+    $_POST["password"] = $_POST["password"] ?? "";
     
     if (strlen($_POST["username"]) < 1) {
         $errors[] = error("Username cannot be blank.");
@@ -44,7 +49,7 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
     // Lock to avoid race conditions.
     $db->query("LOCK TABLES `logs` WRITE, `accounts` WRITE");
     // Now see how many login attempts there are from the past hour.
-    $attempts = $db->query("SELECT 1 FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' AND `timestamp`>" . (time()-3600));
+    $attempts = preparedQuery("SELECT 1 FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `ip`=? AND `timestamp`>?", array($_SERVER["REMOTE_ADDR"], (time()-3600)));
     
     // Stop if they've logged in or tried to too many times.
     if ($attempts->num_rows >= $config["loginsPerHour"]) {
@@ -58,7 +63,7 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
     }
     else {
         // First find the account they want to log into.
-        $result = $db->query("SELECT `id`, `name`, `role`, `password` FROM `accounts` WHERE `username`='" . $db->real_escape_string($_POST["username"]) . "'");
+        $result = preparedQuery("SELECT `id`, `name`, `role`, `password` FROM `accounts` WHERE `username`=?", array($_POST["username"]));
         // If there's no account with that name, give them the generic failure message. This helps prevent username enumeration.
         if ($result->num_rows < 1) {
             // We don't log this because there's no actual account being logged into.
@@ -96,7 +101,7 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
                 $_SESSION["logged_in"] = true;
                 $_SESSION["id"] = $r["id"];
 
-                $_SESSION["messages"][] = success("Successfully logged in. Welcome, " . $r["name"] . ".");
+                $_SESSION["messages"][] = success("Successfully logged in. Welcome, {$r["name"]}.");
                 $success = true;
                             
                 if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on") and ($ishttps == "on")) {
@@ -116,13 +121,13 @@ elseif (isset($_POST["username"]) and isset($_POST["password"]) and validateCSRF
                 }
         
                 // Update the user's lastactive time, IP, and login cookie.
-                $db->query("UPDATE `accounts` SET `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', `lastactive`='" . time() . "', `cookie`='" . hash("sha256", $cookie) . "', `cookietime`='" . time() . "' WHERE `id`='" . $r["id"] . "'");
+                preparedQuery("UPDATE `accounts` SET `ip`=?, `lastactive`=?, `cookie`=?, `cookietime`=? WHERE `id`=?", array($_SERVER["REMOTE_ADDR"], time(), hash("sha256", $cookie), time(), $r["id"]));
                 // Log the successful login.
-                $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('login_success', '" . $r["id"] . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
+                preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('login_success', ?, ?, ?, ?)", array($r["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             }
             if (!$success) {
                 // Log the failed login attempt.
-                $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('login_fail', '" . $r["id"] . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
+                preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('login_fail', ?, ?, ?, ?)", array($r["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             }
         }
     }

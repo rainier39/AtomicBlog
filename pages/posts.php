@@ -37,13 +37,12 @@ $id = $_SESSION["id"] ?? 0;
 $tagQuery = "";
 
 if (isset($_GET["tag"])) {
-    $tagQuery = " AND EXISTS( SELECT * FROM `tags` WHERE `tags`.`post`=`posts`.`id` AND `tag` LIKE '%" . $db->real_escape_string($_GET["tag"]) . "%')";
+    $tagQuery = " AND EXISTS( SELECT * FROM `tags` WHERE `tags`.`post`=p.`id` AND `tag`='" . $db->real_escape_string($_GET["tag"]) . "')";
 }
 
 // Get all of the blog posts.
-$posts = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')){$tagQuery} ORDER BY `id` DESC");
+$posts = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (`published`='1' OR `account`='{$id}'){$tagQuery} ORDER BY `id` DESC");
 
-// TODO: tags from unpublished posts can show up, minor issue to fix later
 // TODO: pagination and an actual post searching/filtering system
 
 // If there are posts, display them.
@@ -56,7 +55,7 @@ if ($posts->num_rows > 0) {
     $postsvars["posts"] .= "</div>";
     // Display a tag cloud.
     // Only keep the top 100 tags.
-    $tagQuery = $db->query("SELECT `tag`, COUNT(`post`) FROM `tags` GROUP BY `tag` ORDER BY COUNT(`post`) DESC LIMIT 100");
+    $tagQuery = $db->query("SELECT `tag`, COUNT(`post`) FROM `tags` LEFT JOIN `posts` AS p ON `tags`.`post`=p.`id` WHERE (p.published='1' OR p.account='{$id}') GROUP BY `tag` ORDER BY COUNT(`post`) DESC LIMIT 100");
     $tagCloud = "<div class='tagCloud'>";
     while ($tag = $tagQuery->fetch_assoc()) {
         $tagCloud .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag["tag"]))) . "' style='font-size:" . clamp($tag["COUNT(`post`)"]+14, 14, 50) . "px'>" . htmlspecialchars($tag["tag"]) . "</a>";

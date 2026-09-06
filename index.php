@@ -49,8 +49,7 @@ date_default_timezone_set($config["timezone"]);
 
 // Make sure that the page is accessed over HTTPS if applicable.
 $ishttps = $_SERVER["HTTPS"] ?? "";
-if (($ishttps != "on") and $config["https"])
-{
+if (($ishttps != "on") and $config["https"]) {
     header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
     exit();
 }
@@ -151,46 +150,21 @@ if ($_SESSION["logged_in"]) {
     preparedQuery("UPDATE `accounts` SET `lastactive`=? WHERE `id`=?", array(time(), $_SESSION["id"]));
 }
 
+// Every page that one is allowed to visit.
+$pages = array("login", "panel", "posts", "register", "post", "profile", "feed");
+
 // If the software hasn't been installed yet, direct all requests to the install page.
-if ($config["installed"] == false)
-{
+if (!$config["installed"]) {
     require "core/install.php";
 }
-elseif ($url[0] == "logout")
-{
+elseif (isset($_POST["logout"]) and validateCSRFToken()) {
     logout(true);
     require "pages/home.php";
 }
-elseif ($url[0] == "login")
-{
-    require "pages/login.php";
+elseif (in_array($url[0], $pages)) {
+    require "pages/{$url[0]}.php";
 }
-elseif ($url[0] == "panel")
-{
-    require "pages/panel.php";
-}
-elseif ($url[0] == "posts")
-{
-    require "pages/posts.php";
-}
-elseif ($url[0] == "register")
-{
-    require "pages/register.php";
-}
-elseif ($url[0] == "post")
-{
-    require "pages/post.php";
-}
-elseif ($url[0] == "profile")
-{
-    require "pages/profile.php";
-}
-elseif ($url[0] == "feed")
-{
-    require "pages/feed.php";
-}
-elseif ($url[0] == "")
-{
+elseif ($url[0] == "") {
     require "pages/home.php";
 }
 // Default everything else to the homepage, and show an error message.

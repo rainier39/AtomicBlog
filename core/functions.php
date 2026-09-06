@@ -103,16 +103,15 @@ function displayPost($p) {
         }
     }
 
-    // Get the account information of the post author.
-    $acc = preparedQuery("SELECT `name`, `namevisible` FROM `accounts` WHERE `id`=?", array($p["account"]));
-    if ($acc->num_rows > 0) {
-        $a = $acc->fetch_assoc();
-        if ($a["namevisible"]) {
-            $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($a["name"]) . "</a>";
-        }
-        else {
-            $postTilevars["author"] = "Anonymous";
-        }
+    // Display the account information of the post author.
+    if ($p["namevisible"]) {
+        $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($p["name"], ENT_NOQUOTES) . "</a>";
+    }
+    elseif (!$p["name"]) {
+        $postTilevars["author"] = "Nobody";
+    }
+    else {
+        $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>Anonymous</a>";
     }
     
     return render_template("postTile.html", $postTilevars, false);

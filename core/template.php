@@ -58,8 +58,12 @@ function render_template($filename, $variables, $echo=true) {
         $template = preg_replace("/{{ ({$k}) }}/", $v, $template);
     }
     foreach ($lang as $k=>$v) {
+        // Triple square brackets for makeURL() strings.
+        // Special case: empty.
+        $template = preg_replace("/\[\[\[\]\]\]/", makeURL(""), $template);
+        $template = preg_replace("/\[\[\[ (.+?) \]\]\]/", makeURL("$1"), $template);
         // Double square brackets for language strings.
-        $template = preg_replace("/\[\[ ({$k}) \]\]/", $v, $template);
+        $template = preg_replace("/\[\[ ({$k}) \]\]/", "{$v}", $template);
     }
     
     // Remove any extra whitespace.

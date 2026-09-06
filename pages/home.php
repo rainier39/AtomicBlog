@@ -35,7 +35,7 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 $id = $_SESSION["id"] ?? 0;
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `id` DESC");
+$starred = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='{$id}')) ORDER BY `id` DESC");
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
@@ -56,7 +56,7 @@ else {
 }
 
 // Get the 5 most recent posts.
-$recent = $db->query("SELECT `id`, `title`, `account`, `starred`, `published` FROM `posts` WHERE (published='1' OR (published='0' AND account='" . $id . "')) ORDER BY `starttime` DESC LIMIT 5");
+$recent = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (published='1' OR (published='0' AND account='{$id}')) ORDER BY `starttime` DESC LIMIT 5");
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
@@ -76,8 +76,8 @@ else {
     $homevars["recent"] .= info("No posts yet.");
 }
 
-// Get all of the views, and just get their post ids.
-$mostViewedPosts = $db->query("SELECT `id`,`title`,`account`,`starred`,`published`,COUNT(`views`.`post`) FROM `posts` LEFT JOIN `views` ON `views`.`post`=`posts`.`id` GROUP BY `posts`.`id` ORDER BY COUNT(`views`.`post`) DESC, `id` ASC LIMIT 5");
+// Get the top 5 most viewed posts.
+$mostViewedPosts = $db->query("SELECT p.`id`,p.`title`,p.`account`,p.`starred`,p.`published`,a.`namevisible`,a.`name`,COUNT(`views`.`post`) FROM `posts` AS p LEFT JOIN `accounts` AS a ON a.`id`=p.`account` LEFT JOIN `views` ON `views`.`post`=p.`id` WHERE (published='1' OR (published='0' AND account='{$id}')) GROUP BY p.`id` ORDER BY COUNT(`views`.`post`) DESC, p.`id` ASC LIMIT 5");
 
 // Only try to display posts if there are any.
 if ($mostViewedPosts->num_rows > 0) {

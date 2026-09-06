@@ -28,6 +28,7 @@ $headervars = array("pagetitle" => $htitle,
 "icon" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true),
 "blogtitle" => $config["title"],
 "description" => $config["description"],
+"installed" => $config["installed"],
 "navbar" => "",
 "messages" => implode($messages));
 
@@ -37,22 +38,17 @@ if (strlen($config["customCSS"]) > 0) {
 }
 
 // Generate the navbar appropriately.
-if ($config["installed"]) {
-    $headervars["navbar"] .= "<div class='navbar'><a href='" . makeURL("") . "'>" . lang("navbar.home") . "</a><a href='" . makeURL("posts") . "'>" . lang("global.posts") . "</a>";
-    if ($_SESSION["logged_in"]) {
-        $headervars["navbar"] .= "<a href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a>";
-        $headervars["navbar"] .= "<a href='" . makeURL("profile/" . $_SESSION["id"]) . "'>Profile</a>";
-        $headervars["navbar"] .= "<a href='" . makeURL("logout") . "'>" . lang("navbar.logout") . "</a>";
-    }
-    else {
-        $headervars["navbar"] .= "<a href='" . makeURL("login") . "'>" . lang("global.login") . "</a>";
-        if ($config["allowRegistration"]) {
-            $headervars["navbar"] .= "<a href='" . makeURL("register") . "'>" . lang("global.register") . "</a>";
-        }
-    }
-    $headervars["navbar"] .= "</div>";
+if ($_SESSION["logged_in"]) {
+    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a>";
+    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("profile/" . $_SESSION["id"]) . "'>Profile</a>";
+    $headervars["navbar"] .= render_template("logout.html", array("token" => $_SESSION["csrf_token"]), false);
 }
-
+else {
+    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("login") . "'>" . lang("global.login") . "</a>";
+    if ($config["allowRegistration"]) {
+        $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("register") . "'>" . lang("global.register") . "</a>";
+    }
+}
 
 render_template("header.html", $headervars);
 

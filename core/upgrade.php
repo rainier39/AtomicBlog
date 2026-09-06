@@ -107,7 +107,7 @@ if ($config["version"] != VERSION) {
         while ($p = $posts->fetch_assoc()) {
             $tags = parseTags($p["tags"]);
             foreach ($tags as $tag) {
-                $db->query("INSERT INTO `tags` (`tag`, `post`) VALUES ('" . $db->real_escape_string(substr($tag, 0, 16)) . "', '{$p["id"]}')");
+                preparedQuery("INSERT INTO `tags` (`tag`, `post`) VALUES (?, ?)", array(substr($tag, 0, 16), $p["id"]));
             }
         }
         $db->query("ALTER TABLE `posts` DROP COLUMN IF EXISTS `tags`");
