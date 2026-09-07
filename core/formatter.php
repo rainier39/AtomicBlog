@@ -56,11 +56,13 @@ function format_code_block($string) {
     function ($matches) {
         // We don't want to format anything inside a codeblock as markdown.
         $matches[2] = str_replace(" ", "&nbsp;", $matches[2]);
-        $matches[2] = str_replace("#", "&#35;", $matches[2]);
+        $matches[2] = str_replace("\\t", "&Tab;", $matches[2]);
+        $matches[2] = str_replace("\\n", "&NewLine;", $matches[2]);
         $matches[2] = str_replace(")", "&#41;", $matches[2]);
         $matches[2] = str_replace("*", "&#42;", $matches[2]);
         $matches[2] = str_replace("-", "&#45;", $matches[2]);
         $matches[2] = str_replace(".", "&#46;", $matches[2]);
+        $matches[2] = str_replace("`", "&grave;", $matches[2]);
         $formatLangs = array("php");
         if (in_array(trim($matches[1]), $formatLangs)) {
             $matches[2] = call_user_func("format_lang_" . trim($matches[1]), $matches[2]);
@@ -92,23 +94,23 @@ function format_inline_code($string) {
 }
 
 function format_h2($string) {
-    return preg_replace("/^#\s+(.+?)$/mis", "<h2>$1</h2>", $string);
+    return preg_replace("/^# +(.+?)$/mis", "<h2>$1</h2>", $string);
 }
 
 function format_h3($string) {
-    return preg_replace("/^##\s+(.+?)$/mis", "<h3>$1</h3>", $string);
+    return preg_replace("/^## +(.+?)$/mis", "<h3>$1</h3>", $string);
 }
 
 function format_h4($string) {
-    return preg_replace("/^###\s+(.+?)$/mis", "<h4>$1</h4>", $string);
+    return preg_replace("/^### +(.+?)$/mis", "<h4>$1</h4>", $string);
 }
 
 function format_h5($string) {
-    return preg_replace("/^####\s+(.+?)$/mis", "<h5>$1</h5>", $string);
+    return preg_replace("/^#### +(.+?)$/mis", "<h5>$1</h5>", $string);
 }
 
 function format_h6($string) {
-    return preg_replace("/^#####\s+(.+?)$/mis", "<h6>$1</h6>", $string);
+    return preg_replace("/^##### +(.+?)$/mis", "<h6>$1</h6>", $string);
 }
 
 function format_horizontal_rule($string) {
@@ -132,22 +134,46 @@ function format_paragraphs($string) {
 }
 
 function format_linebreaks($string) {
-    return preg_replace("/\s\s$/mis", "</br>", $string);
+    return preg_replace("/\s\s$/mis", "<br>", $string);
 }
 
 // -- Define the formatter functions for any supported coding/markup languages. --
 
 // PHP (Hypertext Preprocessor).
 function format_lang_php($string) {
-    // WIP code, will be replaced with regex or full on lexer/parser later. TODO
+    // WIP code, may be replaced with full on lexer/parser later. TODO
     $keywords = array("or", "__halt_compiler", "abstract", "and", "array", "as", "break", "callable", "case", "catch", "class", "clone", "const", "continue", "declare", "default", "die", "do", "echo", "else", "elseif", "empty", "enddeclare", "endfor", "endforeach", "endif", "endswitch", "endwhile", "eval", "exit", "extends", "final", "finally", "fn", "for", "foreach", "function", "global", "goto", "if", "implements", "include", "include_once", "instanceof", "insteadof", "interface", "isset", "list", "match", "namespace", "new", "print", "private", "protected", "public", "readonly", "require", "require_once", "return", "static", "switch", "throw", "trait", "try", "unset", "use", "var", "while", "xor", "yield", "yield from");
     foreach ($keywords as $k) {
-        $string = str_replace($k, "<font color=red>" . $k . "</font>", $string);
+        $string = preg_replace("/(?<![a-zA-Z0-9_])({$k})(?![a-zA-Z0-9_])/s", "<span style='color: red;'>$1</span>", $string);
     }
+    // Multi-line comments.
+    $string = preg_replace("/\/&#42;.*?&#42;\//s", "<span style='color: darkgreen;'>$0</span>", $string);
+    // Single-line comments.
+    $string = preg_replace("/^(\/\/.*?)\\n/m", "<span style='color: darkgreen;'>$0</span>", $string);
+    // Technically hash signs are also comments.
+    $string = preg_replace("/^(#.*?)\\n/m", "<span style='color: darkgreen;'>$0</span>", $string);
+    
+    // Quotes (double only).
+    $string = preg_replace("/&quot;.*?&quot;/s", "<span style='color: purple;'>$0</span>", $string);
+    
+    // Variables.
+    $string = preg_replace("/\\$[a-zA-Z_]+/", "<span style='color: blue;'>$0</span>", $string);
+    
+    // Parens.
+    $string = str_replace("(", "<span style='color: darkblue;'>(</span>", $string);
+    $string = str_replace("&#41;", "<span style='color: darkblue;'>)</span>", $string);
+    
+    // Curly brackets.
+    $string = str_replace("{", "<span style='color: darkblue;'>{</span>", $string);
+    $string = str_replace("}", "<span style='color: darkblue;'>}</span>", $string);
+    
+    // Square brackets.
+    $string = str_replace("[", "<span style='color: darkblue;'>[</span>", $string);
+    $string = str_replace("]", "<span style='color: darkblue;'>]</span>", $string);
     
     // PHP opening and closing tags.
-    $string = str_replace("&lt;?php", "<font color=green>&lt;?php</font>", $string);
-    $string = str_replace("?&gt;", "<font color=green>?&gt;</font>", $string);
+    $string = str_replace("&lt;?php", "<span style='color: green;'>&lt;?php</span>", $string);
+    $string = str_replace("?&gt;", "<span style='color: green;'>?&gt;</span>", $string);
     
     return $string;
 }
