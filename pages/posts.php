@@ -45,6 +45,9 @@ $posts = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`publ
 
 // TODO: pagination and an actual post searching/filtering system
 
+// Only do this ONCE.
+$uploads = scandir("images/");
+
 // If there are posts, display them.
 if ($posts->num_rows > 0) {
     $postsvars["posts"] .= "<div class='postTiles'>";

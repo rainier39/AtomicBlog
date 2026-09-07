@@ -6,7 +6,6 @@
 }
 html {
  font-family: 'Helvetica', 'Arial', sans-serif;
- text-rendering: optimizeLegibility;
 }
 body {
  margin: auto;
@@ -294,6 +293,8 @@ code, .codeblock {
 .tagslabel {
  display: inline-block;
  margin-right: 4px;
+}
+.tagCloud {
 }
 .tagCloud a {
  display: inline-block;

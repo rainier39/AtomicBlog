@@ -34,6 +34,9 @@ if (!checkPerm(PERM_VIEW_POSTS)) {
 
 $id = $_SESSION["id"] ?? 0;
 
+// Only do this ONCE.
+$uploads = scandir("images/");
+
 // Get all of the starred blog posts.
 $starred = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='{$id}')) ORDER BY `id` DESC");
 

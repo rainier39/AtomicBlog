@@ -80,4 +80,18 @@ function render_template($filename, $variables, $echo=true) {
     }
 }
 
+// Render a page, placing the header and footer accordingly.
+function render_page($templatename, $templatevars, string $htitle="") {
+    global $config, $hcontent, $messages;
+    if ($htitle == "") {
+        $htitle = $config["title"];
+    }
+    else {
+        $htitle = $htitle . " - " . $config["title"];
+    }
+    require "pages/header.php";
+    render_template($templatename, $templatevars);
+    require "pages/footer.php";
+}
+
 ?>

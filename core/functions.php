@@ -43,20 +43,6 @@ function logout($redirect=false) {
     if ($redirect) redirect("");
 }
 
-// Render a page, placing the header and footer accordingly.
-function render_page($templatename, $templatevars, string $htitle="") {
-    global $config, $hcontent, $messages;
-    if ($htitle == "") {
-        $htitle = $config["title"];
-    }
-    else {
-        $htitle = $htitle . " - " . $config["title"];
-    }
-    require "pages/header.php";
-    render_template($templatename, $templatevars);
-    require "pages/footer.php";
-}
-
 // Set the user's CSRF token, overwriting the prior one if any.
 function generateCSRFToken() {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
@@ -70,7 +56,7 @@ function flushConfig() {
 
 // Display a blog post tile.
 function displayPost($p) {
-    global $db;
+    global $db, $uploads;
     
     $postTilevars = array("url" => makeURL("post/" . $p["id"]),
     "image" => "",
@@ -86,21 +72,17 @@ function displayPost($p) {
     }
 
     // Display the post's icon if it exists.
-    $uploads = scandir("images/");
-    foreach ($uploads as $u) {
-        if (str_starts_with($u, $p["id"] . ".")) {
-            // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = preparedQuery("SELECT `timestamp` FROM `logs` WHERE `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$u}"));
-            if ($uploadTime->num_rows > 0) {
-                $ut = $uploadTime->fetch_assoc()["timestamp"];
-            }
-            else {
-                $ut = time();
-            }
-            $postTilevars["image"] = "<img src='" . makeURL("images/{$u}") . "?{$ut}'>";
-            // Just use the first icon we find.
-            break;
+    $icon = $p["id"] . ".webp";
+    if (is_file("images/{$icon}")) {
+        // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+        $uploadTime = preparedQuery("SELECT `timestamp` FROM `logs` WHERE `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$icon}"));
+        if ($uploadTime->num_rows > 0) {
+            $ut = $uploadTime->fetch_assoc()["timestamp"];
         }
+        else {
+            $ut = time();
+        }
+        $postTilevars["image"] = "<img src='" . makeURL("images/{$icon}") . "?{$ut}'>";
     }
 
     // Display the account information of the post author.

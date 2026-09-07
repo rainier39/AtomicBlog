@@ -581,24 +581,22 @@ if ($displayPost) {
         $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>Anonymous</a>";
     }
     if (!empty($p["edittime"])) {
-        $postvars["edited"] .= " | <small>Modified: <abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr></small>";
+        $postvars["edited"] .= " | Modified: <abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr>";
     }
     // Display the post's icon if it exists.
-    $uploads = scandir("images/");
-    foreach ($uploads as $u) {
-        if (str_starts_with($u, $p["id"] . ".")) {
-            // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-            $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='images/{$u}' ORDER BY `timestamp` DESC LIMIT 1");
-            if ($uploadTime->num_rows > 0) {
-                $ut = $uploadTime->fetch_assoc()["timestamp"];
-            }
-            else {
-                $ut = time();
-            }
-            $postvars["icon"] = "<p><img src='" . makeURL("images/{$u}") . "?{$ut}' class='pIcon'></p>";
-            // Just use the first icon we find.
-            break;
+    $icon = $p["id"] . ".webp";
+    if (file_exists("images/{$icon}")) {
+        // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
+        $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='images/{$icon}' ORDER BY `timestamp` DESC LIMIT 1");
+        if ($uploadTime->num_rows > 0) {
+            $ut = $uploadTime->fetch_assoc()["timestamp"];
         }
+        else {
+            $ut = time();
+        }
+        $postvars["icon"] = "<p>
+         <img src='" . makeURL("images/{$icon}") . "?{$ut}' class='pIcon'>
+        </p>";
     }
     foreach ($tags as $tag) {
         $postvars["tags"] .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag))) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
