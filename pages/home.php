@@ -38,7 +38,7 @@ $id = $_SESSION["id"] ?? 0;
 $uploads = scandir("images/");
 
 // Get all of the starred blog posts.
-$starred = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE `starred`='1' AND (published='1' OR (published='0' AND account='{$id}')) ORDER BY `id` DESC");
+$starred = preparedQuery("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE `starred`='1' AND (published='1' OR (published='0' AND account=?)) ORDER BY `id` DESC", array($id));
 
 // Only display the posts if there are any.
 if ($starred->num_rows > 0) {
@@ -59,7 +59,7 @@ else {
 }
 
 // Get the 5 most recent posts.
-$recent = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (published='1' OR (published='0' AND account='{$id}')) ORDER BY `starttime` DESC LIMIT 5");
+$recent = preparedQuery("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (published='1' OR (published='0' AND account=?)) ORDER BY `starttime` DESC LIMIT 5", array($id));
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
@@ -80,7 +80,7 @@ else {
 }
 
 // Get the top 5 most viewed posts.
-$mostViewedPosts = $db->query("SELECT p.`id`,p.`title`,p.`account`,p.`starred`,p.`published`,a.`namevisible`,a.`name`,COUNT(`views`.`post`) FROM `posts` AS p LEFT JOIN `accounts` AS a ON a.`id`=p.`account` LEFT JOIN `views` ON `views`.`post`=p.`id` WHERE (published='1' OR (published='0' AND account='{$id}')) GROUP BY p.`id` ORDER BY COUNT(`views`.`post`) DESC, p.`id` ASC LIMIT 5");
+$mostViewedPosts = preparedQuery("SELECT p.`id`,p.`title`,p.`account`,p.`starred`,p.`published`,a.`namevisible`,a.`name`,COUNT(`views`.`post`) FROM `posts` AS p LEFT JOIN `accounts` AS a ON a.`id`=p.`account` LEFT JOIN `views` ON `views`.`post`=p.`id` WHERE (published='1' OR (published='0' AND account=?)) GROUP BY p.`id` ORDER BY COUNT(`views`.`post`) DESC, p.`id` ASC LIMIT 5", array($id));
 
 // Only try to display posts if there are any.
 if ($mostViewedPosts->num_rows > 0) {

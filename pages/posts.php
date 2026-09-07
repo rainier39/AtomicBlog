@@ -58,7 +58,7 @@ if ($posts->num_rows > 0) {
     $postsvars["posts"] .= "</div>";
     // Display a tag cloud.
     // Only keep the top 100 tags.
-    $tagQuery = $db->query("SELECT `tag`, COUNT(`post`) FROM `tags` LEFT JOIN `posts` AS p ON `tags`.`post`=p.`id` WHERE (p.published='1' OR p.account='{$id}') GROUP BY `tag` ORDER BY COUNT(`post`) DESC LIMIT 100");
+    $tagQuery = preparedQuery("SELECT `tag`, COUNT(`post`) FROM `tags` LEFT JOIN `posts` AS p ON `tags`.`post`=p.`id` WHERE (p.published='1' OR p.account=?) GROUP BY `tag` ORDER BY COUNT(`post`) DESC LIMIT 100", array($id));
     $tagCloud = "<div class='tagCloud'>";
     while ($tag = $tagQuery->fetch_assoc()) {
         $tagCloud .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag["tag"]))) . "' style='font-size:" . clamp($tag["COUNT(`post`)"]+14, 14, 50) . "px'>" . htmlspecialchars($tag["tag"]) . "</a>";

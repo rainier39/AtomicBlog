@@ -29,7 +29,7 @@ $title = "Profile Settings";
 // Handle requests.
 if (validateCSRFToken()) {
     // Get the information for this account.
-    $accountInfo = $db->query("SELECT `color`, `bio`, `namevisible`, `emailvisible` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+    $accountInfo = preparedQuery("SELECT `color`, `bio`, `namevisible`, `emailvisible` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
 
     $a = $accountInfo->fetch_assoc();
     
@@ -90,7 +90,7 @@ if (validateCSRFToken()) {
     }
     // If something has actually changed...
     elseif ($bioChanged or $colorChanged or ($nv != $a["namevisible"]) or ($ev != $a["emailvisible"])) {
-        $db->query("UPDATE `accounts` SET `bio`='" . $db->real_escape_string($bio) . "', `color`='" . $db->real_escape_string($color) . "', `namevisible`='" . $nv . "', `emailvisible`='" . $ev . "' WHERE `id`='" . $_SESSION["id"] . "'");
+        preparedQuery("UPDATE `accounts` SET `bio`=?, `color`=?, `namevisible`=?, `emailvisible`=? WHERE `id`=?", array($bio, $color, $nv, $ev, $_SESSION["id"]));
         $messages[] = success("Successfully updated profile settings.");
     }
     else {
@@ -99,7 +99,7 @@ if (validateCSRFToken()) {
 }
 
 // Get the information for this account.
-$accountInfo = $db->query("SELECT `color`, `bio`, `namevisible`, `emailvisible` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+$accountInfo = preparedQuery("SELECT `color`, `bio`, `namevisible`, `emailvisible` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
 
 $a = $accountInfo->fetch_assoc();
 

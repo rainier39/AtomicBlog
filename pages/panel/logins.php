@@ -28,7 +28,7 @@ $title = "Login Logs";
 
 $loginsVars = array("logins" => "");
 
-$attempts = $db->query("SELECT `logtype`, `ip`, `useragent`, `timestamp` FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `targetid`='" . $_SESSION["id"] . "' ORDER BY `timestamp` DESC");
+$attempts = preparedQuery("SELECT `logtype`, `ip`, `useragent`, `timestamp` FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `targetid`=? ORDER BY `timestamp` DESC", array($_SESSION["id"]));
 
 while ($a = $attempts->fetch_assoc()) {
     if ($a["logtype"] == "login_success") {

@@ -23,8 +23,6 @@
 if (!defined('INDEX')) exit;
 
 $title = "";
-$uid = $url[1] ?? "";
-if ($uid != "") $uid = (int)$uid;
 
 if (!checkPerm(PERM_VIEW_PROFILE)) {
     $messages[] = error("You don't have permission to view profiles.");
@@ -32,7 +30,7 @@ if (!checkPerm(PERM_VIEW_PROFILE)) {
     exit();
 }
 
-$profileinfo = $db->query("SELECT `name`, `color`, `bio`, `email`, `lastactive`, `namevisible`, `emailvisible`, `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($uid) . "'");
+$profileinfo = preparedQuery("SELECT `id`, `name`, `color`, `bio`, `email`, `lastactive`, `namevisible`, `emailvisible`, `role` FROM `accounts` WHERE `id`=?", array($url[1] ?? ""));
 $p = $profileinfo->fetch_assoc();
 
 if ($profileinfo->num_rows < 1) {
@@ -42,8 +40,8 @@ if ($profileinfo->num_rows < 1) {
     exit();
 }
 
-$comments = $db->query("SELECT 1 FROM `comments` WHERE `account`='" . $db->real_escape_string($uid) . "'");
-$posts = $db->query("SELECT 1 FROM `posts` WHERE `account`='" . $db->real_escape_string($uid) . "'");
+$comments = preparedQuery("SELECT 1 FROM `comments` WHERE `account`=?", array($p["id"]));
+$posts = preparedQuery("SELECT 1 FROM `posts` WHERE `account`=?", array($p["id"]));
 
 if ($p["namevisible"]) {
     $name = $p["name"];
@@ -75,14 +73,14 @@ $uploads = scandir("images/");
 $avatars = array();
 // Get all avatars.
 foreach ($uploads as $u) {
-    if (str_starts_with($u, "a_" . $uid . ".")) {
+    if (str_starts_with($u, "a_" . $p["id"] . ".")) {
         $avatars[] = $u;
     }
 }
 // Just use the first avatar we find.
 if (count($avatars) > 0) {
     // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-    $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$avatars[0]}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+    $uploadTime = preparedQuery("SELECT `timestamp` FROM `logs` WHERE `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$avatars[0]}"));
     if ($uploadTime->num_rows > 0) {
         $ut = $uploadTime->fetch_assoc()["timestamp"];
     }

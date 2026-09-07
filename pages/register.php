@@ -19,7 +19,7 @@
 // register.php
 // Allow a user to sign up for an account.
 
-// TODO: make emailed login link expire, allow resending email (with strict limits)
+// TODO: allow resending email (with strict limits)
 
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
@@ -43,7 +43,8 @@ if (!$config["allowRegistration"]) {
 }
 
 if (isset($url[1]) and ($config["registrationMode"] == "email")) {
-    $account = $db->query("SELECT `id` FROM `accounts` WHERE `cookie`='" . $db->real_escape_string(hash("sha256", $url[1])) . "' AND `role`='Unapproved'");
+    // Look for valid email links issued within the past hour.
+    $account = preparedQuery("SELECT `id` FROM `accounts` WHERE `cookie`=? AND `cookietime`>? AND `role`='Unapproved'", array(hash("sha256", $url[1]), (time()-3600)));
     
     if ($account->num_rows < 1) {
         $messages[] = error("Invalid account activation link.");
@@ -53,7 +54,7 @@ if (isset($url[1]) and ($config["registrationMode"] == "email")) {
     
     $a = $account->fetch_assoc();
     
-    $db->query("UPDATE `accounts` SET `cookie`=NULL, `role`='Member' WHERE `id`='" . $a["id"] . "'");
+    preparedQuery("UPDATE `accounts` SET `cookie`=NULL, `cookietime`=0, `role`='Member' WHERE `id`=?", array($a["id"]));
 
     $messages[] = unsafe_success("Successfully activated your account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
     render_page("", $registervars, $title);
@@ -70,7 +71,7 @@ if (validateCSRFToken()) {
     // Lock to avoid race conditions.
     $db->query("LOCK TABLE `accounts` WRITE");
     // Make sure there aren't too many accounts from this IP.
-    $ipCheck = $db->query("SELECT `jointime` FROM `accounts` WHERE `ip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "' OR `joinip`='" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "'");
+    $ipCheck = preparedQuery("SELECT `jointime` FROM `accounts` WHERE `ip`=? OR `joinip`=?", array($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_ADDR"]));
     if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
         $errors[] = "You've made too many accounts.";
     }
@@ -107,7 +108,10 @@ if (validateCSRFToken()) {
             
     // If everything checks out, make the account.
     if (count($errors) == 0) {
-        $cookie = "NULL";
+        $cookie = "";
+        $cookiefordb = "NULL";
+        $cookietime = 0;
+        $now = time();
         // Decide what role to assign.
         switch ($config["registrationMode"]) {
             case "open":
@@ -116,13 +120,14 @@ if (validateCSRFToken()) {
             // Fallthrough intentional.
             case "email":
                 $cookie = bin2hex(random_bytes(32));
+                $cookiefordb = hash("sha256", $cookie);
+                $cookietime = $now;
             case "approval":
             // Default to approval.
             default:
                 $role = "Unapproved";
         }
-        $now = time();
-        $db->query("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`) VALUES ('" . $db->real_escape_string($_POST["username"]) . "', '" . $db->real_escape_string($_POST["email"]) . "', '" . $db->real_escape_string(password_hash($_POST["password"], PASSWORD_DEFAULT)) . "', '" . $db->real_escape_string($_POST["name"]) . "', '" . $role . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $now . "', '" . $now . "', '" . hash("sha256", $cookie) . "')");
+        preparedQuery("INSERT INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`, `cookie`, `cookietime`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array($_POST["username"], $_POST["email"], password_hash($_POST["password"], PASSWORD_DEFAULT), $_POST["name"], $role, $_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_ADDR"], $now, $now, $cookiefordb, $cookietime));
 
         // Inform the user that they've successfully registered.
         if ($role == "Unapproved") {
@@ -131,6 +136,7 @@ if (validateCSRFToken()) {
                     $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
                     break;
                 case "email":
+                    // TODO: remove HTTP_HOST and replace with config baseURL.
                     $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . makeURL("register/" . $cookie)));
                     if ($emailSuccess) {
                         $messages[] = success("You've successfully registered for an account. Click the link provided to the email you specified to activate your account.");
@@ -148,7 +154,7 @@ if (validateCSRFToken()) {
         $db->query("UNLOCK TABLES");
         $registerSuccess = true;
         // Log the registration.
-        $db->query("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', '" . $accountid . "', '" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "', '" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "', '" . time() . "')");
+        preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `ip`, `useragent`, `timestamp`) VALUES ('registration', ?, ?, ?, ?)", array($accountid, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
     }
     // Otherwise, display the errors.
     else {

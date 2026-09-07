@@ -35,9 +35,9 @@ if (validateCSRFToken()) {
     // Change a user's role.
     if (isset($_POST["changerole"]) and isset($_POST["id"])) {
         $_POST["id"] = (int)$_POST["id"];
-        $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+        $rolequery = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
         $crole = $rolequery->fetch_assoc()["role"];
-        $userquery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $db->real_escape_string($_POST["id"]) . "'");
+        $userquery = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_POST["id"]));
         $urole = $userquery->fetch_assoc();
         // Does the user exist?
         if ($userquery->num_rows != 1) {
@@ -69,7 +69,7 @@ if (validateCSRFToken()) {
         }
         // Change the role.
         else {
-            $db->query("UPDATE `accounts` SET `role`='" . $db->real_escape_string($_POST["changerole"]) . "' WHERE `id`='" . $_POST["id"] . "'");
+            preparedQuery("UPDATE `accounts` SET `role`=? WHERE `id`=?", array($_POST["changerole"], $_POST["id"]));
             $messages[] = success("Successfully changed role.");
         }
     }
@@ -81,7 +81,7 @@ $usersvars = array("tbody" => "");
     
 while ($u = $users->fetch_assoc()) {
     // If this user's role is below the current user's role, allow it to be changed.
-    $rolequery = $db->query("SELECT `role` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+    $rolequery = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
     $crole = $rolequery->fetch_assoc()["role"];
     if ($permissions[$u["role"]] < $permissions[$crole]) {
         $roleform = "<form method='post'>";

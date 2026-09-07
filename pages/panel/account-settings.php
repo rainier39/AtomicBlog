@@ -27,7 +27,7 @@ if (!defined('INDEX')) exit;
 $title = "Account Settings";
 
 // Get the information for this account.
-$accountInfo = $db->query("SELECT `name`, `username`, `email`, `password` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
+$accountInfo = preparedQuery("SELECT `name`, `username`, `email`, `password` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
 
 while ($a = $accountInfo->fetch_assoc()) {
     $name = $a["name"];
@@ -71,7 +71,7 @@ if (validateCSRFToken()) {
                 $messages[] = success("Successfully did nothing.");
             }
             else {
-                $db->query("UPDATE `accounts` SET `name`='" . $db->real_escape_string($_POST["name"]) . "', `username`='" . $db->real_escape_string($_POST["username"]) . "', `email`='" . $db->real_escape_string($_POST["email"]) . "' WHERE `id`='" . $_SESSION["id"] . "'");
+                preparedQuery("UPDATE `accounts` SET `name`=?, `username`=?, `email`=? WHERE `id`=?", array($_POST["name"], $_POST["username"], $_POST["email"], $_SESSION["id"]));
                 $messages[] = success("Successfully changed account settings.");
                 $_POST["password1"] = "";
             }
@@ -96,7 +96,7 @@ if (validateCSRFToken()) {
         }
         else {
             // Change the password and invalidate the login cookie.
-            $db->query("UPDATE `accounts` SET `password`='" . $db->real_escape_string(password_hash($_POST["newpassword"], PASSWORD_DEFAULT)) . "', `cookie`=NULL WHERE `id`='" . $_SESSION["id"] . "'");
+            preparedQuery("UPDATE `accounts` SET `password`=?, `cookie`=NULL, `cookietime`=0 WHERE `id`=?", array(password_hash($_POST["newpassword"], PASSWORD_DEFAULT), $_SESSION["id"]));
             clearLoginCookie();
             $messages[] = success("Successfully changed password.");
             $_POST["password2"] = "";
@@ -130,15 +130,10 @@ if (validateCSRFToken()) {
             $size = filesize("images/" . $target);
             $deleted = unlink("images/" . $target);
             if ($deleted) {
-                $db->query("UPDATE `accounts` SET `quota`=`quota`-" . $size . " WHERE `id`='" . $_SESSION["id"] . "'");
-                // Make sure the quota is never less than 0.
-                $userQuota = $db->query("SELECT `quota` FROM `accounts` WHERE `id`='" . $_SESSION["id"] . "'");
-                $uq = (int)$userQuota->fetch_assoc()["quota"];
-                if ($uq < 0) {
-                    $db->query("UPDATE `accounts` SET `quota`=0 WHERE `id`='" . $_SESSION["id"] . "'");
-                }
+                // Subtract from the quota, ensuring it never drops below zero.
+                preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
                 // Log the deletion.
-                $db->query("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', '" . $_SESSION["id"] . "','" . $db->real_escape_string($target) . "','" . $db->real_escape_string($_SERVER["REMOTE_ADDR"]) . "','" . $db->real_escape_string(substr($_SERVER["HTTP_USER_AGENT"], 0, 256)) . "','" . time() . "')");
+                preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                 $messages[] = success("Successfully deleted avatar.");
             }
             else {
@@ -168,7 +163,7 @@ foreach ($uploads as $u) {
 }
 foreach ($avatars as $avatar) {
     // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
-    $uploadTime = $db->query("SELECT `timestamp` FROM `logs` WHERE `content`='" . "images/{$avatar}" . "' ORDER BY `timestamp` DESC LIMIT 1");
+    $uploadTime = preparedQuery("SELECT `timestamp` FROM `logs` WHERE `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$avatar}"));
     if ($uploadTime->num_rows > 0) {
         $ut = $uploadTime->fetch_assoc()["timestamp"];
     }
