@@ -170,15 +170,14 @@ if (!$registerSuccess) {
     "name" => $_POST["name"] ?? "",
     "username" => $_POST["username"] ?? "",
     "email" => $_POST["email"] ?? "",
-    "password" => $_POST["password"] ?? "",
-    "repeatpassword" => $_POST["repeatpassword"] ?? "",
+    "minlength" => MIN_PASSWORD_LENGTH,
     "captcha" => "");
     
     // Add the CAPTCHA if we can and it's enabled.
     if (extension_loaded("gd") and $config["captchaEnabled"]) {
         $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='CAPTCHA image'>";
         $registervars["captcha"] .= "<label for='captcha'>CAPTCHA:</label>
-        <input id='captcha' name='captcha' type='text'>";
+        <input id='captcha' name='captcha' type='text' required>";
     }
 }
 else {

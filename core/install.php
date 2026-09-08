@@ -24,6 +24,13 @@ if (!defined('INDEX')) exit;
 
 $title = "Installer";
 
+// Check for a lock.
+if (is_file("config/.install_lock")) {
+    $messages[] = error("Installer is locked.");
+    render_page("", array(), $title);
+    exit();
+}
+
 // If the blog is being installed in a folder, take note of that fact.
 $dir = explode("/", $_SERVER["REQUEST_URI"]);
 if (end($dir) and str_starts_with(end($dir), "index.php")) {
@@ -194,6 +201,16 @@ if (validateCSRFToken()) {
 
         // Write the new config array to the config file.
         flushConfig();
+        
+        // Create the lockfile so that the installer can only be run again by someone with access to the host filesystem (hopefully the blog owner).
+        // This is mainly to prevent any accidental exposure of the installer due to a botched upgrade or misplaced config.
+        $lock = fopen("config/.install_lock", "w");
+        if ($lock) {
+            fclose($lock);
+        }
+        else {
+            $messages[] = error("Warning: failed to create install lock file.");
+        }
 
         // Print a message that the software has been installed.
         $messages[] = success("Software successfully installed!");
@@ -211,15 +228,13 @@ if (!$config["installed"]) {
     "sqlserver" => $_POST["SQLServer"] ?? "",
     "sqldb" => $_POST["SQLDatabase"] ?? "",
     "sqluser" => $_POST["SQLUsername"] ?? "",
-    "sqlpass" => $_POST["SQLPassword"] ?? "",
     "title" => $_POST["title"] ?? "",
     "description" => $_POST["description"] ?? "",
     "name" => $_POST["name"] ?? "",
     "username" => $_POST["username"] ?? "",
     "email" => $_POST["email"] ?? "",
-    "password" => $_POST["password"] ?? "",
-    "repeatpassword" => $_POST["repeatpassword"] ?? "",
-    "overwrite" => (isset($_POST["overwrite"]) ? " checked" : ""));
+    "overwrite" => (isset($_POST["overwrite"]) ? " checked" : ""),
+    "minlength" => MIN_PASSWORD_LENGTH);
     
     if (!is_writable("./config/")) {
         $messages[] = error("Config directory isn't writable.");

@@ -9,9 +9,9 @@
    <label for='email'>[[ global.email: ]]</label>
    <input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='{{{ email }}}' required>
    <label for='password'>[[ global.password: ]]</label>
-   <input type='password' name='password' id='password' autocomplete='new-password' value='{{{ password }}}' required>
+   <input type='password' name='password' id='password' autocomplete='new-password' minlength='{{{ minlength }}}' required>
    <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
-   <input type='password' name='repeatpassword' id='repeatpassword' value='{{{ repeatpassword }}}' required>
+   <input type='password' name='repeatpassword' id='repeatpassword' minlength='{{{ minlength }}}' required>
    {{ captcha }}
    <br>
    <input type='submit' value='[[ global.register ]]' class='button'>

@@ -138,8 +138,8 @@ if (validateCSRFToken()) {
 if (!$success) {
     $loginvars = array("token" => $_SESSION["csrf_token"],
     "username" => $_POST["username"] ?? "",
-    "password" => $_POST["password"] ?? "",
     "https" => ($ishttps == "on"),
+    "minlength" => MIN_PASSWORD_LENGTH,
     "test" => true);
     render_page("login.html", $loginvars, $title);
 }

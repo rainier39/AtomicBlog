@@ -5,7 +5,7 @@
    <label for='username'>[[ global.username: ]]</label>
    <input type='text' name='username' id='username' autocomplete='username' maxlength='32' required value='{{ username }}'>
    <label for='password'>[[ global.password: ]]</label>
-   <input type='password' name='password' id='password' autocomplete='current-password' required value='{{ password }}'>
+   <input type='password' name='password' id='password' autocomplete='current-password' minlength='{{{ minlength }}}' required>
    {% if (https) %}
    <label for='stayloggedin'>[[ login.stayloggedin ]]</label>
    <input type='checkbox' name='stayloggedin' id='stayloggedin' checked>

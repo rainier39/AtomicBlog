@@ -147,10 +147,7 @@ $settingsVars = array("token" => $_SESSION["csrf_token"],
 "name" => $_POST["name"] ?? $name,
 "username" => $_POST["username"] ?? $username,
 "email" => $_POST["email"] ?? $email,
-"password1" => $_POST["password1"] ?? "",
-"password2" => $_POST["password2"] ?? "",
-"newpassword" => $_POST["newpassword"] ?? "",
-"repeatpassword" => $_POST["repeatpassword"] ?? "",
+"minlength" => MIN_PASSWORD_LENGTH,
 "avatars" => "");
 
 $uploads = scandir("images/");

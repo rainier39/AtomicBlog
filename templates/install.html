@@ -10,7 +10,7 @@
    <label for='sqlusername'>SQL Username: </label>
    <input type='text' name='SQLUsername' id='sqlusername' value='{{{ sqluser }}}' required>
    <label for='sqlpassword'>SQL Password: </label>
-   <input type='password' name='SQLPassword' id='sqlpassword' value='{{{ sqlpass }}}' required>
+   <input type='password' name='SQLPassword' id='sqlpassword' required>
    <div></div><h2>Blog Configuration</h2>
    <label for='title'>Blog Title: </label>
    <input type='text' name='title' id='title' maxlength='32' value='{{{ title }}}' required>
@@ -24,9 +24,9 @@
    <label for='email'>Email Address: </label>
    <input type='email' name='email' id='email' maxlength='64' value='{{{ email }}}' required>
    <label for='password'>Password: </label>
-   <input type='password' name='password' id='password' value='{{{ password }}}' required>
+   <input type='password' name='password' id='password' minlength='{{{ minlength }}}' required>
    <label for='repeatpassword'>Repeat password: </label>
-   <input type='password' name='repeatpassword' id='repeatpassword' value='{{{ repeatpassword }}}' required>
+   <input type='password' name='repeatpassword' id='repeatpassword' minlength='{{{ minlength }}}' required>
    <div></div><h2>Settings</h2>
    <label for='overwrite'>Overwrite old database: </label>
    <input type='checkbox' name='overwrite' id='overwrite'{{ overwrite }}>        
