@@ -136,8 +136,7 @@ if (validateCSRFToken()) {
                     $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
                     break;
                 case "email":
-                    // TODO: remove HTTP_HOST and replace with config baseURL.
-                    $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . makeURL("register/" . $cookie)));
+                    $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ($config["baseURL"] . makeURL("register/" . $cookie)));
                     if ($emailSuccess) {
                         $messages[] = success("You've successfully registered for an account. Click the link provided to the email you specified to activate your account.");
                     }

@@ -33,8 +33,16 @@ if (is_file("config/.install_lock")) {
 
 // If the blog is being installed in a folder, take note of that fact.
 $dir = explode("/", $_SERVER["REQUEST_URI"]);
-if (end($dir) and str_starts_with(end($dir), "index.php")) {
-    array_pop($dir);
+if (end($dir)) {
+    // Get rid of query strings.
+    $qs = strpos(end($dir), "?");
+    if ($qs !== false) {
+        $dir[count($dir)-1] = substr(end($dir), 0, $qs);
+    }
+    // Get rid of the "index.php" part.
+    if (str_starts_with(end($dir), "index.php")) {
+        array_pop($dir);
+    }
 }
 if (count($dir) > 0) {
     $config["dir"] = trim(implode("/", $dir), "/");
@@ -194,7 +202,14 @@ if (validateCSRFToken()) {
         preparedQuery("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES (?, ?, ?, ?, 'Owner', ?, ?, ?, ?)", array($_POST["username"], $_POST["email"], password_hash($_POST["password"], PASSWORD_DEFAULT), $_POST["name"], $_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_ADDR"], time(), time()));
 
         // Create a new array of our new config values.
-        $newConfig = array("installed" => true, "SQLServer" => $_POST["SQLServer"], "SQLDatabase" => $_POST["SQLDatabase"], "SQLUsername" => $_POST["SQLUsername"], "SQLPassword" => $_POST["SQLPassword"], "title" => $_POST["title"], "description" => $_POST["description"]);
+        $newConfig = array("installed" => true,
+        "SQLServer" => $_POST["SQLServer"],
+        "SQLDatabase" => $_POST["SQLDatabase"],
+        "SQLUsername" => $_POST["SQLUsername"],
+        "SQLPassword" => $_POST["SQLPassword"],
+        "title" => $_POST["title"],
+        "description" => $_POST["description"],
+        "baseURL" => $_POST["baseURL"]);
 
         // Merge the old config array with the new one.
         $config = array_merge($config, $newConfig);
@@ -224,12 +239,14 @@ if (validateCSRFToken()) {
 
 // Display the install page form.
 if (!$config["installed"]) {
+    $baseURL = rtrim((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"], "/");
     $installvars = array("token" => $_SESSION["csrf_token"],
     "sqlserver" => $_POST["SQLServer"] ?? "",
     "sqldb" => $_POST["SQLDatabase"] ?? "",
     "sqluser" => $_POST["SQLUsername"] ?? "",
     "title" => $_POST["title"] ?? "",
     "description" => $_POST["description"] ?? "",
+    "baseURL" => $_POST["baseURL"] ?? $baseURL,
     "name" => $_POST["name"] ?? "",
     "username" => $_POST["username"] ?? "",
     "email" => $_POST["email"] ?? "",

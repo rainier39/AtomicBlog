@@ -103,14 +103,20 @@ if ($config["version"] != VERSION) {
             `post` int unsigned NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         // Move all existing tags to the new tags table before dropping the column.
-        $posts = $db->query("SELECT `tags`, `id` FROM `posts`");
-        while ($p = $posts->fetch_assoc()) {
-            $tags = parseTags($p["tags"]);
-            foreach ($tags as $tag) {
-                preparedQuery("INSERT INTO `tags` (`tag`, `post`) VALUES (?, ?)", array(substr($tag, 0, 16), $p["id"]));
+        try {
+            $posts = $db->query("SELECT `tags`, `id` FROM `posts`");
+            while ($p = $posts->fetch_assoc()) {
+                $tags = parseTags($p["tags"]);
+                foreach ($tags as $tag) {
+                    preparedQuery("INSERT INTO `tags` (`tag`, `post`) VALUES (?, ?)", array(substr($tag, 0, 16), $p["id"]));
+                }
             }
         }
+        catch (mysqli_sql_exception $e) {}
         $db->query("ALTER TABLE `posts` DROP COLUMN IF EXISTS `tags`");
+        
+        // Give them a baseURL as well.
+        $config["baseURL"] = rtrim((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"], "/");
     
         // Bump the version.
         $config["version"] = "v3.0.0-beta";

@@ -33,7 +33,7 @@ header("Content-Type: application/atom+xml");
 // This is here for debugging purposes.
 //header("Content-Type: text/plain");
 
-$uri = ($config["https"] ? "https://" : "http://") . $_SERVER["SERVER_NAME"];
+$uri = $config["baseURL"] . "/";
 
 $lastPostTime = 0;
 $lastPostTimeQuery = $db->query("SELECT `starttime`, `edittime` FROM `posts` WHERE `published`='1' ORDER BY `edittime` DESC,`starttime` DESC LIMIT 1");

@@ -47,13 +47,6 @@ if ($config["clickjackingPrevention"]) {
 
 date_default_timezone_set($config["timezone"]);
 
-// Make sure that the page is accessed over HTTPS if applicable.
-$ishttps = $_SERVER["HTTPS"] ?? "";
-if (($ishttps != "on") and $config["https"]) {
-    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
-    exit();
-}
-
 // Initialize the permissions file.
 require "core/default_permissions.php";
 // Get any admin-defined permissions.
@@ -68,6 +61,18 @@ require "core/database.php";
 
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
+
+// Make sure that the page is accessed over HTTPS if applicable.
+$ishttps = $_SERVER["HTTPS"] ?? "";
+if (($ishttps != "on") and $config["https"]) {
+    if (str_starts_with($config["baseURL"], "http://")) {
+        header("Location: https://" . substr($config["baseURL"], 7) . (($config["dir"] != "") ? "/{$config["dir"]}" : ""));
+    }
+    else {
+        header("Location: https://" . substr($config["baseURL"], 8) . (($config["dir"] != "") ? "/{$config["dir"]}" : ""));
+    }
+    exit();
+}
 
 // If the forum is installed, create a database connection.
 if ($config["installed"]) {
