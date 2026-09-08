@@ -447,15 +447,18 @@ function upload($file, $name) {
     
     // Enforce disk quotas.
     if (($uq + $_FILES[$file]["size"]) > $config["perUserDiskQuota"]) {
+        $db->query("UNLOCK TABLES");
         return "Upload failed, your disk quota would be exceeded.";
     }
     if (($gq + $_FILES[$file]["size"]) > $config["totalDiskQuota"]) {
+        $db->query("UNLOCK TABLES");
         return "Upload failed, the total disk quota would be exceeded.";
     }
     
     // Enforce rate limits.
     $rateLimit = preparedQuery("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND (`perpid`=? OR `ip`=?) AND `timestamp`>?", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], (time()-3600)));
     if ($rateLimit->num_rows >= $config["uploadsPerHour"]) {
+        $db->query("UNLOCK TABLES");
         return "Upload failed, rate limited. Try again later.";
     }
     
@@ -473,6 +476,7 @@ function upload($file, $name) {
         $image = imagecreatefromgif($_FILES[$file]["tmp_name"]);
         
         if ($image === false) {
+            $db->query("UNLOCK TABLES");
             return "Upload failed, invalid GIF image.";
         }
     }
@@ -481,6 +485,7 @@ function upload($file, $name) {
         $image = imagecreatefromjpeg($_FILES[$file]["tmp_name"]);
         
         if ($image === false) {
+            $db->query("UNLOCK TABLES");
             return "Upload failed, invalid JPEG image.";
         }
     }
@@ -489,6 +494,7 @@ function upload($file, $name) {
         $image = imagecreatefrompng($_FILES[$file]["tmp_name"]);
         
         if ($image === false) {
+            $db->query("UNLOCK TABLES");
             return "Upload failed, invalid PNG image.";
         }
     }
@@ -497,10 +503,12 @@ function upload($file, $name) {
         $image = imagecreatefromwebp($_FILES[$file]["tmp_name"]);
         
         if ($image === false) {
+            $db->query("UNLOCK TABLES");
             return "Upload failed, invalid WEBP image.";
         }
     }
     else {
+        $db->query("UNLOCK TABLES");
         return "Upload failed, unsupported or unrecognized image type.";
     }
     
@@ -514,15 +522,18 @@ function upload($file, $name) {
     }
 
     if (!$success) {
+        $db->query("UNLOCK TABLES");
         return "Failed to write image to file.";
     }
     // We do these checks in case the filesize grows after the image has been processed.
     elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
         unlink($target);
+        $db->query("UNLOCK TABLES");
         return "Upload failed, your disk quota would be exceeded.";
     }
     elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
         unlink($target);
+        $db->query("UNLOCK TABLES");
         return "Upload failed, the total disk quota would be exceeded.";
     }
     preparedQuery("UPDATE `accounts` SET `quota`=`quota`+? WHERE `id`=?", array(filesize($target), $_SESSION["id"]));
