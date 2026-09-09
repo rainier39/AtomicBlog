@@ -599,7 +599,13 @@ if ($displayPost) {
         </p>";
     }
     foreach ($tags as $tag) {
-        $postvars["tags"] .= "<a href='" . makeURL("posts/&tag=" . urlencode(htmlspecialchars($tag))) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
+        if ($config["prettyURLs"]) {
+            $char = "?";
+        }
+        else {
+            $char = "&";
+        }
+        $postvars["tags"] .= "<a href='" . makeURL("posts/{$char}tag=" . urlencode(htmlspecialchars($tag))) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
     }
     
     if ($config["enableComments"]) {
