@@ -84,24 +84,30 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
     // Make sure the user is allowed to delete the post.
     if ((($id == $p["account"]) and checkPerm(PERM_DELETE_POST))
     or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p["account"]))) {
-        // Delete the post.
-        preparedQuery("DELETE FROM `posts` WHERE `id`=?", array($p["id"]));
-        // Delete all of the post's tags.
-        preparedQuery("DELETE FROM `tags` WHERE `post`=?", array($p["id"]));
-        // Delete all of the post's views.
-        preparedQuery("DELETE FROM `views` WHERE `post`=?", array($p["id"]));
-        // Delete all of the post's comments.
-        preparedQuery("DELETE FROM `comments` WHERE `post`=?", array($p["id"]));
-        // Delete all icons and attachments.
-        $uploads = scandir("images/");
-        foreach ($uploads as $u) {
-            if (str_starts_with($u, $p["id"] . ".") or str_starts_with($u, $p["id"] . "_")) {
-                unlink("images/" . $u);
-            }
+        // Delete the post, its tags, views, and comments.
+        // For some reason this cannot be a preparedQuery, it fails and deletes everything but the views for no apparent or diagnosable reason.
+        $db->query("DELETE p,t,v,c
+        FROM `posts` AS p
+        LEFT JOIN `tags` AS t ON p.`id`=t.`post`
+        LEFT JOIN `views` AS v ON p.`id`=v.`post`
+        LEFT JOIN `comments` AS c ON p.`id`=c.`post`
+        WHERE p.`id`='" . $db->real_escape_string($p["id"]) . "'");
+        // If the deletion failed.
+        if ($db->affected_rows < 1) {
+            $messages[] = error("Failed to delete post.");
         }
-                
-        $_SESSION["messages"][] = success("Successfully deleted the post.");
-        redirect("");
+        else {
+            // Delete all icons and attachments.
+            $uploads = scandir("images/");
+            foreach ($uploads as $u) {
+                if (str_starts_with($u, $p["id"] . ".") or str_starts_with($u, $p["id"] . "_")) {
+                    unlink("images/" . $u);
+                }
+            }
+                    
+            $_SESSION["messages"][] = success("Successfully deleted the post.");
+            redirect("");
+        }
     }
     else {
         $messages[] = error("You don't have permission to do this.");
