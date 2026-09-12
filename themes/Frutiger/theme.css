@@ -3,7 +3,7 @@
 /** Global **/
 /* Global variables */
 .header {
- background: linear-gradient(white 0, #888 15%, #777 20%, #666 25%, #555 30%, #444 35%, #333 40%, #222 50%, #111 100%);
+ background: linear-gradient(#b1b1b1, #2b2b2b, black, black);
  border-radius: 12px;
  margin: 8px 4px 4px 4px;
  box-shadow: none;
@@ -11,7 +11,7 @@
 }
 .navbar {
  border: 1px solid var(--main-border-color);
- background: linear-gradient(white 0, lightslategrey 55%, lightslategrey 100%);
+ background: linear-gradient(#c5cbd2, lightslategrey, lightslategrey);
  border-radius: 12px;
  margin: 4px;
  box-shadow: none;

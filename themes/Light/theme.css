@@ -293,6 +293,7 @@ code, .codeblock {
  margin-right: 4px;
 }
 .tagCloud {
+ text-align: center;
 }
 .tagCloud a {
  display: inline-block;
