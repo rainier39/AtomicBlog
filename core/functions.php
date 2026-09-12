@@ -56,7 +56,7 @@ function flushConfig() {
 
 // Display a blog post tile.
 function displayPost($p) {
-    global $db, $uploads;
+    global $db, $uploads, $config;
     
     $postTilevars = array("url" => makeURL("post/" . $p["id"]),
     "image" => "",
@@ -83,6 +83,12 @@ function displayPost($p) {
             $ut = time();
         }
         $postTilevars["image"] = "<img src='" . makeURL("images/{$icon}") . "?{$ut}'>";
+    }
+    // Otherwise display a default icon.
+    else {
+        if (is_file("themes/{$config["theme"]}/default-icon.webp")) {
+            $postTilevars["image"] = "<img src='" . makeURL("themes/{$config["theme"]}/default-icon.webp") . "'>";
+        }
     }
 
     // Display the account information of the post author.

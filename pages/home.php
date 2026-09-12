@@ -48,7 +48,7 @@ if ($starred->num_rows > 0) {
         $homevars["starred"] .= displayPost($s);
     }
     // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 5-$starred->num_rows; $extra++) {
+    for ($extra = 0; $extra < 6-$starred->num_rows; $extra++) {
         $homevars["starred"] .= "<div class='postTile postTileUnpublished'></div>";
     }
     $homevars["starred"] .= "</div>";
@@ -58,8 +58,8 @@ else {
     $homevars["starred"] .= info("No starred posts yet.");
 }
 
-// Get the 5 most recent posts.
-$recent = preparedQuery("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (published='1' OR (published='0' AND account=?)) ORDER BY `starttime` DESC LIMIT 5", array($id));
+// Get the 6 most recent posts.
+$recent = preparedQuery("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (published='1' OR (published='0' AND account=?)) ORDER BY `starttime` DESC LIMIT 6", array($id));
 
 // Only try to display posts if there are any.
 if ($recent->num_rows > 0) {
@@ -69,7 +69,7 @@ if ($recent->num_rows > 0) {
         $homevars["recent"] .= displayPost($r);
     }
     // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 5-$recent->num_rows; $extra++) {
+    for ($extra = 0; $extra < 6-$recent->num_rows; $extra++) {
         $homevars["recent"] .= "<div class='postTile postTileUnpublished'></div>";
     }
     $homevars["recent"] .= "</div>";
@@ -79,8 +79,8 @@ else {
     $homevars["recent"] .= info("No posts yet.");
 }
 
-// Get the top 5 most viewed posts.
-$mostViewedPosts = preparedQuery("SELECT p.`id`,p.`title`,p.`account`,p.`starred`,p.`published`,a.`namevisible`,a.`name`,COUNT(`views`.`post`) FROM `posts` AS p LEFT JOIN `accounts` AS a ON a.`id`=p.`account` LEFT JOIN `views` ON `views`.`post`=p.`id` WHERE (published='1' OR (published='0' AND account=?)) GROUP BY p.`id` ORDER BY COUNT(`views`.`post`) DESC, p.`id` ASC LIMIT 5", array($id));
+// Get the top 6 most viewed posts.
+$mostViewedPosts = preparedQuery("SELECT p.`id`,p.`title`,p.`account`,p.`starred`,p.`published`,a.`namevisible`,a.`name`,COUNT(`views`.`post`) FROM `posts` AS p LEFT JOIN `accounts` AS a ON a.`id`=p.`account` LEFT JOIN `views` ON `views`.`post`=p.`id` WHERE (published='1' OR (published='0' AND account=?)) GROUP BY p.`id` ORDER BY COUNT(`views`.`post`) DESC, p.`id` ASC LIMIT 6", array($id));
 
 // Only try to display posts if there are any.
 if ($mostViewedPosts->num_rows > 0) {
@@ -90,7 +90,7 @@ if ($mostViewedPosts->num_rows > 0) {
         $homevars["viewed"] .= displayPost($m);
     }
     // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 5-$mostViewedPosts->num_rows; $extra++) {
+    for ($extra = 0; $extra < 6-$mostViewedPosts->num_rows; $extra++) {
         $homevars["viewed"] .= "<div class='postTile postTileUnpublished'></div>";
     }
     $homevars["viewed"] .= "</div>";
