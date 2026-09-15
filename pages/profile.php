@@ -30,7 +30,7 @@ if (!checkPerm(PERM_VIEW_PROFILE)) {
     exit();
 }
 
-$profileinfo = preparedQuery("SELECT `id`, `name`, `color`, `bio`, `email`, `lastactive`, `namevisible`, `emailvisible`, `role` FROM `accounts` WHERE `id`=?", array($url[1] ?? ""));
+$profileinfo = preparedQuery("SELECT `id`, `name`, `color`, `bio`, `email`, `jointime`, `lastactive`, `namevisible`, `emailvisible`, `role` FROM `accounts` WHERE `id`=?", array($url[1] ?? ""));
 $p = $profileinfo->fetch_assoc();
 
 if ($profileinfo->num_rows < 1) {
@@ -64,7 +64,9 @@ else {
     $bio = info("No bio to display yet.");
 }
 
-$lastactiveHTML = "<small><abbr class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</abbr></small>";
+$jointime = "<abbr class='date' title='" . date("g:i:sa", $p["jointime"]) . "'>" . date("F jS, Y", $p["jointime"]) . "</abbr>";
+
+$lastactiveHTML = "<abbr class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</abbr>";
 
 $title = htmlspecialchars($name) . "'s Profile";
 
@@ -90,15 +92,18 @@ if (count($avatars) > 0) {
     $avatar = "<img src='" . makeURL("images/" . $avatars[0]) . "?{$ut}'>";
 }
 
-$profilevars = array("color" => $p["color"],
-"name" => $name,
-"avatar" => $avatar,
-"bio" => $bio,
-"lastactive" => $lastactiveHTML,
-"role" => $p["role"],
-"email" => $email,
-"comments" => $comments->num_rows,
-"posts" => $posts->num_rows);
+$profilevars = array(
+ "color" => $p["color"],
+ "name" => $name,
+ "avatar" => $avatar,
+ "bio" => $bio,
+ "jointime" => $jointime,
+ "lastactive" => $lastactiveHTML,
+ "role" => $p["role"],
+ "email" => $email,
+ "comments" => $comments->num_rows,
+ "posts" => $posts->num_rows
+);
 
 render_page("profile.html", $profilevars, $title);
 

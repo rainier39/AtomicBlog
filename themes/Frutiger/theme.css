@@ -2,7 +2,7 @@
 
 /** Global **/
 /* Global variables */
-.header {
+header {
  background: linear-gradient(#b1b1b1, #2b2b2b, black, black);
  border-radius: 12px;
  margin: 8px 4px 4px 4px;
@@ -22,7 +22,7 @@
  margin: 4px;
  box-shadow: none;
 }
-.footer {
+footer {
  border-radius: 12px;
  box-shadow: none;
  border: 1px solid var(--main-border-color);
