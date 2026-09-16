@@ -173,6 +173,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         }
             
         if (count($errors) != 0) {
+            $db->query("UNLOCK TABLES");
             foreach ($errors as $e) {
                 $messages[] = error($e);
             }
@@ -180,10 +181,12 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         else {
             // Make the commment.
             preparedQuery("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES (?, ?, ?, ?, ?, ?)", array($commentid, $p["id"], $email, $_SERVER["REMOTE_ADDR"], time(), $content));
-            $messages[] = success("Successfully made comment.");
+            $newcomment = $db->insert_id;
+            $db->query("UNLOCK TABLES");
+            $_SESSION["messages"][] = success("Successfully made comment.");
             $_POST["content"] = "";
+            redirect("post/{$p["id"]}#comment_{$newcomment}");
         }
-        $db->query("UNLOCK TABLES");
     }
     else {
         $messages[] = error("You don't have permission to do this.");
@@ -565,11 +568,11 @@ if ($displayPost) {
     if ((($id == $p["account"]) and checkPerm(PERM_STAR_POST))
     or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .=
-            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "'></form>";
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "' onclick='history.pushState(\"\", document.title, window.location.pathname)'></form>";
     }
     if (($id == $p["account"]) and checkPerm(PERM_NEW_POST)) {
         $postvars["postbuttons"] .=
-            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "'></form>";
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "' onclick='history.pushState(\"\", document.title, window.location.pathname)'></form>";
     }
     if ((($id == $p["account"]) and checkPerm(PERM_UPLOAD))
     or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p["account"]))) {

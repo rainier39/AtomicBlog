@@ -51,7 +51,10 @@ function generateCSRFToken() {
 // Write the current configuration to the config file.
 function flushConfig() {
     global $config;
-    return file_put_contents("./config/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($config, true) . "\n\n?>\n");
+    $written = file_put_contents("./config/config.php", "<?php\n\nif (!defined('INDEX')) exit;\n\n\$config = " . var_export($config, true) . "\n\n?>\n");
+    // Clear any cached versions of the config now that we've updated it.
+    if ($written !== false) opcache_invalidate("config/config.php");
+    return $written;
 }
 
 // Display a blog post tile.

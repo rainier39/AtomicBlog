@@ -390,6 +390,20 @@ if (validateCSRFToken()) {
             $changes++;
         }
     }
+    if (isset($_POST["commentdelay"])) {
+        $commentdelay = (int)$_POST["commentdelay"];
+        if ($commentdelay < 1) {
+            $errors[] = "Edit delay cannot be less than 1.";
+        }
+        elseif ($commentdelay > 32767) {
+            $errors[] = "Edit delay cannot be greater than 32,767.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($commentdelay != $config["commentDelay"]) {
+            $config["commentDelay"] = $commentdelay;
+            $changes++;
+        }
+    }
     if (isset($_POST["uploadsPerHour"])) {
         $uploadsPerHour = (int)$_POST["uploadsPerHour"];
         if ($uploadsPerHour < 1) {
@@ -422,29 +436,32 @@ if (validateCSRFToken()) {
 }
 
 // Display the config form.
-$configvars = array("token" => $_SESSION["csrf_token"],
-"title" => $_POST["ctitle"] ?? $config["title"],
-"description" => $_POST["cdescription"] ?? $config["description"],
-"footer" => $_POST["cfooter"] ?? $config["footer"],
-"timezone" => $timezonesHTML,
-"language" => $languageHTML,
-"theme" => $themeHTML,
-"customcss" => $_POST["customCSS"] ?? $config["customCSS"],
-"allowregistration" => $config["allowRegistration"] ? " checked" : "",
-"registrationmode" => $registerHTML,
-"comments" => $config["enableComments"] ? " checked" : "",
-"captcha" => $config["captchaEnabled"] ? " checked" : "",
-"captchalength" => $_POST["captchaLength"] ?? $config["captchaLength"],
-"feedEnabled" => $config["feedEnabled"] ? " checked" : "",
-"maxUploadSize" => bytesToReadable($_POST["maxUploadSize"] ?? $config["maxUploadSize"]),
-"totalDiskQuota" => bytesToReadable($_POST["totalDiskQuota"] ?? $config["totalDiskQuota"]),
-"perUserDiskQuota" => bytesToReadable($_POST["perUserDiskQuota"] ?? $config["perUserDiskQuota"]),
-"loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],
-"accountsperip" => $_POST["accounts"] ?? $config["accountsPerIP"],
-"accountcooldown" => $_POST["accountcooldown"] ?? $config["accountCooldown"],
-"postdelay" => $_POST["postdelay"] ?? $config["postDelay"],
-"editdelay" => $_POST["editdelay"] ?? $config["editDelay"],
-"uploadsPerHour" => $_POST["uploadsPerHour"] ?? $config["uploadsPerHour"]);
+$configvars = array(
+ "token" => $_SESSION["csrf_token"],
+ "title" => $_POST["ctitle"] ?? $config["title"],
+ "description" => $_POST["cdescription"] ?? $config["description"],
+ "footer" => $_POST["cfooter"] ?? $config["footer"],
+ "timezone" => $timezonesHTML,
+ "language" => $languageHTML,
+ "theme" => $themeHTML,
+ "customcss" => $_POST["customCSS"] ?? $config["customCSS"],
+ "allowregistration" => $config["allowRegistration"] ? " checked" : "",
+ "registrationmode" => $registerHTML,
+ "comments" => $config["enableComments"] ? " checked" : "",
+ "captcha" => $config["captchaEnabled"] ? " checked" : "",
+ "captchalength" => $_POST["captchaLength"] ?? $config["captchaLength"],
+ "feedEnabled" => $config["feedEnabled"] ? " checked" : "",
+ "maxUploadSize" => bytesToReadable($_POST["maxUploadSize"] ?? $config["maxUploadSize"]),
+ "totalDiskQuota" => bytesToReadable($_POST["totalDiskQuota"] ?? $config["totalDiskQuota"]),
+ "perUserDiskQuota" => bytesToReadable($_POST["perUserDiskQuota"] ?? $config["perUserDiskQuota"]),
+ "loginsperhour" => $_POST["logins"] ?? $config["loginsPerHour"],
+ "accountsperip" => $_POST["accounts"] ?? $config["accountsPerIP"],
+ "accountcooldown" => $_POST["accountcooldown"] ?? $config["accountCooldown"],
+ "postdelay" => $_POST["postdelay"] ?? $config["postDelay"],
+ "editdelay" => $_POST["editdelay"] ?? $config["editDelay"],
+ "commentdelay" => $_POST["commentdelay"] ?? $config["commentDelay"],
+ "uploadsPerHour" => $_POST["uploadsPerHour"] ?? $config["uploadsPerHour"]
+);
 
 render_page("panel/configuration.html", $configvars, $title);
 
