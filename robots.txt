@@ -3,3 +3,4 @@ Allow: /
 Disallow: /login/
 Disallow: /register/
 Disallow: /panel/
+Disallow: /feed/
