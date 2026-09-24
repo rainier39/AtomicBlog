@@ -45,6 +45,9 @@ function format($string) {
     $string = format_link($string);
     $string = format_paragraphs($string);
     $string = format_linebreaks($string);
+    // Extended Markdown.
+    $string = format_strike($string);
+    $string = format_highlight($string);
 
     // In the end, return the string.
     return $string;
@@ -62,7 +65,9 @@ function format_code_block($string) {
         $matches[2] = str_replace("*", "&#42;", $matches[2]);
         $matches[2] = str_replace("-", "&#45;", $matches[2]);
         $matches[2] = str_replace(".", "&#46;", $matches[2]);
+        $matches[2] = str_replace("~", "&#126;", $matches[2]);
         $matches[2] = str_replace("`", "&grave;", $matches[2]);
+        $matches[2] = str_replace("=", "&equals;", $matches[2]);
         $formatLangs = array("php");
         if (in_array(trim($matches[1]), $formatLangs)) {
             $matches[2] = call_user_func("format_lang_" . trim($matches[1]), $matches[2]);
@@ -135,6 +140,15 @@ function format_paragraphs($string) {
 
 function format_linebreaks($string) {
     return preg_replace("/\s\s$/mis", "<br>", $string);
+}
+
+// -- Extended Markdown, not part of the official standard but commonly implemented. --
+function format_strike($string) {
+    return preg_replace("/~~(.+?)~~/is", "<s>$1</s>", $string);
+}
+
+function format_highlight($string) {
+    return preg_replace("/==(.+?)==/is", "<mark>$1</mark>", $string);
 }
 
 // -- Define the formatter functions for any supported coding/markup languages. --
