@@ -102,6 +102,8 @@ if (validateCSRFToken()) {
             $_POST["password2"] = "";
             $_POST["newpassword"] = "";
             $_POST["repeatpassword"] = "";
+            // Log the event.
+            preparedQuery("INSERT INTO `logs` (`logtype`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('panel_change_password', ?, ?, ?, ?)", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
         }
     }
     // Handle uploading an avatar.

@@ -429,6 +429,8 @@ if (validateCSRFToken()) {
     if ($changes > 0) {
         flushConfig();
         $messages[] = success("Successfully updated the blog configuration.");
+        // Log the event.
+        preparedQuery("INSERT INTO `logs` (`logtype`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('panel_blogconfig', ?, ?, ?, ?)", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
     }
     else {
         $messages[] = info("Nothing to change.");

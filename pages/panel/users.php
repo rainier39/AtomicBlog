@@ -34,17 +34,16 @@ $title = "Manage Users";
 if (validateCSRFToken()) {
     // Change a user's role.
     if (isset($_POST["changerole"]) and isset($_POST["id"])) {
-        $_POST["id"] = (int)$_POST["id"];
         $rolequery = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
         $crole = $rolequery->fetch_assoc()["role"];
-        $userquery = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_POST["id"]));
+        $userquery = preparedQuery("SELECT `role`, `id` FROM `accounts` WHERE `id`=?", array($_POST["id"]));
         $urole = $userquery->fetch_assoc();
         // Does the user exist?
         if ($userquery->num_rows != 1) {
             $messages[] = error("Specified user does not exist.");
         }
         // Is the user us?
-        elseif ($_POST["id"] === (int)$_SESSION["id"]) {
+        elseif ($urole["id"] == $_SESSION["id"]) {
             $messages[] = error("You don't have permission to do this.");
         }
         // Does the role exist?
@@ -69,8 +68,10 @@ if (validateCSRFToken()) {
         }
         // Change the role.
         else {
-            preparedQuery("UPDATE `accounts` SET `role`=? WHERE `id`=?", array($_POST["changerole"], $_POST["id"]));
+            preparedQuery("UPDATE `accounts` SET `role`=? WHERE `id`=?", array($_POST["changerole"], $urole["id"]));
             $messages[] = success("Successfully changed role.");
+            // Log the event.
+            preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`, `content`) VALUES ('change_role', ?, ?, ?, ?, ?, ?)", array($urole["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time(), "{$urole["role"]}|{$_POST["changerole"]}"));
         }
     }
 }
