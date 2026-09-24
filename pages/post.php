@@ -62,6 +62,8 @@ if (isset($_POST["toggleStar"]) and validateCSRFToken()) {
         preparedQuery("UPDATE `posts` SET `starred`=`starred`^1 WHERE id=?", array($p["id"]));
         // Let's not update the whole post just for flipping 1 bit.
         $p["starred"] = !$p["starred"];
+        // Log the event.
+        preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('post_togglestar', ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
     }
     else {
         $messages[] = error("You don't have permission to do this.");
@@ -106,6 +108,10 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
             }
                     
             $_SESSION["messages"][] = success("Successfully deleted the post.");
+            
+            // Log the event.
+            preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('post_delete', ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
+            
             redirect("");
         }
     }
@@ -215,6 +221,8 @@ elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
                 preparedQuery("DELETE FROM `comments` WHERE `id`=?", array($c_id));
                     
                 $messages[] = success("Successfully deleted comment.");
+                // Log the event.
+                preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('comment_delete', ?, ?, ?, ?, ?)", array($c_id, $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             }
         }
     }
@@ -278,6 +286,8 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
                     preparedQuery("UPDATE `comments` SET `content`=?, `timestamp`=? WHERE `id`=?", array($content, time(), $c_id));
                 
                     $_SESSION["messages"][] = success("Successfully edited comment.");
+                    // Log the event.
+                    preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('comment_edit', ?, ?, ?, ?, ?)", array($c_id, $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                     redirect("post/" . $p["id"]);
                 }
             }
@@ -335,6 +345,8 @@ elseif (($url[2] ?? "") == "edit") {
                 $success = true;
                 $updatePost = true;
                 $_SESSION["messages"][] = success("Successfully edited post.");
+                // Log the event.
+                preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('post_edit', ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             }
             // Otherwise, print the errors.
             else {
