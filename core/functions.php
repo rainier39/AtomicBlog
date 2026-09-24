@@ -29,7 +29,7 @@ function clearLoginCookie() {
 }
 
 // Log a user out.
-function logout($redirect=false) {
+function logout() {
     global $db;
     // Remove any login cookies and purge the database of them too.
     clearLoginCookie();
@@ -40,7 +40,6 @@ function logout($redirect=false) {
     }
     session_unset();
     session_destroy();
-    if ($redirect) redirect("");
 }
 
 // Set the user's CSRF token, overwriting the prior one if any.

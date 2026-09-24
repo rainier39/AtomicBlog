@@ -40,20 +40,20 @@ if (validateCSRFToken()) {
     $_POST["password"] = $_POST["password"] ?? "";
     
     if (strlen($_POST["username"]) < 1) {
-        $errors[] = error("Username cannot be blank.");
+        $errors[] = "Username cannot be blank.";
     }
     if (strlen($_POST["password"]) < 1) {
-        $errors[] = error("Password cannot be blank.");
+        $errors[] = "Password cannot be blank.";
     }
     
     // Lock to avoid race conditions.
     $db->query("LOCK TABLES `logs` WRITE, `accounts` WRITE");
     // Now see how many login attempts there are from the past hour.
-    $attempts = preparedQuery("SELECT 1 FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `ip`=? AND `timestamp`>?", array($_SERVER["REMOTE_ADDR"], (time()-3600)));
+    $attempts = preparedQuery("SELECT 1 FROM `logs` WHERE `logtype`='login_fail' AND `ip`=? AND `timestamp`>?", array($_SERVER["REMOTE_ADDR"], (time()-3600)));
     
     // Stop if they've logged in or tried to too many times.
     if ($attempts->num_rows >= $config["loginsPerHour"]) {
-        $errors[] = error("Too many logins or login attempts. Try again later.");
+        $errors[] = "Too many login attempts. Try again later.";
     }
     
     if (count($errors) !== 0) {
@@ -145,7 +145,13 @@ if (!$success) {
 }
 // Otherwise redirect the successfully logged-in user.
 else {
-    redirect("panel");
+    if (isset($_SESSION["lastpage"])) {
+        redirect($_SESSION["lastpage"]);
+        unset($_SESSION["lastpage"]);
+    }
+    else {
+        redirect("panel");
+    }
 }
 
 ?>

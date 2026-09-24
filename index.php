@@ -112,6 +112,7 @@ session_start([
     'cookie_secure' => (($ishttps == "on") ? true : false),
 ]);
 
+// Make sure this is always set to avoid warnings.
 $_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
 
 // Generate a CSRF token if needed.
@@ -147,12 +148,21 @@ if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$confi
 
 // If a user is logged in but lacks permission to log in (i.e. their role has been changed since they logged in), log them out.
 if ($_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
-    logout(true);
+    logout();
+    // Do this to avoid warnings.
+    $_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
 }
 
 // Update a logged-in user's last action time.
 if ($_SESSION["logged_in"]) {
     preparedQuery("UPDATE `accounts` SET `lastactive`=? WHERE `id`=?", array(time(), $_SESSION["id"]));
+}
+
+// Log the user out if requested.
+if (isset($_POST["logout"]) and validateCSRFToken()) {
+    logout();
+    // Do this to avoid warnings.
+    $_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
 }
 
 // Every page that one is allowed to visit.
@@ -162,11 +172,12 @@ $pages = array("login", "panel", "posts", "register", "post", "profile", "feed")
 if (!$config["installed"]) {
     require "core/install.php";
 }
-elseif (isset($_POST["logout"]) and validateCSRFToken()) {
-    logout(true);
-    require "pages/home.php";
-}
 elseif (in_array($url[0], $pages)) {
+    $forbidden = array("login", "register", "feed");
+    // Remember what page a user was on before they logged in.
+    if (!$_SESSION["logged_in"] and (!in_array($url[0], $forbidden))) {
+        $_SESSION["lastpage"] = implode("/", $url);
+    }
     require "pages/{$url[0]}.php";
 }
 elseif ($url[0] == "") {

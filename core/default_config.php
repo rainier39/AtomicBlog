@@ -45,6 +45,7 @@ $default_config = array(
     "allowRegistration" => true,
     // "approval", "email", "open"
     "registrationMode" => "approval",
+    // Max login attempts per hour from a given IP.
     "loginsPerHour" => 5,
     "accountsPerIP" => 3,
     // How long a user must wait (in seconds) between creating accounts. 600 seconds = 10 minutes.
