@@ -131,7 +131,17 @@ function format_image($string) {
 }
 
 function format_link($string) {
-    return preg_replace("/\[(.+?)\]\((http|https):\/\/(.+?)\)/is", "<a href='$2://$3' target='_blank' rel='nofollow'>$1</a>", $string);
+    // Regular link formatting (http, https, mailto).
+    $string = preg_replace("/\[(.+?)\]\((http:\/\/|https:\/\/|mailto:)(.+?)\)/is", "<a href='$2$3' target='_blank' rel='nofollow'>$1</a>", $string);
+    // Link shorthand. Missing email support, not planned.
+    $string = preg_replace("/&lt;(http:\/\/|https:\/\/)(.+?)&gt;/is", "<a href='$1$2' target='_blank' rel='nofollow'>$1$2</a>", $string);
+    // Fragment identifier formatting.
+    $string = preg_replace("/\[(.+?)\]\((#)(.+?)\)/is", "<a href='#$3' target='_self' rel='nofollow'>$1</a>", $string);
+    // Reference-style links.
+    $string = preg_replace("/\[(.+?)\]\[([0-9]+?)\]/is", "<a href='#ref_$2' target='_self' rel='nofollow' id='cite_$2'>$1<sup>[$2]</sup></a>", $string);
+    $string = preg_replace("/\[([0-9]+?)\]: (http:\/\/|https:\/\/)([^ ]+?)\s*?$/mis", "[<a href='#cite_$1' target='_self' rel='nofollow'>$1</a>]: <a href='$2$3' target='_blank' rel='nofollow' id='ref_$1'>$3</a>  ", $string);
+    $string = preg_replace("/\[([0-9]+?)\]: (http:\/\/|https:\/\/)(.+?) (&quot;|&#039;|\()(.+?)(&quot;|&#039;|\))/is", "[<a href='#cite_$1' target='_self' rel='nofollow'>$1</a>]: <a href='$2$3' target='_blank' rel='nofollow' id='ref_$1'>$5</a>", $string);
+    return $string;
 }
 
 function format_paragraphs($string) {
