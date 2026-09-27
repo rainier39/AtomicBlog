@@ -79,7 +79,9 @@ $default_config = array(
     // Controls whether or not the site can be embedded in an iframe.
     "clickjackingPrevention" => true,
     "customCSS" => "",
-    "feedEnabled" => true
+    "feedEnabled" => true,
+    // Who can see the userlist. "public", "users", or "admins".
+    "userlist" => "admins"
 );
 
 ?>

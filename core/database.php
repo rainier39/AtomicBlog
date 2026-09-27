@@ -32,7 +32,7 @@ function preparedQuery(string $query, array $params) {
     // Figure out what type each parameter is.
     $types = "";
     foreach ($params as $param) {
-        if (is_numeric($param)) {
+        if (is_numeric($param) and !preg_match("/[^0-9.]/", (string)$param)) {
             // Case: integer.
             if ((int)$param == $param) {
                 $types .= "i";

@@ -37,6 +37,13 @@ if (strlen($config["customCSS"]) > 0) {
     $headervars["head"] .= "<style>" . htmlspecialchars($config["customCSS"], ENT_NOQUOTES) . "</style>";
 }
 
+// Add userlist button to navbar if appropriate.
+if (($config["userlist"] == "public")
+or (($config["userlist"] == "users") and $_SESSION["logged_in"])
+or ($config["userlist"] == "admins") and checkPerm(PERM_MANAGE_USERS)) {
+    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("users") . "'>Users</a>";
+}
+
 // Generate the navbar appropriately.
 if ($_SESSION["logged_in"]) {
     $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a>";

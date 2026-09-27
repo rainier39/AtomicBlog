@@ -166,7 +166,7 @@ if (isset($_POST["logout"]) and validateCSRFToken()) {
 }
 
 // Every page that one is allowed to visit.
-$pages = array("login", "panel", "posts", "register", "post", "profile", "feed");
+$pages = array("login", "panel", "posts", "register", "post", "profile", "users", "feed");
 
 // If the software hasn't been installed yet, direct all requests to the install page.
 if (!$config["installed"]) {
