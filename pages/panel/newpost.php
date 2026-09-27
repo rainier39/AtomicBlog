@@ -85,7 +85,9 @@ $newpostvars = array("token" => $_SESSION["csrf_token"],
 "tags" => $_POST["tags"] ?? "",
 "markdownbuttons" => markdownButtons(),
 "content" => $_POST["content"] ?? "",
-"unpublished" => (isset($_POST["unpublished"]) ? " checked" : ""));
+"unpublished" => (isset($_POST["unpublished"]) ? " checked" : ""),
+"previewjs" => makeURL("javascript/preview.js", true),
+"endpoint" => makeURL("api/preview-ajax.php"));
 
 render_page("panel/newpost.html", $newpostvars, $title);
 

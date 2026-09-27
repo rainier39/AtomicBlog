@@ -156,6 +156,10 @@ footer span {
 .buttonSmall {
  padding: 3px 6px;
 }
+#previewcontent {
+ overflow: auto;
+ overflow-wrap: break-word;
+}
 
 /** Pages **/
 /* Install page */

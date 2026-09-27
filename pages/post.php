@@ -364,7 +364,9 @@ elseif (($url[2] ?? "") == "edit") {
             "title" => $_POST["title"] ?? $p["title"],
             "tags" => $_POST["tags"] ?? unparseTags($tags),
             "buttons" => markdownButtons(),
-            "content" => $_POST["content"] ?? $p["content"]);
+            "content" => $_POST["content"] ?? $p["content"],
+            "previewjs" => makeURL("javascript/preview.js", true),
+            "endpoint" => makeURL("api/preview-ajax.php"));
             
             render_page("postEdit.html", $posteditvars, $title);
         }
