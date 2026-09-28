@@ -47,10 +47,6 @@ if ($starred->num_rows > 0) {
     while ($s = $starred->fetch_assoc()) {
         $homevars["starred"] .= displayPost($s);
     }
-    // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 6-$starred->num_rows; $extra++) {
-        $homevars["starred"] .= "<div class='postTile postTileUnpublished'></div>";
-    }
     $homevars["starred"] .= "</div>";
 }
 // Otherwise print a message.
@@ -68,10 +64,6 @@ if ($recent->num_rows > 0) {
     while ($r = $recent->fetch_assoc()) {
         $homevars["recent"] .= displayPost($r);
     }
-    // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 6-$recent->num_rows; $extra++) {
-        $homevars["recent"] .= "<div class='postTile postTileUnpublished'></div>";
-    }
     $homevars["recent"] .= "</div>";
 }
 // Otherwise print a message.
@@ -88,10 +80,6 @@ if ($mostViewedPosts->num_rows > 0) {
     // Display the posts.
     while ($m = $mostViewedPosts->fetch_assoc()) {
         $homevars["viewed"] .= displayPost($m);
-    }
-    // Add placeholder divs if needed to prevent one or two giant tiles.
-    for ($extra = 0; $extra < 6-$mostViewedPosts->num_rows; $extra++) {
-        $homevars["viewed"] .= "<div class='postTile postTileUnpublished'></div>";
     }
     $homevars["viewed"] .= "</div>";
 }

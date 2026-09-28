@@ -300,9 +300,9 @@ code, .codeblock {
 .tagCloud {
  text-align: center;
 }
-.tagCloud a {
+.tagCloudTag {
  display: inline-block;
- padding: 4px 8px;
+ padding: 3px 6px;
 }
 /* Comments */
 .comment {
@@ -392,33 +392,30 @@ code, .codeblock {
 .users {
  display: grid;
  gap: 6px;
- grid-template-columns: auto auto auto;
+ grid-template-columns: auto auto auto auto auto;
  max-width: 100%;
  min-width: 0;
+ overflow-wrap: break-word;
 }
 .userlistTile {
  border-radius: 4px;
  box-shadow: 0px 0px 3px #0006;
  padding: 4px 8px;
  min-width: 0;
- max-width: 100%;
 }
 .userlistTileInner {
- display: grid;
- grid-template-columns: auto auto auto;
+ display: inline-block;
  width: fit-content;
- gap: 8px;
  background: white;
  border-radius: inherit;
- padding: 2px 4px;
- max-width: 100%;
- min-width: 0;
+ padding: 3px 6px;
+ max-width: calc(100% - 12px);
 }
 .userlistTileName {
  font-weight: bold;
  color: black;
  overflow-wrap: break-word;
- max-width: 100%;
+
  min-width: 0;
  overflow: hidden;
 }
@@ -473,7 +470,7 @@ code, .codeblock {
  }
  /* Users page (userlist) */
  .users {
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto;
  }
 }
 /** Phone/Tablet **/
@@ -506,7 +503,7 @@ code, .codeblock {
  }
  /* Users page (userlist) */
  .users {
-  grid-template-columns: auto;
+  grid-template-columns: auto auto;
  }
  /* Userlist becomes vertical on mobile. */
  .userlist {
