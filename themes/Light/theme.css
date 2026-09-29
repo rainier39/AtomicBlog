@@ -334,6 +334,7 @@ code, .codeblock {
 .commentContent {
  padding: 10px 20px;
  overflow-wrap: break-word;
+ white-space: pre;
 }
 /* Edit post page */
 .editPostForm textarea {

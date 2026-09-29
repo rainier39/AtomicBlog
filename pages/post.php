@@ -708,9 +708,9 @@ if ($displayPost) {
             
             if (!$editing) {
                 $postvars["comments"] .= "</div></div>
-                <div class='commentContent'>
-                " . htmlspecialchars($c["content"]) . "
-                </div>
+                <div class='commentContent'>"
+                . htmlspecialchars($c["content"]) . 
+                "</div>
                 </div>";
             }
             else {
