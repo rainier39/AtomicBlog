@@ -1,23 +1,30 @@
   <!-- pages/panel/account-settings.php -->
   <h1>Account Settings</h1>
+  <h2>Change username</h2>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
-   <label for='name'>[[ global.name: ]]</label>
-   <input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='{{{ name }}}' required>
    <label for='username'>[[ global.username: ]]</label>
    <input type='text' name='username' id='username' autocomplete='username' maxlength='32' value='{{{ username }}}' required>
+   <label for='upassword'>[[ global.password: ]]</label>
+   <input type='password' name='password' id='upassword' minlength='{{{ minlength }}}' autocomplete='password' required>
+   <br>
+   <input type='submit' value='Change username' class='button'>
+  </form>
+  <h2>Change email address</h2>
+  <form method='post' class='form'>
+   <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='email'>[[ global.email: ]]</label>
    <input type='email' name='email' id='email' autocomplete='email' maxlength='64' value='{{{ email }}}' required>
-   <label for='password1'>[[ global.password: ]]</label>
-   <input type='password' name='password1' id='password1' minlength='{{{ minlength }}}' autocomplete='password' required>
+   <label for='epassword'>[[ global.password: ]]</label>
+   <input type='password' name='password' id='epassword' minlength='{{{ minlength }}}' autocomplete='password' required>
    <br>
    <input type='submit' value='Change settings' class='button'>
   </form>
-  <h2>Change Password</h2>
+  <h2>Change password</h2>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
-   <label for='password2'>[[ global.password: ]]</label>
-   <input type='password' name='password2' id='password2' autocomplete='password' minlength='{{{ minlength }}}' required>
+   <label for='ppassword'>[[ global.password: ]]</label>
+   <input type='password' name='password' id='ppassword' autocomplete='password' minlength='{{{ minlength }}}' required>
    <label for='newpassword'>New Password: </label>
    <input type='password' name='newpassword' id='newpassword' autocomplete='new-password' minlength='{{{ minlength }}}' required>
    <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
@@ -25,11 +32,3 @@
    <br>
    <input type='submit' value='Change password' class='button'>
   </form>
-  <h2>Avatar</h2>
-   {{ avatars }}
-   <h3>Upload a new avatar</h3>
-   <form method='post' enctype='multipart/form-data'>
-    <input type='hidden' name='csrf_token' value='{{ token }}'>
-    <input type='file' name='avatar'>
-    <input type='submit' value='Upload avatar'>
-   </form>

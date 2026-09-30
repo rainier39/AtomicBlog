@@ -2,6 +2,8 @@
   <h1>Profile Settings</h1>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
+   <label for='name'>[[ global.name: ]]</label>
+   <input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='{{{ name }}}' required>
    <label for='color'>Color:</label>
    <input id='color' type='color' name='color' value='{{{ color }}}'>
    <label for='bio'>Bio:</label>
@@ -13,3 +15,11 @@
    <br>
    <input type='submit' value='Change settings' class='button'>
   </form>
+  <h2>Avatar</h2>
+   {{ avatars }}
+   <h3>Upload a new avatar</h3>
+   <form method='post' enctype='multipart/form-data'>
+    <input type='hidden' name='csrf_token' value='{{ token }}'>
+    <input type='file' name='avatar'>
+    <input type='submit' value='Upload avatar' class='button'>
+   </form>
