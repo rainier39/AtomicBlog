@@ -38,8 +38,8 @@ if (strlen($config["customCSS"]) > 0) {
 }
 
 // Add userlist button to navbar if appropriate.
-if (($config["userlist"] == "public")
-or (($config["userlist"] == "users") and $_SESSION["logged_in"])
+if ((($config["userlist"] == "public") and checkPerm(PERM_VIEW_PROFILE))
+or (($config["userlist"] == "users") and $_SESSION["logged_in"] and checkPerm(PERM_VIEW_PROFILE))
 or ($config["userlist"] == "admins") and checkPerm(PERM_MANAGE_USERS)) {
     $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("users") . "'>Users</a>";
 }

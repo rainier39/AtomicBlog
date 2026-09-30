@@ -114,6 +114,7 @@ session_start([
 
 // Make sure this is always set to avoid warnings.
 $_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
+$_SESSION["role"] = $_SESSION["role"] ?? "Guest";
 
 // Generate a CSRF token if needed.
 if (!isset($_SESSION["csrf_token"])) {
@@ -146,11 +147,21 @@ if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$confi
     }
 }
 
+// Set or update the user's role. We do this here, once, every time a page executes in case their role has changed since it was last set.
+if ($_SESSION["logged_in"]) {
+    $roleCheck = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
+    $_SESSION["role"] = $roleCheck->fetch_assoc()["role"];
+}
+else {
+    $_SESSION["role"] = "Guest";
+}
+
 // If a user is logged in but lacks permission to log in (i.e. their role has been changed since they logged in), log them out.
 if ($_SESSION["logged_in"] and (!checkPerm(PERM_LOGIN))) {
     logout();
     // Do this to avoid warnings.
-    $_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
+    $_SESSION["logged_in"] = false;
+    $_SESSION["role"] = "Guest";
 }
 
 // Update a logged-in user's last action time.
@@ -162,7 +173,8 @@ if ($_SESSION["logged_in"]) {
 if (isset($_POST["logout"]) and validateCSRFToken()) {
     logout();
     // Do this to avoid warnings.
-    $_SESSION["logged_in"] = $_SESSION["logged_in"] ?? false;
+    $_SESSION["logged_in"] = false;
+    $_SESSION["role"] = "Guest";
 }
 
 // Every page that one is allowed to visit.

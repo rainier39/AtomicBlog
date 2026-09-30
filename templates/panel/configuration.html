@@ -38,6 +38,10 @@
    <input type='text' id='captchaLength' name='captchaLength' value='{{{ captchalength }}}'>
    <label for='feedEnabled' title='Whether or not the Atom feed is enabled.'>Enable Feed:</label>
    <input type='checkbox' id='feedEnabled' name='feedEnabled'{{ feedEnabled }}>
+   <label for='userlist' title='Who can view the userlist.'>Userlist:</label>
+   <select name='userlist' id='userlist'>
+   {{ userlist }}
+   </select>
    <h2>Uploads</h2><div></div>
    <label for='maxUploadSize' title='Maximum size (in bytes) of a single upload.'>Max Upload Size:</label>
    <input type='text' id='maxUploadSize' name='maxUploadSize' value='{{{ maxUploadSize }}}'>

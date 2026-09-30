@@ -119,6 +119,26 @@ foreach ($modes as $m) {
     $registerHTML .= "<option value='$m'$s>$m</option>";
 }
 
+// Userlist stuff.
+$userlistHTML = "";
+$userlistmodes = array("public", "users", "admins");
+// Use the user-supplied mode if it's valid, otherwise default to the config.
+if (isset($_POST["userlist"]) and in_array($_POST["userlist"], $userlistmodes)) {
+    $currentMode = $_POST["userlist"];
+}
+else {
+    $currentMode = $config["userlist"];
+}
+foreach ($userlistmodes as $m) {
+    if ($m == $currentMode) {
+        $s = " selected";
+    }
+    else {
+        $s = "";
+    }
+    $userlistHTML .= "<option value='$m'$s>$m</option>";
+}
+
 // Handle requests.
 if (validateCSRFToken()) {    
     $errors = array();
@@ -275,6 +295,16 @@ if (validateCSRFToken()) {
     if ($fe != $config["feedEnabled"]) {
         $config["feedEnabled"] = $fe;
         $changes++;
+    }
+    if (isset($_POST["userlist"])) {
+        if (!in_array($_POST["userlist"], $userlistmodes)) {
+            $errors[] = "Invalid userlist mode.";
+        }
+        // Only write to the config if the value is actually being changed.
+        elseif ($_POST["userlist"] != $config["userlist"]) {
+            $config["userlist"] = $_POST["userlist"];
+            $changes++;
+        }
     }
     // --- Uploads ---
     if (isset($_POST["maxUploadSize"])) {
@@ -453,6 +483,7 @@ $configvars = array(
  "captcha" => $config["captchaEnabled"] ? " checked" : "",
  "captchalength" => $_POST["captchaLength"] ?? $config["captchaLength"],
  "feedEnabled" => $config["feedEnabled"] ? " checked" : "",
+ "userlist" => $userlistHTML,
  "maxUploadSize" => bytesToReadable($_POST["maxUploadSize"] ?? $config["maxUploadSize"]),
  "totalDiskQuota" => bytesToReadable($_POST["totalDiskQuota"] ?? $config["totalDiskQuota"]),
  "perUserDiskQuota" => bytesToReadable($_POST["perUserDiskQuota"] ?? $config["perUserDiskQuota"]),

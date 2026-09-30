@@ -325,24 +325,15 @@ function checkPerm($perm) {
     
     // If a user is logged in.
     if ($_SESSION["logged_in"]) {
-        $roleCheck = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
-        
-        // If the account doesn't exist, deny.
-        if ($roleCheck->num_rows < 1) {
+        // If no permissions are defined for the role, deny.
+        if (!array_key_exists($_SESSION["role"], $permissions)) {
             return false;
         }
-        
-        while ($r = $roleCheck->fetch_assoc()) {
-            // If no permissions are defined for the role, deny.
-            if (!array_key_exists($r["role"], $permissions)) {
-                return false;
-            }
-            elseif ($permissions[$r["role"]]&$perm) {
-                return true;
-            }
-            else {
-                return false;
-            }
+        elseif ($permissions[$_SESSION["role"]]&$perm) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
     // If it's a guest.
@@ -380,15 +371,11 @@ function checkOutrank($actinguserid, $targetuserid) {
     global $db, $permissions;
     
     // Default to Guest, since deleted accounts should have no rights.
-    $actinguserrole = "Guest";
     $targetuserrole = "Guest";
     
-    $actinguser = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($actinguserid));
     $targetuser = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($targetuserid));
     
-    while ($a = $actinguser->fetch_assoc()) {
-        $actinguserrole = $a["role"];
-    }
+    $actinguserrole = $_SESSION["role"];
     while ($t = $targetuser->fetch_assoc()) {
         $targetuserrole = $t["role"];
     }
