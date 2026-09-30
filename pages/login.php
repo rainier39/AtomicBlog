@@ -112,7 +112,8 @@ if (validateCSRFToken()) {
                         "expires" => time() + 60*60*24*7,
                         "secure" => true,
                         "httponly" => true,
-                        "samesite" => "Strict"
+                        "samesite" => "Strict",
+                        "path" => "/" . $config["dir"]
                     );
                     setcookie($config["cookiePrefix"] . "login", $cookie, $cookieoptions);
                 }

@@ -101,15 +101,16 @@ foreach (scandir("themes") as $theme) {
 }
 
 // Break up the URL for easy use throughout the software.
-$url = explode('/', ($_GET['url'] ?? ""));
+$url = explode("/", ($_GET["url"] ?? ""));
 
 // Initialize the session.
 session_name($config["cookiePrefix"] . "session");
 session_start([
-    'cookie_httponly' => true,
-    'cookie_samesite' => "strict",
+    "cookie_httponly" => true,
+    "cookie_samesite" => "strict",
     // Only set the secure attribute if the site is being served over HTTPS.
-    'cookie_secure' => (($ishttps == "on") ? true : false),
+    "cookie_secure" => (($ishttps == "on") ? true : false),
+    "cookie_path" => "/" . $config["dir"]
 ]);
 
 // Make sure this is always set to avoid warnings.
