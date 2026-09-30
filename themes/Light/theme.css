@@ -426,22 +426,6 @@ code, .codeblock {
 /* Panel */
 .panelcontent {
 }
-/* Userlist (manage users page) */
-.userlist {
- width: 100%;
- border-collapse: collapse;
-}
-.userlist td {
- font-weight: normal;
- border: 1px solid grey;
- padding: 6px;
-}
-.userlist thead th {
- background: #5058d8;
- border: 1px solid navy;
- color: white;
- padding: 3px 6px;
-}
 /* Blog statistics page */
 .stats td {
  padding: 3px 6px;
@@ -505,29 +489,5 @@ code, .codeblock {
  /* Users page (userlist) */
  .users {
   grid-template-columns: auto auto;
- }
- /* Userlist becomes vertical on mobile. */
- .userlist {
-  width: 46vw;
- }
- .userlist thead {
-  display:none
- }
- .userlist td {
-  display: block;
-  margin: 6px;
-  text-align: left;
-  position: relative;
-  min-width: 100%;
-  padding-left: 100%;
- }
- .userlist td::before {
-  content:attr(data-label);
-  position: absolute;
-  padding-right: 80px;
-  text-align: left;
-  left: 0;
-  padding-left: 2px;
-  font-weight: bold;
  }
 }
