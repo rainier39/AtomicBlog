@@ -148,7 +148,7 @@ if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$confi
 }
 
 // Set or update the user's role. We do this here, once, every time a page executes in case their role has changed since it was last set.
-if ($_SESSION["logged_in"]) {
+if ($config["installed"] and $_SESSION["logged_in"]) {
     $roleCheck = preparedQuery("SELECT `role` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));
     $_SESSION["role"] = $roleCheck->fetch_assoc()["role"];
 }
