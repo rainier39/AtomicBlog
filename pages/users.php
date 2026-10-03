@@ -27,7 +27,7 @@ $title = "Users";
 if (!checkPerm(PERM_VIEW_PROFILE)
 or (($config["userlist"] == "users") and !$_SESSION["logged_in"])
 or ($config["userlist"] == "admins") and !checkPerm(PERM_MANAGE_USERS)) {
-    $messages[] = error("You don't have permission to view this page.");
+    $messages[] = error("error.noviewpage");
     render_page("", array(), $title);
     exit();
 }
@@ -36,35 +36,35 @@ if (validateCSRFToken()) {
     $victimQuery = preparedQuery("SELECT `role`, `id` FROM `accounts` WHERE `id`=?", array($_POST["id"] ?? 0));
     $victim = $victimQuery->fetch_assoc();
     if (!checkPerm(PERM_MANAGE_USERS)) {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
     elseif ($victimQuery->num_rows < 1) {
-        $messages[] = error("The specified account does not exist.");
+        $messages[] = error("error.noaccount");
     }
     elseif ($_SESSION["id"] == $victim["id"]) {
-        $messages[] = error("You cannot change your own role.");
+        $messages[] = error("error.nopermission");
     }
     // The current user must outrank the target user.
     elseif ($permissions[$_SESSION["role"]] <= $permissions[$victim["role"]]) {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
     elseif (!array_key_exists($_POST["changerole"], $permissions)) {
-        $messages[] = error("Specified role does not exist.");
+        $messages[] = error("error.norole");
     }
     // User accounts cannot be turned into Guests.
     elseif ($_POST["changerole"] == "Guest") {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
     // The current user can't give someone a role above/including their own.
     elseif ($permissions[$_POST["changerole"]] >= $permissions[$_SESSION["role"]]) {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
     elseif ($_POST["changerole"] == $victim["role"]) {
-        $messages[] = info("Nothing to change.");
+        $messages[] = info("info.nochange");
     }
     else {
         preparedQuery("UPDATE `accounts` SET `role`=? WHERE `id`=?", array($_POST["changerole"], $victim["id"]));
-        $messages[] = success("Successfully changed role.");
+        $messages[] = success("success.changerole");
         // Log the event.
         preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`, `content`) VALUES ('change_role', ?, ?, ?, ?, ?, ?)", array($victim["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time(), "{$victim["role"]}|{$_POST["changerole"]}"));
     }
@@ -74,12 +74,12 @@ $usersvars = array("users" => "");
 
 $usersQuery = $db->query("SELECT * FROM `accounts`");
 if ($usersQuery->num_rows < 1) {
-    $usersvars["users"] .= info("No users to display.");
+    $usersvars["users"] .= info("info.nousers");
 }
 else {
     while ($u = $usersQuery->fetch_assoc()) {
         $tilevars = array(
-         "name" => $u["name"],
+         "name" => $u["namevisible"] ? $u["name"] : lang("user.anonymous"),
          "role" => htmlspecialchars($u["role"]),
          "joindate" => date("F jS, Y", $u["jointime"]),
          "jointime" => date("g:i:sa", $u["jointime"]),
@@ -93,10 +93,10 @@ else {
             if ($permissions[$_SESSION["role"]] > $permissions[$u["role"]]) {
                 $tilevars["admininfo"] = "<details>
                  <summary>More info</summary>
-                 <div>Username: " . htmlspecialchars($u["username"]) . "</div>
-                 <div>Email: " . htmlspecialchars($u["email"]) . "</div>
-                 <div>Join IP: " . htmlspecialchars($u["joinip"]) . "</div>
-                 <div>Current IP: " . htmlspecialchars($u["ip"]) . "</div>
+                 <div>[[ global.username: ]] " . htmlspecialchars($u["username"]) . "</div>
+                 <div>[[ global.email: ]] " . htmlspecialchars($u["email"]) . "</div>
+                 <div>[[ user.joinip ]] " . htmlspecialchars($u["joinip"]) . "</div>
+                 <div>[[ user.currentip ]] " . htmlspecialchars($u["ip"]) . "</div>
                 </details>";
             }
             if ($permissions[$_SESSION["role"]] > $permissions[$u["role"]]) {
@@ -113,7 +113,7 @@ else {
                 }
                 $tilevars["role"] .= "</select>";
                 $tilevars["role"] .= " <input type='hidden' name='id' value='" . $u["id"] . "'>
-                 <input type='submit' value='Change'>
+                 <input type='submit' value='" . lang("user.change") . "'>
                 </form>";
             }
         }

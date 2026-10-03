@@ -1,23 +1,50 @@
 {
  "code": "en-US",
  "author": "rainier39",
- "version": "v1.0.0-alpha",
+ "version": "v3.0.0-beta",
  
+ "error.nopermission": "You don't have permission to do this.",
+ "error.noviewpage": "You don't have permission to view this page.",
+ "error.notfound": "Page not found.",
+ "info.nochange": "There's nothing to change.",
+ "global.home": "Home",
  "global.posts": "Posts",
+ "global.users": "Users",
  "global.panel": "Panel",
+ "global.profile": "Profile",
  "global.login": "Login",
  "global.register": "Register",
- "global.name:": "Name: ",
- "global.username:": "Username: ",
- "global.email:": "Email Address: ",
- "global.password:": "Password: ",
- "global.repeatpassword:": "Repeat Password: ",
-
- "navbar.home": "Home",
+ "global.bio": "Bio",
+ "global.name:": "Name:",
+ "global.username:": "Username:",
+ "global.email:": "Email:",
+ "global.password:": "Password:",
+ "global.repeatpassword:": "Repeat password:",
+ "global.posts:": "Posts:",
+ "global.comments:": "Comments:",
+ 
  "navbar.logout": "Logout",
  
- "postTile.by": "By: ",
+ "postTile.by": "By: %s",
  
- "login.stayloggedin": "Stay Logged In: ",
- "posts.allposts": "All Posts"
+ "home.starred": "Starred",
+ "home.mostrecent": "Most recent",
+ "home.mostviewed": "Most viewed",
+ 
+ "login.stayloggedin": "Stay logged in:",
+ 
+ "error.norole": "The specified role does not exist.",
+ "error.noaccount": "The specified account does not exist.",
+ "info.nousers": "No users to display.",
+ "info.nobio": "No bio to display.",
+ "success.changerole": "Successfully changed role.",
+ "user.anonymous": "Anonymous",
+ "user.joined:": "Joined:",
+ "user.lastactive:": "Last active:",
+ "user.role:": "Role:",
+ "user.profile": "%s's Profile",
+ "user.profileinfo": "Profile information",
+ "user.change": "Change",
+ "user.joinip": "Join IP:",
+ "user.currentip": "Current IP"
 }

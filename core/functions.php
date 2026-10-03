@@ -108,6 +108,10 @@ function displayPost($p) {
 }
 
 function success($message) {
+    global $lang;
+    if (array_key_exists($message, $lang)) {
+        $message = lang($message);
+    }
     return "<div class='message success'>" . htmlspecialchars($message) . "</div>";
 }
 
@@ -117,10 +121,18 @@ function unsafe_success($message) {
 }
 
 function info($message) {
+    global $lang;
+    if (array_key_exists($message, $lang)) {
+        $message = lang($message);
+    }
     return "<div class='message info'>" . htmlspecialchars($message) . "</div>";
 }
 
 function error($message) {
+    global $lang;
+    if (array_key_exists($message, $lang)) {
+        $message = lang($message);
+    }
     return "<div class='message error'>" . htmlspecialchars($message) . "</div>";
 }
 

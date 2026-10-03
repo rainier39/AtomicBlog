@@ -25,7 +25,7 @@ if (!defined('INDEX')) exit;
 $title = "";
 
 if (!checkPerm(PERM_VIEW_PROFILE)) {
-    $messages[] = error("You don't have permission to view profiles.");
+    $messages[] = error("error.noviewpage");
     render_page("", array(), $title);
     exit();
 }
@@ -35,8 +35,8 @@ $p = $profileinfo->fetch_assoc();
 
 if ($profileinfo->num_rows < 1) {
     http_response_code(404);
-    $messages[] = error("Profile not found.");
-    render_page("", array(), "Profile not found");
+    $messages[] = error("error.notfound");
+    render_page("", array(), lang("error.notfound"));
     exit();
 }
 
@@ -47,7 +47,7 @@ if ($p["namevisible"]) {
     $name = $p["name"];
 }
 else {
-    $name = "Anonymous";
+    $name = lang("user.anonymous");
 }
 
 if ($p["emailvisible"]) {
@@ -61,14 +61,14 @@ if ($p["bio"]) {
     $bio = format($p["bio"]);
 }
 else {
-    $bio = info("No bio to display yet.");
+    $bio = info("info.nobio");
 }
 
 $jointime = "<abbr class='date' title='" . date("g:i:sa", $p["jointime"]) . "'>" . date("F jS, Y", $p["jointime"]) . "</abbr>";
 
 $lastactiveHTML = "<abbr class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</abbr>";
 
-$title = htmlspecialchars($name) . "'s Profile";
+$title = lang("user.profile", htmlspecialchars($name));
 
 $avatar = "";
 $uploads = scandir("images/");

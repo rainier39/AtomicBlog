@@ -41,13 +41,13 @@ if (strlen($config["customCSS"]) > 0) {
 if ((($config["userlist"] == "public") and checkPerm(PERM_VIEW_PROFILE))
 or (($config["userlist"] == "users") and $_SESSION["logged_in"] and checkPerm(PERM_VIEW_PROFILE))
 or ($config["userlist"] == "admins") and checkPerm(PERM_MANAGE_USERS)) {
-    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("users") . "'>Users</a>";
+    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("users") . "'>" . lang("global.users") . "</a>";
 }
 
 // Generate the navbar appropriately.
 if ($_SESSION["logged_in"]) {
     $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("panel") . "'>" . lang("global.panel") . "</a>";
-    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("profile/" . $_SESSION["id"]) . "'>Profile</a>";
+    $headervars["navbar"] .= "<a class='navbarButton' href='" . makeURL("profile/" . $_SESSION["id"]) . "'>" . lang("global.profile") . "</a>";
     $headervars["navbar"] .= render_template("logout.html", array("token" => $_SESSION["csrf_token"]), false);
 }
 else {

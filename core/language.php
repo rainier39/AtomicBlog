@@ -73,14 +73,19 @@ function updateLang() {
 
 updateLang();
 
-function lang($identifier) {
+function lang($identifier, $arg="") {
     global $lang;
     
     if (count($lang) < 1) {
         return "MISSING";
     }
     elseif (array_key_exists($identifier, $lang)) {
-        return $lang[$identifier];
+        if (str_contains($lang[$identifier], "%s")) {
+            return str_replace("%s", $arg, $lang[$identifier]);
+        }
+        else {
+            return $lang[$identifier];
+        }
     }
     // Special case: ISO lang code should be empty string if unknown.
     elseif ($identifier == "code") {

@@ -57,13 +57,22 @@ function render_template($filename, $variables, $echo=true) {
         $template = preg_replace("/{{{ ({$k}) }}}/", htmlspecialchars($v), $template);
         $template = preg_replace("/{{ ({$k}) }}/", $v, $template);
     }
+    // Triple square brackets for makeURL() strings.
+    // Special case: empty.
+    $template = preg_replace("/\[\[\[\]\]\]/", makeURL(""), $template);
+    $template = preg_replace("/\[\[\[ (.+?) \]\]\]/", makeURL("$1"), $template);
     foreach ($lang as $k=>$v) {
-        // Triple square brackets for makeURL() strings.
-        // Special case: empty.
-        $template = preg_replace("/\[\[\[\]\]\]/", makeURL(""), $template);
-        $template = preg_replace("/\[\[\[ (.+?) \]\]\]/", makeURL("$1"), $template);
         // Double square brackets for language strings.
-        $template = preg_replace("/\[\[ ({$k}) \]\]/", "{$v}", $template);
+        $template = preg_replace_callback("/\[\[ ({$k})(,([^ ]*?))*? \]\]/",
+        function ($match) use($variables) {
+            if ((count($match) == 4) and array_key_exists($match[3], $variables)) {
+                $match[0] = lang($match[1], $variables[$match[3]]);
+            }
+            else {
+                $match[0] = lang($match[1]);
+            }
+            return $match[0];
+        }, $template);
     }
     
     // Remove any extra whitespace.

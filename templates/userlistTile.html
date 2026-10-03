@@ -3,8 +3,8 @@
  <div class='userlistTileInner'>
   <div><a class='userlistTileName' href='{{{ profile }}}'>{{{ name }}}</a></div>
   <div>{{ role }}</div>
-  <div>Joined: <abbr class='date' title='{{{ jointime }}}'>{{{ joindate }}}</abbr></div>
-  <div>Last active: <abbr class='date' title='{{{ lastactivetime }}}'>{{{ lastactivedate }}}</abbr></div>
+  <div>[[ user.joined: ]] <abbr class='date' title='{{{ jointime }}}'>{{{ joindate }}}</abbr></div>
+  <div>[[ user.lastactive: ]] <abbr class='date' title='{{{ lastactivetime }}}'>{{{ lastactivedate }}}</abbr></div>
   {{ admininfo }}
  </div>
 </div>
