@@ -1,5 +1,23 @@
+function removepreview() {
+    let preview = document.getElementById("clearpreview");
+    let dummy = document.getElementById("previewdummy");
+    let pcontent = document.getElementById("previewcontent");
+    document.getElementById("previewcontent").innerHTML = "";
+    if (preview.style.display != "none") {
+        preview.style.display = "none";
+    }
+    if (dummy.style.display != "none") {
+        dummy.style.display = "none";
+    }
+    if (pcontent.style.display != "none") {
+        pcontent.style.display = "none";
+    }
+}
+
 async function dopreview() {
-    let preview = document.getElementById("preview");
+    let preview = document.getElementById("clearpreview");
+    let dummy = document.getElementById("previewdummy");
+    let pcontent = document.getElementById("previewcontent");
     let content = document.getElementById("content").value;
     const resp = await fetch(previewendpoint, {
       method: "POST",
@@ -8,10 +26,14 @@ async function dopreview() {
     });
     const formatted = await resp.text();
     let previewbox = document.getElementById("previewcontent");
-    if (previewbox == null) {
-        preview.outerHTML += "<br><div class='postContent' id='previewcontent'>" + formatted + "</div>";
+    previewbox.innerHTML = formatted;
+    if (preview.style.display == "none") {
+        preview.style.display = "inline-block";
     }
-    else {
-        previewbox.innerHTML = formatted;
+    if (dummy.style.display == "none") {
+        dummy.style.display = "block";
+    }
+    if (pcontent.style.display == "none") {
+        pcontent.style.display = "block";
     }
 }

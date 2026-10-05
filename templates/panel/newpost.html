@@ -1,6 +1,4 @@
 <!-- pages/panel/newpost.php -->
-  <script>const previewendpoint = "{{{ endpoint }}}";</script>
-  <script src='{{{ previewjs }}}'></script>
   <h1>New Post</h1>
   <form method='post' class='form newPostForm'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
@@ -12,7 +10,11 @@
    <label for='content'>Content: </label>
    <textarea name='content' id='content' required maxlength='65500'>{{{ content }}}</textarea>
    <br>
-   <button type='button' onclick='dopreview();' id='preview' class='button' value='Preview'>Preview</button>
+   <div>
+    <button type='button' onclick='dopreview();' id='preview' class='button'>Preview</button>
+    <button type='button' onclick='removepreview();' id='clearpreview' class='button' style='display: none;'>Clear preview</button>
+   </div>
+   <br id='previewdummy' style='display: none;'><div class='postContent' id='previewcontent' style='display: none;'></div>
    <label for='unpublished'>Unpublished: </label>
    <input type='checkbox' name='unpublished' id='unpublished'{{ unpublished }}>
    <br>

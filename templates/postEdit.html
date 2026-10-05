@@ -10,10 +10,15 @@
    <label for='content'>Content: </label>
    <textarea name='content' id='content' maxlength='65500' required>{{{ content }}}</textarea>
    <br>
-   <button type='button' onclick='dopreview();' id='preview' class='button' value='Preview'>Preview</button>
+   <div>
+    <button type='button' onclick='dopreview();' id='preview' class='button'>Preview</button>
+    <button type='button' onclick='removepreview();' id='clearpreview' class='button' style='display: none;'>Clear preview</button>
+   </div>
+   <br id='previewdummy' style='display: none;'><div class='postContent' id='previewcontent' style='display: none;'></div>
    <br>
-   <input type='submit' value='Edit post' class='button' name='edit'>
-   <br>
-   <input type='submit' value='Cancel edit' class='button' name='cancel' formnovalidate>
+   <div>
+    <input type='submit' value='Edit post' class='button' name='edit'>
+    <input type='submit' value='Cancel edit' class='button' name='cancel' formnovalidate>
+   </div>
   </form>
  </div>
