@@ -100,6 +100,9 @@ if (validateCSRFToken()) {
                 
                 $_SESSION["logged_in"] = true;
                 $_SESSION["id"] = $r["id"];
+                
+                // Generate a new CSRF token.
+                generateCSRFToken();
 
                 $_SESSION["messages"][] = success("Successfully logged in. Welcome, {$r["name"]}.");
                 $success = true;
@@ -147,8 +150,9 @@ if (!$success) {
 // Otherwise redirect the successfully logged-in user.
 else {
     if (isset($_SESSION["lastpage"])) {
-        redirect($_SESSION["lastpage"]);
+        $lastpage = $_SESSION["lastpage"];
         unset($_SESSION["lastpage"]);
+        redirect($lastpage);
     }
     else {
         redirect("panel");

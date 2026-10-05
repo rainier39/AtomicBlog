@@ -110,6 +110,10 @@ if (validateCSRFToken()) {
             // Change the password and invalidate the login cookie.
             preparedQuery("UPDATE `accounts` SET `password`=?, `cookie`=NULL, `cookietime`=0 WHERE `id`=?", array(password_hash($_POST["newpassword"], PASSWORD_DEFAULT), $_SESSION["id"]));
             clearLoginCookie();
+            // Prevent possible session fixation attacks.
+            session_regenerate_id(true);
+            // Generate a new CSRF token.
+            generateCSRFToken();
             $messages[] = success("Successfully changed password.");
             // Log the event.
             preparedQuery("INSERT INTO `logs` (`logtype`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('panel_change_password', ?, ?, ?, ?)", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));

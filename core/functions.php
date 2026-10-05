@@ -35,11 +35,14 @@ function logout() {
     clearLoginCookie();
     $id = $_SESSION["id"] ?? 0;
     // For the weird case of a user being logged in, but no database connection.
+    // (me being logged in, deleting the config, and reinstalling the software)
     if ($db) {
         preparedQuery("UPDATE `accounts` SET `cookie`=NULL WHERE `id`=?", array($id));
     }
     session_unset();
     session_destroy();
+    // Generate a new CSRF token.
+    generateCSRFToken();
 }
 
 // Set the user's CSRF token, overwriting the prior one if any.
@@ -799,13 +802,9 @@ function parseUserAgent($ua) {
 
 function validateCSRFToken() {
     if (($_POST["csrf_token"] ?? "") == $_SESSION["csrf_token"]) {
-        // Generate a new token.
-        generateCSRFToken();
         return true;
     }
     else {
-        // Generate a new token.
-        generateCSRFToken();
         return false;
     }
 }

@@ -139,6 +139,8 @@ if ($config["installed"] and (!$_SESSION["logged_in"]) and isset($_COOKIE[$confi
         $c = $cookieValid->fetch_assoc();
         // Prevent possible session fixation attacks.
         session_regenerate_id(true);
+        // Also regenerate the CSRF token.
+        generateCSRFToken();
         $_SESSION["logged_in"] = true;
         $_SESSION["id"] = $c["id"];
     }
