@@ -91,7 +91,7 @@ function render_template($filename, $variables, $echo=true) {
 
 // Render a page, placing the header and footer accordingly.
 function render_page($templatename, $templatevars, string $htitle="") {
-    global $config, $hcontent, $messages;
+    global $config, $hcontent, $messages, $scripts;
     if ($htitle == "") {
         $htitle = $config["title"];
     }

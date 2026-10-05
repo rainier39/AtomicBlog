@@ -9,7 +9,7 @@ async function dopreview() {
     const formatted = await resp.text();
     let previewbox = document.getElementById("previewcontent");
     if (previewbox == null) {
-        preview.outerHTML += "<br><div id='previewcontent'>" + formatted + "</div>";
+        preview.outerHTML += "<br><div class='postContent' id='previewcontent'>" + formatted + "</div>";
     }
     else {
         previewbox.innerHTML = formatted;

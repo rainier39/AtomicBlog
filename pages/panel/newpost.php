@@ -80,14 +80,17 @@ if (validateCSRFToken()) {
     }
 }
 
-$newpostvars = array("token" => $_SESSION["csrf_token"],
-"title" => $_POST["title"] ?? "",
-"tags" => $_POST["tags"] ?? "",
-"markdownbuttons" => markdownButtons(),
-"content" => $_POST["content"] ?? "",
-"unpublished" => (isset($_POST["unpublished"]) ? " checked" : ""),
-"previewjs" => makeURL("javascript/preview.js", true),
-"endpoint" => makeURL("api/preview-ajax.php"));
+$newpostvars = array(
+ "token" => $_SESSION["csrf_token"],
+ "title" => $_POST["title"] ?? "",
+ "tags" => $_POST["tags"] ?? "",
+ "markdownbuttons" => markdownButtons(),
+ "content" => $_POST["content"] ?? "",
+ "unpublished" => (isset($_POST["unpublished"]) ? " checked" : "")
+);
+
+$scripts[] = "<script>const previewendpoint = '" . makeURL("api/preview-ajax.php") . "';</script>";
+$scripts[] = "<script src='" . makeURL("javascript/preview.js", true) . "' async></script>";
 
 render_page("panel/newpost.html", $newpostvars, $title);
 

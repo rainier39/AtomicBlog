@@ -620,9 +620,10 @@ function generateCaptcha() {
 }
 
 function markdownButtons() {
+    global $scripts;
     // We need the "javascript:;" part because we need a valid href attribute so that these buttons are focusable (I.E. the user can use tab to select them).
-    return "<div></div><div class='markdownbuttons'><script src='" . makeURL("javascript/markdownbuttons.js", true) . "'></script>
-    <label></label>
+    $scripts[] = "<script src='" . makeURL("javascript/markdownbuttons.js", true) . "' async></script>";
+    return "<div></div><div class='markdownbuttons'>
     <a class='button buttonSmall' title='bold' onclick='format(\"bold\")' href='javascript:;'><b>B</b></a>
     <a class='button buttonSmall' title='italic' onclick='format(\"italic\")' href='javascript:;'><i>i</i></a>
     <a class='button buttonSmall' title='strikethrough' onclick='format(\"strikethrough\")' href='javascript:;'><s>s</s></a>

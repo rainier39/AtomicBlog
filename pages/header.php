@@ -37,6 +37,13 @@ if (strlen($config["customCSS"]) > 0) {
     $headervars["head"] .= "<style>" . htmlspecialchars($config["customCSS"], ENT_NOQUOTES) . "</style>";
 }
 
+// Add scripts to the head.
+if (count($scripts) > 0) {
+    foreach ($scripts as $script) {
+        $headervars["head"] .= $script;
+    }
+}
+
 // Add userlist button to navbar if appropriate.
 if ((($config["userlist"] == "public") and checkPerm(PERM_VIEW_PROFILE))
 or (($config["userlist"] == "users") and $_SESSION["logged_in"] and checkPerm(PERM_VIEW_PROFILE))

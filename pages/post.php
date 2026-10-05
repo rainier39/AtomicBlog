@@ -360,13 +360,16 @@ elseif (($url[2] ?? "") == "edit") {
             $success = true;
         }
         if (!$success) {
-            $posteditvars = array("token" => $_SESSION["csrf_token"],
-            "title" => $_POST["title"] ?? $p["title"],
-            "tags" => $_POST["tags"] ?? unparseTags($tags),
-            "buttons" => markdownButtons(),
-            "content" => $_POST["content"] ?? $p["content"],
-            "previewjs" => makeURL("javascript/preview.js", true),
-            "endpoint" => makeURL("api/preview-ajax.php"));
+            $posteditvars = array(
+             "token" => $_SESSION["csrf_token"],
+             "title" => $_POST["title"] ?? $p["title"],
+             "tags" => $_POST["tags"] ?? unparseTags($tags),
+             "buttons" => markdownButtons(),
+             "content" => $_POST["content"] ?? $p["content"]
+            );
+            
+            $scripts[] = "<script>const previewendpoint = '" . makeURL("api/preview-ajax.php") . "';</script>";
+            $scripts[] = "<script src='" . makeURL("javascript/preview.js", true) . "' async></script>";
             
             render_page("postEdit.html", $posteditvars, $title);
         }
@@ -489,11 +492,14 @@ elseif (($url[2] ?? "") == "uploads") {
             }
         }
         // Display forms and images.
-        $postuploadsvars = array("back" => makeURL("post/{$p["id"]}"),
-        "token" => $_SESSION["csrf_token"],
-        "icons" => "",
-        "script" => makeURL("javascript/uploads.js", true),
-        "attachments" => "");
+        $postuploadsvars = array(
+         "back" => makeURL("post/{$p["id"]}"),
+         "token" => $_SESSION["csrf_token"],
+         "icons" => "",
+         "attachments" => ""
+        );
+        
+        $scripts[] = "<script src='" . makeURL("javascript/uploads.js", true) . "' async></script>";
         
         foreach ($icons as $icon) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
@@ -628,7 +634,7 @@ if ($displayPost) {
         else {
             $char = "&";
         }
-        $postvars["tags"] .= "<a href='" . makeURL("posts/{$char}tag=" . urlencode(htmlspecialchars($tag))) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
+        $postvars["tags"] .= "<a href='" . makeURL("posts/{$char}tag=" . urlencode($tag)) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
     }
     
     if ($config["enableComments"]) {

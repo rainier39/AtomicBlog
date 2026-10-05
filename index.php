@@ -28,6 +28,7 @@ define("VERSION", "v3.0.0-beta");
 define("MIN_PASSWORD_LENGTH", 12);
 
 $messages = array();
+$scripts = array();
 
 // Get the configuration settings.
 require "core/default_config.php";
