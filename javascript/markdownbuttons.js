@@ -8,6 +8,9 @@ function format(type) {
     else if (type == "italic") {
         var pattern = "*%s*";
     }
+    else if (type == "strikethrough") {
+        var pattern = "~~%s~~";
+    }
     else if (type == "code") {
         var pattern = "`%s`";
     }

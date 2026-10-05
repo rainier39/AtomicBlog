@@ -622,6 +622,7 @@ function markdownButtons() {
     <label></label>
     <a class='button buttonSmall' title='bold' onclick='format(\"bold\")' href='javascript:;'><b>B</b></a>
     <a class='button buttonSmall' title='italic' onclick='format(\"italic\")' href='javascript:;'><i>i</i></a>
+    <a class='button buttonSmall' title='strikethrough' onclick='format(\"strikethrough\")' href='javascript:;'><s>s</s></a>
     <a class='button buttonSmall' title='code' onclick='format(\"code\")' href='javascript:;'>c</a>
     <a class='button buttonSmall' title='codeblock' onclick='format(\"codeblock\")' href='javascript:;'>&lt;&gt;</a>
     <a class='button buttonSmall' title='link' onclick='format(\"link\")' href='javascript:;'>link</a>
