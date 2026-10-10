@@ -30,22 +30,26 @@ if (!checkPerm(PERM_MANAGE_BLOG)) {
 
 $title = "Blog Statistics";
 
-$totalposts = $db->query("SELECT 1 FROM `posts`");
-$published = $db->query("SELECT 1 FROM `posts` WHERE `published`='1'");
-$unpublished = $db->query("SELECT 1 FROM `posts` WHERE `published`='0'");
-$totalaccounts = $db->query("SELECT 1 FROM `accounts`");
-$totalcomments = $db->query("SELECT 1 FROM `comments`");
-$totalviews = $db->query("SELECT 1 FROM `views`");
-$uniqueviewers = $db->query("SELECT DISTINCT `ip` FROM `views`");
+$totalposts = $db->query("SELECT COUNT(*) FROM `posts`")->fetch_assoc()["COUNT(*)"];
+$published = $db->query("SELECT COUNT(*) FROM `posts` WHERE `published`='1'")->fetch_assoc()["COUNT(*)"];
+$unpublished = $db->query("SELECT COUNT(*) FROM `posts` WHERE `published`='0'")->fetch_assoc()["COUNT(*)"];
+$totalaccounts = $db->query("SELECT COUNT(*) FROM `accounts`")->fetch_assoc()["COUNT(*)"];
+$totalcomments = $db->query("SELECT COUNT(*) FROM `comments`")->fetch_assoc()["COUNT(*)"];
+$totalviews = $db->query("SELECT COUNT(*) FROM `views`")->fetch_assoc()["COUNT(*)"];
+$uniqueviewers = $db->query("SELECT COUNT(DISTINCT `ip`) FROM `views`")->fetch_assoc()["COUNT(DISTINCT `ip`)"];
+$logentries = $db->query("SELECT COUNT(*) FROM `logs`")->fetch_assoc()["COUNT(*)"];
 
-$statsVars = array("version" => $config["version"],
-"totalposts" => $totalposts->num_rows,
-"published" => $published->num_rows,
-"unpublished" => $unpublished->num_rows,
-"totalaccounts" => $totalaccounts->num_rows,
-"totalcomments" => $totalcomments->num_rows,
-"totalviews" => $totalviews->num_rows,
-"uniqueviewers" => $uniqueviewers->num_rows);
+$statsVars = array(
+ "version" => $config["version"],
+ "totalposts" => $totalposts,
+ "published" => $published,
+ "unpublished" => $unpublished,
+ "totalaccounts" => $totalaccounts,
+ "totalcomments" => $totalcomments,
+ "totalviews" => $totalviews,
+ "uniqueviewers" => $uniqueviewers,
+ "logentries" => $logentries
+);
 
 render_page("panel/stats.html", $statsVars, $title);
 
