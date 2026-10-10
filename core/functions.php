@@ -852,6 +852,35 @@ function readableToBytes($readable) {
     return $bytes;
 }
 
+function generatePagination($pages, $page, $loc) {
+    if ($pages < 2) return "";
+    
+    $content = "<div class='pagination'>";
+    if ($page != 1) {
+        $content .= "<a href='" . makeURL("{$loc}/1") . "'>&lt;&lt;</a>";
+        $content .= "<a href='" . makeURL("{$loc}/" . $page-1) . "'>&lt;</a>";
+    }
+    for ($i = max(1, ceil($page-15)); $i <= min($pages, ceil($page+15)); $i++) {
+        if ($i == $page) {
+            $content .= "<span>{$i}</span>";
+        }
+        else {
+            $content .= "<a href='" . makeURL("{$loc}/" . $i) . "'>{$i}</a>";
+        }
+        // Support being on fractional pages.
+        if (($page > $i) and ($page < ($i+1))) {
+            $content .= "<span>{$page}</span>";
+        }
+    }
+    if ($page != $pages) {
+        $content .= "<a href='" . makeURL("{$loc}/" . $page+1) . "'>&gt;</a>";
+        $content .= "<a href='" . makeURL("{$loc}/" . $pages) . "'>&gt;&gt;</a>";
+    }
+    $content .= "</div>";
+    
+    return $content;
+}
+
 // --- PHP 7.* Compatibility ---
 if (!function_exists("str_starts_with")) {
     function str_starts_with(string $haystack, string $needle) {

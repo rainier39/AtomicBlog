@@ -26,9 +26,29 @@ if (!defined('INDEX')) exit;
 
 $title = "Login Logs";
 
-$loginsVars = array("logins" => "");
+$loginsVars = array(
+ "logins" => "",
+ "pagination" => ""
+);
 
-$attempts = preparedQuery("SELECT `logtype`, `ip`, `useragent`, `timestamp` FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `targetid`=? ORDER BY `timestamp` DESC", array($_SESSION["id"]));
+$itemsPerPage = 20;
+$attemptcount = preparedQuery("SELECT COUNT(*) FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `targetid`=?", array($_SESSION["id"]));
+$ac = $attemptcount->fetch_assoc()["COUNT(*)"];
+$pages = ceil($ac/$itemsPerPage);
+
+// Figure out what page we're on.
+if (isset($url[2])) {
+    $page = clamp((float)$url[2], 1, $pages);
+}
+// Default to first page.
+else {
+    $page = 1;
+}
+
+// Calculate the offset.
+$offset = ($page - 1) * $itemsPerPage;
+
+$attempts = preparedQuery("SELECT `logtype`, `ip`, `useragent`, `timestamp` FROM `logs` WHERE (`logtype`='login_fail' OR `logtype`='login_success') AND `targetid`=? ORDER BY `timestamp` DESC LIMIT ? OFFSET ?", array($_SESSION["id"], $itemsPerPage, $offset));
 
 while ($a = $attempts->fetch_assoc()) {
     if ($a["logtype"] == "login_success") {
@@ -56,6 +76,9 @@ while ($a = $attempts->fetch_assoc()) {
 if ($loginsVars["logins"] == "") {
     $loginsVars["logins"] = info("No logins to display.");
 }
+
+// Generate the pagination.
+$loginsVars["pagination"] = generatePagination($pages, $page, "panel/logins");
 
 render_page("panel/logins.html", $loginsVars, $title);
 

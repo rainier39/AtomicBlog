@@ -24,7 +24,11 @@ if (!defined('INDEX')) exit;
 
 $title = lang("global.posts");
 
-$postsvars = array("posts" => "");
+$postsvars = array(
+ "posts" => "",
+ "tagCloud" => "",
+ "pagination" => ""
+);
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
     $messages[] = error("You don't have permission to view posts.");
@@ -40,10 +44,27 @@ if (isset($_GET["tag"])) {
     $tagQuery = " AND EXISTS( SELECT * FROM `tags` WHERE `tags`.`post`=p.`id` AND `tag`='" . $db->real_escape_string($_GET["tag"]) . "')";
 }
 
-// Get all of the blog posts.
-$posts = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (`published`='1' OR `account`='{$id}'){$tagQuery} ORDER BY `id` DESC");
+$itemsPerPage = 24;
+$postCountQuery = preparedQuery("SELECT COUNT(*) FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (`published`='1' OR `account`=?){$tagQuery}", array($id));
+$postCount = $postCountQuery->fetch_assoc()["COUNT(*)"];
+$pages = ceil($postCount/$itemsPerPage);
 
-// TODO: pagination and an actual post searching/filtering system
+// Figure out what page we're on.
+if (isset($url[1])) {
+    $page = clamp((float)$url[1], 1, $pages);
+}
+// Default to first page.
+else {
+    $page = 1;
+}
+
+// Calculate the offset.
+$offset = ($page - 1) * $itemsPerPage;
+
+// Get all of the blog posts.
+$posts = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (`published`='1' OR `account`='{$id}'){$tagQuery} ORDER BY `id` DESC LIMIT {$itemsPerPage} OFFSET {$offset}");
+
+// TODO: an actual post searching/filtering system
 
 // Only do this ONCE.
 $uploads = scandir("images/");
@@ -59,17 +80,19 @@ if ($posts->num_rows > 0) {
     // Display a tag cloud.
     // Only keep the top 30 tags.
     $tagQuery = preparedQuery("SELECT `tag`, COUNT(`post`) FROM `tags` LEFT JOIN `posts` AS p ON `tags`.`post`=p.`id` WHERE (p.published='1' OR p.account=?) GROUP BY `tag` ORDER BY COUNT(`post`) DESC LIMIT 30", array($id));
-    $tagCloud = "<div class='tagCloud'>";
+    $postsvars["tagCloud"] = "<div class='tagCloud'>";
     while ($tag = $tagQuery->fetch_assoc()) {
-        $tagCloud .= "<a href='" . makeURL("posts/&tag=" . urlencode($tag["tag"])) . "' style='font-size:" . clamp($tag["COUNT(`post`)"]+14, 14, 50) . "px' class='tagCloudTag'>" . htmlspecialchars($tag["tag"]) . "</a>";
+        $postsvars["tagCloud"] .= "<a href='" . makeURL("posts/&tag=" . urlencode($tag["tag"])) . "' style='font-size:" . clamp($tag["COUNT(`post`)"]+14, 14, 50) . "px' class='tagCloudTag'>" . htmlspecialchars($tag["tag"]) . "</a>";
     }
-    $tagCloud .= "</div>";
-    $postsvars["posts"] = $tagCloud . $postsvars["posts"];
+    $postsvars["tagCloud"] .= "</div>";
 }
 // Otherwise print a message.
 else {
     $postsvars["posts"] .= info("No posts yet.");
 }
+
+// Generate the pagination.
+$postsvars["pagination"] = generatePagination($pages, $page, "posts");
 
 render_page("posts.html", $postsvars, $title);
 

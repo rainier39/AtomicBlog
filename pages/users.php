@@ -70,9 +70,29 @@ if (validateCSRFToken()) {
     }
 }
 
-$usersvars = array("users" => "");
+$usersvars = array(
+ "users" => "",
+ "pagination" => ""
+);
 
-$usersQuery = $db->query("SELECT * FROM `accounts`");
+$itemsPerPage = 20;
+$userCountQuery = $db->query("SELECT COUNT(*) FROM `accounts`");
+$userCount = $userCountQuery->fetch_assoc()["COUNT(*)"];
+$pages = ceil($userCount/$itemsPerPage);
+
+// Figure out what page we're on.
+if (isset($url[1])) {
+    $page = clamp((float)$url[1], 1, $pages);
+}
+// Default to first page.
+else {
+    $page = 1;
+}
+
+// Calculate the offset.
+$offset = ($page - 1) * $itemsPerPage;
+
+$usersQuery = preparedQuery("SELECT * FROM `accounts` LIMIT ? OFFSET ?", array($itemsPerPage, $offset));
 if ($usersQuery->num_rows < 1) {
     $usersvars["users"] .= info("info.nousers");
 }
@@ -120,6 +140,9 @@ else {
         $usersvars["users"] .= render_template("userlistTile.html", $tilevars, false);
     }
 }
+
+// Generate the pagination.
+$usersvars["pagination"] = generatePagination($pages, $page, "users");
 
 render_page("users.html", $usersvars, $title);
 

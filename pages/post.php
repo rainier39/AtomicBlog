@@ -299,7 +299,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
 }
 // Handle cancelling editing a comment.
 elseif (isset($_POST["canceleditcomment"]) and validateCSRFToken()) {
-    redirect("post/" . $p["id"]);
+    redirect("post/{$p["id"]}/" . (float)$url[2]);
 }
 // Handle editing.
 elseif (($url[2] ?? "") == "edit") {
@@ -562,16 +562,20 @@ if ($displayPost) {
         }
     }
     
-    $postvars = array("postbuttons" => "",
-    "title" => $p["title"],
-    "author" => "Nobody",
-    "ptime" => date("g:i:sa", $p["starttime"]),
-    "pdate" => date("F jS, Y", $p["starttime"]),
-    "edited" => "",
-    "icon" => "",
-    "tags" => "",
-    "content" => $p["content"],
-    "comments" => "");
+    $postvars = array(
+     "postbuttons" => "",
+     "title" => $p["title"],
+     "author" => "Nobody",
+     "ptime" => date("g:i:sa", $p["starttime"]),
+     "pdate" => date("F jS, Y", $p["starttime"]),
+     "edited" => "",
+     "icon" => "",
+     "tags" => "",
+     "content" => $p["content"],
+     "commentForm" => "",
+     "comments" => "",
+     "pagination" => ""
+    );
     
     $title = $p["title"];
     
@@ -640,18 +644,40 @@ if ($displayPost) {
     if ($config["enableComments"]) {
         // First, display the comments form if we have permission to comment.
         if (checkPerm(PERM_COMMENT)) {
-            $commentformvars = array("token" => $_SESSION["csrf_token"],
-            "email" => $_POST["email"] ?? "",
-            "emailRequired" => ($_SESSION["logged_in"] ?? false) ? "disabled" : "",
-            "max" => $config["commentMaxLength"],
-            "content" => $_POST["content"] ?? "");
-            $postvars["comments"] .= render_template("postCommentForm.html", $commentformvars, false);
+            $commentformvars = array(
+             "token" => $_SESSION["csrf_token"],
+             "email" => $_POST["email"] ?? "",
+             "emailRequired" => ($_SESSION["logged_in"] ?? false) ? "disabled" : "",
+             "max" => $config["commentMaxLength"],
+             "content" => $_POST["content"] ?? ""
+            );
+            $postvars["commentForm"] = render_template("postCommentForm.html", $commentformvars, false);
         }
         else {
             $postvars["comments"] .= error("You don't have permission to comment.");
         }
+        $itemsPerPage = 5;
+        $commentCountQuery = preparedQuery("SELECT COUNT(*) FROM `comments` WHERE `post`=?", array($p["id"]));
+        $commentCount = $commentCountQuery->fetch_assoc()["COUNT(*)"];
+        $pages = ceil($commentCount/$itemsPerPage);
+
+        // Figure out what page we're on.
+        if (isset($url[2])) {
+            $page = clamp((float)$url[2], 1, $pages);
+        }
+        // Default to first page.
+        else {
+            $page = 1;
+        }
+
+        // Calculate the offset.
+        $offset = ($page - 1) * $itemsPerPage;
+        
+        // Generate the pagination.
+        $postvars["pagination"] = generatePagination($pages, $page, "post/{$p["id"]}");
+        
         // Next, display the existing comments.
-        $comments = preparedQuery("SELECT `comments`.*,`accounts`.`namevisible`,`accounts`.`name`,`accounts`.`color` FROM `comments` LEFT JOIN `accounts` ON `comments`.`account`=`accounts`.`id` WHERE `post`=? ORDER BY `comments`.`id` DESC", array($p["id"]));
+        $comments = preparedQuery("SELECT `comments`.*,`accounts`.`namevisible`,`accounts`.`name`,`accounts`.`color` FROM `comments` LEFT JOIN `accounts` ON `comments`.`account`=`accounts`.`id` WHERE `post`=? ORDER BY `comments`.`id` DESC LIMIT ? OFFSET ?", array($p["id"], $itemsPerPage, $offset));
         
         if ($comments->num_rows < 1) {
             $postvars["comments"] .= "<br>" . info("No comments to display yet.");
@@ -681,11 +707,11 @@ if ($displayPost) {
                 $authorcolor = " style='background: #" . $c["color"] . ";'";
             }
             
-            $url2 = $url[2] ?? "";
-            $url3 = explode("#", $url[3] ?? "");
+            $url3 = $url[3] ?? "";
+            $url4 = explode("#", $url[4] ?? "");
             $editing = false;
             
-            if (($url2 == "editcomment") and ($url3[0] == $c["id"])) {
+            if (($url3 == "editcomment") and ($url4[0] == $c["id"])) {
                 $editing = true;
             }
             
@@ -698,7 +724,7 @@ if ($displayPost) {
             or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS))
             and (!$editing)) {
-                $postvars["comments"] .= "<a href='" . makeURL("post/{$p["id"]}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
+                $postvars["comments"] .= "<a href='" . makeURL("post/{$p["id"]}/{$page}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
             }
             
             if ((checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id)
@@ -721,15 +747,16 @@ if ($displayPost) {
             }
             else {
                 $postvars["comments"] .= "</div></div>
-                <div class='commentContent'>
+                <div class='commentEditContent'>
                 <form method='post' class='form'>
                  <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                  <input type='hidden' name='commentid' value='" . $c["id"] . "'>
                  <textarea name='newcontent' maxlength='" . $config["commentMaxLength"] . "' required>" . htmlspecialchars($_POST["newcontent"] ?? $c["content"]) . "</textarea>
                  <div></div>
-                 <input class='button' type='submit' name='editcomment' value='Edit'>
-                 <div></div>
-                 <input class='button' type='submit' name='canceleditcomment' value='Cancel Edit' formnovalidate>
+                 <div>
+                  <input class='button' type='submit' name='editcomment' value='Edit'>
+                  <input class='button' type='submit' name='canceleditcomment' value='Cancel Edit' formnovalidate>
+                 </div>
                 </form>
                 </div>
                 </div>";
