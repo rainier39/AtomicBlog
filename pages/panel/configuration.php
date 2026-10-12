@@ -23,7 +23,7 @@
 if (!defined('INDEX')) exit;
 
 if (!checkPerm(PERM_MANAGE_BLOG)) {
-    $messages[] = error("You don't have permission to do this.");
+    $messages[] = error("error.noviewpage");
     render_page("", array(), $title);
     exit();
 }

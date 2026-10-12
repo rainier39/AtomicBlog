@@ -23,11 +23,11 @@
 if (!defined('INDEX')) exit;
 
 $title = "";
-$panelActions = array("account-settings", "profile-settings", "logins", "newpost", "configuration", "stats");
+$panelActions = array("account-settings", "profile-settings", "logins", "newpost", "configuration", "stats", "logs");
 
 // If the user isn't logged in, don't let them into the panel.
 if (!$_SESSION["logged_in"]) {
-    $messages[] = error("You must be logged in to access this page.");
+    $messages[] = error("error.noviewpage");
     render_page("", array(), $title);
     exit();
 }
@@ -45,6 +45,7 @@ elseif (!isset($url[1]) or $url[1] == "") {
     if (checkPerm(PERM_MANAGE_BLOG)) {
         $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/stats") . "'>Blog statistics</a></p>";
         $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>Configure blog</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/logs") . "'>View logs</a></p>";
     }
     render_page("panel.html", $panelvars, $title);
 }
@@ -55,7 +56,7 @@ elseif (in_array($url[1], $panelActions)) {
 // Display an error page.
 else {
     http_response_code(404);
-    $messages[] = error("Page not found.");
+    $messages[] = error("error.notfound");
     render_page("", array(), "Page not found");
 }
 

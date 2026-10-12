@@ -110,7 +110,7 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
             $_SESSION["messages"][] = success("Successfully deleted the post.");
             
             // Log the event.
-            preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('post_delete', ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
+            preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `content`, `ip`, `useragent`, `timestamp`) VALUES ('post_delete', ?, ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $p["title"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             
             redirect("");
         }
