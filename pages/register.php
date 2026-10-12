@@ -20,6 +20,7 @@
 // Allow a user to sign up for an account.
 
 // TODO: allow resending email (with strict limits)
+// TODO: improve captcha, use the fontttf function instead of imagestring
 
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;

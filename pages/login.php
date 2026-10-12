@@ -27,7 +27,7 @@ $title = lang("global.login");
 
 // If the user is already logged in, don't let them into the page.
 if ($_SESSION["logged_in"]) {
-   $messages[] = error("You're already logged in.");
+   $messages[] = error("error.alreadyloggedin");
    render_page("", array(), $title);
    exit();
 }
@@ -40,10 +40,10 @@ if (validateCSRFToken()) {
     $_POST["password"] = $_POST["password"] ?? "";
     
     if (strlen($_POST["username"]) < 1) {
-        $errors[] = "Username cannot be blank.";
+        $errors[] = "error.blankusername";
     }
     if (strlen($_POST["password"]) < 1) {
-        $errors[] = "Password cannot be blank.";
+        $errors[] = "error.blankpassword";
     }
     
     // Lock to avoid race conditions.
@@ -53,7 +53,7 @@ if (validateCSRFToken()) {
     
     // Stop if they've logged in or tried to too many times.
     if ($attempts->num_rows >= $config["loginsPerHour"]) {
-        $errors[] = "Too many login attempts. Try again later.";
+        $errors[] = "error.toomanyloginattempts";
     }
     
     if (count($errors) !== 0) {
@@ -67,30 +67,30 @@ if (validateCSRFToken()) {
         // If there's no account with that name, give them the generic failure message. This helps prevent username enumeration.
         if ($result->num_rows < 1) {
             // We don't log this because there's no actual account being logged into.
-            $messages[] = error("The username or password you entered was incorrect.");
+            $messages[] = error("error.wrongusernameorpassword");
         }
         else {
             $r = $result->fetch_assoc();
             
             // Wrong password.
             if (!password_verify($_POST["password"], $r["password"])) {
-                $messages[] = error("The username or password you entered was incorrect.");
+                $messages[] = error("error.wrongusernameorpassword");
             }
             // Make sure the account is allowed to be logged into.
             elseif (!checkRolePerm(PERM_LOGIN, $r["role"])) {
                 if ($r["role"] == "Unapproved") {
                     switch ($config["registrationMode"]) {
                         case "email":
-                            $messages[] = error("You must click the link that you were emailed before you can log in.");
+                            $messages[] = error("error.verifyemail");
                             break;
                         case "approval":
                         default:
-                            $messages[] = error("Your account must be approved before you can log in.");
+                            $messages[] = error("error.approveaccount");
                             break;
                     }
                 }
                 else {
-                    $messages[] = error("This account cannot be logged into.");
+                    $messages[] = error("error.nologin");
                 }
             }
             // Finally, log the user in.
@@ -104,7 +104,7 @@ if (validateCSRFToken()) {
                 // Generate a new CSRF token.
                 generateCSRFToken();
 
-                $_SESSION["messages"][] = success("Successfully logged in. Welcome, {$r["name"]}.");
+                $_SESSION["messages"][] = success("success.loggedin", $r["name"]);
                 $success = true;
                             
                 if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on") and ($ishttps == "on")) {

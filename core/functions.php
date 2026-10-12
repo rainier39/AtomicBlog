@@ -110,10 +110,10 @@ function displayPost($p) {
     return render_template("postTile.html", $postTilevars, false);
 }
 
-function success($message) {
+function success($message, $arg="") {
     global $lang;
     if (array_key_exists($message, $lang)) {
-        $message = lang($message);
+        $message = lang($message, $arg);
     }
     return "<div class='message success'>" . htmlspecialchars($message) . "</div>";
 }
@@ -123,18 +123,18 @@ function unsafe_success($message) {
     return "<div class='message success'>" . $message . "</div>";
 }
 
-function info($message) {
+function info($message, $arg="") {
     global $lang;
     if (array_key_exists($message, $lang)) {
-        $message = lang($message);
+        $message = lang($message, $arg);
     }
     return "<div class='message info'>" . htmlspecialchars($message) . "</div>";
 }
 
-function error($message) {
+function error($message, $arg="") {
     global $lang;
     if (array_key_exists($message, $lang)) {
-        $message = lang($message);
+        $message = lang($message, $arg);
     }
     return "<div class='message error'>" . htmlspecialchars($message) . "</div>";
 }
@@ -590,8 +590,6 @@ function generateCaptcha() {
             imagesetpixel($img, $w, $h, $rand);
         }
     }
-    
-    $white = imagecolorallocate($img, 255, 255, 255);
     
     // Draw some lines.
     $rand = imagecolorallocate($img, random_int(120, 200), random_int(120, 200), random_int(120, 200));

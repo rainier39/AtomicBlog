@@ -632,13 +632,7 @@ if ($displayPost) {
         </p>";
     }
     foreach ($tags as $tag) {
-        if ($config["prettyURLs"]) {
-            $char = "?";
-        }
-        else {
-            $char = "&";
-        }
-        $postvars["tags"] .= "<a href='" . makeURL("posts/{$char}tag=" . urlencode($tag)) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
+        $postvars["tags"] .= "<a href='" . makeURL("posts/&tag=" . urlencode($tag)) . "' class='tag'>" . htmlspecialchars($tag) . "</a>";
     }
     
     if ($config["enableComments"]) {

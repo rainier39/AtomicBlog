@@ -6,6 +6,8 @@
  "error.nopermission": "You don't have permission to do this.",
  "error.noviewpage": "You don't have permission to view this page.",
  "error.notfound": "Page not found.",
+ "error.blankusername": "Your username cannot be blank.",
+ "error.blankpassword": "Your password cannot be blank.",
  "info.nochange": "There's nothing to change.",
  "global.home": "Home",
  "global.posts": "Posts",
@@ -31,6 +33,13 @@
  "home.mostrecent": "Most recent",
  "home.mostviewed": "Most viewed",
  
+ "error.alreadyloggedin": "You're already logged in.",
+ "error.toomanyloginattempts": "Too many login attempts. Try again later.",
+ "error.wrongusernameorpassword": "The username or password you entered was incorrect.",
+ "error.verifyemail": "You must click the link that you were emailed before you can log in.",
+ "error.approveaccount": "Your account must be approved before you can log in",
+ "error.nologin": "This account cannot be logged into.",
+ "success.loggedin": "Successfully logged in. Welcome, %s.",
  "login.stayloggedin": "Stay logged in:",
  
  "error.norole": "The specified role does not exist.",
