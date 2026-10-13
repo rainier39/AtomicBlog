@@ -69,7 +69,7 @@ while ($a = $attempts->fetch_assoc()) {
     }
     $ua = parseUserAgent($a["useragent"]);
     $ua = "<span class='date' title='" . htmlspecialchars($a["useragent"]) . "'>{$ua["os"]}, {$ua["browser"]}</span>";
-    $loginsVars["logins"] .= "<div class='loginLog'>$type <b>on</b> <small>$date</small> <b>at</b> <small>$time</small> <b>from</b> $ip, $ua</div>";
+    $loginsVars["logins"] .= "<div class='logEntry'>$type <b>on</b> <small>$date</small> <b>at</b> <small>$time</small> <b>from</b> $ip, $ua</div>";
 }
 
 // If there are no login attempts.

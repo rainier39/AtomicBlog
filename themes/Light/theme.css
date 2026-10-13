@@ -450,12 +450,12 @@ code, .codeblock {
  padding: 3px 6px;
  text-align: right;
 }
-/* Login logs page */
-.loginLogs {
+/* Logs page & login logs page */
+.logEntries {
  display: grid;
  gap: 6px;
 }
-.loginLog {
+.logEntry {
  display: block;
  padding: 3px 6px;
  box-shadow: 0px 0px 2px #0008;
