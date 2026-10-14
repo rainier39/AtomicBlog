@@ -116,7 +116,7 @@ if ($config["version"] != VERSION) {
         $db->query("ALTER TABLE `posts` DROP COLUMN IF EXISTS `tags`");
         
         // Give them a baseURL as well.
-        $config["baseURL"] = rtrim((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"], "/");
+        $config["baseURL"] = rtrim(($ishttps ? "https://" : "http://") . $_SERVER["HTTP_HOST"], "/");
     
         // Bump the version.
         $config["version"] = "v3.0.0-beta";

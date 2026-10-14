@@ -239,7 +239,8 @@ if (validateCSRFToken()) {
 
 // Display the install page form.
 if (!$config["installed"]) {
-    $baseURL = rtrim((($ishttps == "on") ? "https://" : "http://") . $_SERVER["HTTP_HOST"], "/");
+    // The HTTP Host header is the best thing to rely on in PHP, as it *should* reflect the actual HTTP Host that the blog owner is installing the software on. The owner may also see and modify it if it's incorrect.
+    $baseURL = rtrim(($ishttps ? "https://" : "http://") . $_SERVER["HTTP_HOST"], "/");
     $installvars = array("token" => $_SESSION["csrf_token"],
     "sqlserver" => $_POST["SQLServer"] ?? "",
     "sqldb" => $_POST["SQLDatabase"] ?? "",

@@ -107,7 +107,7 @@ if (validateCSRFToken()) {
                 $_SESSION["messages"][] = success("success.loggedin", $r["name"]);
                 $success = true;
                             
-                if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on") and ($ishttps == "on")) {
+                if (isset($_POST["stayloggedin"]) and ($_POST["stayloggedin"] == "on") and $ishttps) {
                     $cookie = bin2hex(random_bytes(32));
                     // Also give the user their login cookie.
                     $cookieoptions = array(
@@ -142,7 +142,7 @@ if (validateCSRFToken()) {
 if (!$success) {
     $loginvars = array("token" => $_SESSION["csrf_token"],
     "username" => $_POST["username"] ?? "",
-    "https" => ($ishttps == "on"),
+    "https" => $ishttps,
     "minlength" => MIN_PASSWORD_LENGTH,
     "test" => true);
     render_page("login.html", $loginvars, $title);

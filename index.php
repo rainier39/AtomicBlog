@@ -63,17 +63,8 @@ require "core/database.php";
 // Initialize the file containing all of the global functions.
 require "core/functions.php";
 
-// Make sure that the page is accessed over HTTPS if applicable.
-$ishttps = $_SERVER["HTTPS"] ?? "";
-if (($ishttps != "on") and $config["https"]) {
-    if (str_starts_with($config["baseURL"], "http://")) {
-        header("Location: https://" . substr($config["baseURL"], 7) . (($config["dir"] != "") ? "/{$config["dir"]}" : ""));
-    }
-    else {
-        header("Location: https://" . substr($config["baseURL"], 8) . (($config["dir"] != "") ? "/{$config["dir"]}" : ""));
-    }
-    exit();
-}
+// Check if the connection is HTTPS (best-effort).
+$ishttps = ($_SERVER["HTTPS"] ?? "") == "on";
 
 // If the forum is installed, create a database connection.
 if ($config["installed"]) {
@@ -110,7 +101,7 @@ session_start([
     "cookie_httponly" => true,
     "cookie_samesite" => "strict",
     // Only set the secure attribute if the site is being served over HTTPS.
-    "cookie_secure" => (($ishttps == "on") ? true : false),
+    "cookie_secure" => $ishttps,
     "cookie_path" => "/" . $config["dir"]
 ]);
 

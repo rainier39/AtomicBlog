@@ -531,7 +531,7 @@ elseif (($url[2] ?? "") == "uploads") {
             }
             $postuploadsvars["attachments"] .= "<div class='uploadTile'>
               <img src='" . makeURL("images/{$attachment}") . "?{$ut}'>
-              URL: <a onclick='copy(\"" . (($ishttps == "on") ? "https://" : "http://") . $_SERVER["SERVER_NAME"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
+              URL: <a onclick='copy(\"" . $config["baseURL"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
               <hr>
               <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
