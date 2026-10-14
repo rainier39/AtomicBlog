@@ -85,6 +85,9 @@ footer span {
 .feed {
  margin: 0;
 }
+.blur {
+ filter: blur(4px);
+}
 /* Messages */
 .message {
  padding: 5px 10px;

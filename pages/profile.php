@@ -40,8 +40,10 @@ if ($profileinfo->num_rows < 1) {
     exit();
 }
 
-$comments = preparedQuery("SELECT 1 FROM `comments` WHERE `account`=?", array($p["id"]));
-$posts = preparedQuery("SELECT 1 FROM `posts` WHERE `account`=?", array($p["id"]));
+$comments = preparedQuery("SELECT COUNT(*) FROM `comments` WHERE `account`=?", array($p["id"]));
+$posts = preparedQuery("SELECT COUNT(*) FROM `posts` WHERE `account`=?", array($p["id"]));
+$comments = $comments->fetch_assoc()["COUNT(*)"];
+$posts = $posts->fetch_assoc()["COUNT(*)"];
 
 if ($p["namevisible"]) {
     $name = $p["name"];
@@ -51,10 +53,11 @@ else {
 }
 
 if ($p["emailvisible"]) {
-    $email = $p["email"];
+    $email = htmlspecialchars($p["email"], ENT_NOQUOTES);
 }
 else {
-    $email = "***@***";
+    // Easter egg!
+    $email = "<span class='blur'>rainier39</span>@<span class='blur'>proton.me</span>";
 }
 
 if ($p["bio"]) {
@@ -101,9 +104,23 @@ $profilevars = array(
  "lastactive" => $lastactiveHTML,
  "role" => $p["role"],
  "email" => $email,
- "comments" => $comments->num_rows,
- "posts" => $posts->num_rows
+ "comments" => $comments,
+ "posts" => $posts,
+ "recentposts" => ""
 );
+
+if ($posts > 0) {
+    $recentPosts = preparedQuery("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (published='1' AND `account`=?) ORDER BY `starttime` DESC LIMIT 6", array($p["id"]));
+    $profilevars["recentposts"] = "<div class='postTiles'>";
+    // Display the posts.
+    while ($p = $recentPosts->fetch_assoc()) {
+        $profilevars["recentposts"] .= displayPost($p);
+    }
+    $profilevars["recentposts"] .= "</div>";
+}
+else {
+    $profilevars["recentposts"] = info("No posts to display.");
+}
 
 render_page("profile.html", $profilevars, $title);
 

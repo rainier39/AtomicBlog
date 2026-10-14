@@ -880,6 +880,7 @@ function generatePagination($pages, $page, $loc) {
 }
 
 // --- PHP 7.* Compatibility ---
+// All of these functions were added in PHP 8, and I've used them in the software.
 if (!function_exists("str_starts_with")) {
     function str_starts_with(string $haystack, string $needle) {
         if (strlen($needle) > strlen($haystack)) {
@@ -907,6 +908,17 @@ if (!function_exists("str_ends_with")) {
         
         // Default to false.
         return false;
+    }
+}
+
+if (!function_exists("str_contains")) {
+    function str_contains(string $haystack, string $needle) {
+        if (strpos($haystack, $needle) !== false) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
 
