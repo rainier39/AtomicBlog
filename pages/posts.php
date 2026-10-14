@@ -27,7 +27,9 @@ $title = lang("global.posts");
 $postsvars = array(
  "posts" => "",
  "tagCloud" => "",
- "pagination" => ""
+ "pagination" => "",
+ "by" => "",
+ "title" => ""
 );
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
@@ -40,8 +42,30 @@ $id = $_SESSION["id"] ?? 0;
 
 $tagQuery = "";
 
+// This is a hacky solution to a problem caused by the software's mod rewrite rule.
+if ($config["prettyURLs"] and str_contains($_SERVER["REQUEST_URI"], "?")) {
+    $_SERVER["REQUEST_URI"] = str_replace("?", "&", $_SERVER["REQUEST_URI"]);
+    $queries = explode("&", $_SERVER["REQUEST_URI"]);
+    // Remove the /posts part.
+    array_shift($queries);
+    foreach ($queries as $q) {
+        $temp = explode("=", $q);
+        if (count($temp) == 2) {
+            $_GET[$temp[0]] = urldecode($temp[1]);
+        }
+    }
+}
+
 if (isset($_GET["tag"])) {
     $tagQuery = " AND EXISTS( SELECT * FROM `tags` WHERE `tags`.`post`=p.`id` AND `tag`='" . $db->real_escape_string($_GET["tag"]) . "')";
+}
+if (isset($_GET["by"]) and $_GET["by"]) {
+    $tagQuery .= " AND a.`name`='" . $db->real_escape_string($_GET["by"]) . "'";
+    $postsvars["by"] = $_GET["by"];
+}
+if (isset($_GET["title"]) and $_GET["title"]) {
+    $tagQuery .= " AND p.`title`='" . $db->real_escape_string($_GET["title"]) . "'";
+    $postsvars["title"] = $_GET["title"];
 }
 
 $itemsPerPage = 24;
