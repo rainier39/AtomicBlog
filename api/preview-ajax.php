@@ -27,7 +27,9 @@ require "../core/formatter.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["previewcontent"])) {
-        echo(format($_POST["previewcontent"]));
+        // Only consider the first 65500 characters as that is the post content limit.
+        // Otherwise the server may be susceptible to Denial of Service.
+        echo(format(substr($_POST["previewcontent"], 0, 65500)));
     }
 }
 
