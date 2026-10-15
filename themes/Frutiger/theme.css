@@ -3,8 +3,8 @@
 /** Global **/
 /* Global variables */
 header {
- background: linear-gradient(#b1b1b1, #2b2b2b, black, black);
- border-radius: 12px;
+ background: linear-gradient(#2973ff, #114ab6);
+ border-radius: 6px;
  margin: 8px 4px 4px 4px;
  box-shadow: none;
  border: 1px solid var(--main-border-color);
@@ -12,18 +12,18 @@ header {
 .navbar {
  border: 1px solid var(--main-border-color);
  background: linear-gradient(#c5cbd2, lightslategrey, lightslategrey);
- border-radius: 12px;
+ border-radius: 6px;
  margin: 4px;
  box-shadow: none;
 }
 .content {
  border: 1px solid var(--main-border-color);
- border-radius: 12px;
+ border-radius: 6px;
  margin: 4px;
  box-shadow: none;
 }
 footer {
- border-radius: 12px;
+ border-radius: 6px;
  box-shadow: none;
  border: 1px solid var(--main-border-color);
  margin: 4px 4px 8px 4px;
@@ -44,8 +44,8 @@ footer {
 
 /* Forms/Buttons */
 .button, .button:hover {
- background: linear-gradient(lightblue 1%, cornflowerblue 10%, cornflowerblue 40%, cornflowerblue 50%, royalblue 50%, royalblue 40%, royalblue 10%, lightskyblue 100%);
- border-radius: 6px;
+ background: linear-gradient(#2973ff, #114ab6);
+ border-radius: 4px;
  border: 1px solid blue;
 }
 
@@ -58,7 +58,7 @@ footer {
 }
 /* Post page */
 .tag {
- border: 1px solid var(--main-border-color);
+ border: 1px solid #253f8c;
  border-radius: 3px;
 }
 
