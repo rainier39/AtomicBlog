@@ -9,7 +9,9 @@ At the time of writing, AtomicBlog is public and in development. I intend on mak
 AtomicBlog has so far been developed and (mostly) tested with Apache2. There are installation instructions for [Apache2](https://github.com/rainier39/AtomicBlog/wiki/Installation-Instructions-(Apache2)) and [Nginx](https://github.com/rainier39/AtomicBlog/wiki/Installation-Instructions-(Nginx)). I will update the software so that it works on new PHP versions as they are released. I also intend on eventually testing the software in a wider range of environments.
 
 ## Demo
-Currently, there is no live online demo for the software. However, there is a [gallery](https://github.com/rainier39/AtomicBlog/wiki) on the homepage of this repository's wiki. Screenshots of what the software looks like are hosted there, and will be updated periodically.
+Currently, there is a live demo of the software hosted [here](https://rainier39.lovestoblog.com/demo/).
+
+There is also a [gallery](https://github.com/rainier39/AtomicBlog/wiki) on the homepage of this repository's wiki. Screenshots of what the software looks like are hosted there, and will be updated periodically.
 
 ## Compatibility
 Aims to be compatible with Apache2 and Nginx. Will work with any MySQL compatible database software. Should work on any Linux distribution. Currently aims to officially support PHP 7.3.0+ and all PHP 8 versions.
