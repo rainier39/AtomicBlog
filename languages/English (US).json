@@ -1,7 +1,7 @@
 {
  "code": "en-US",
  "author": "rainier39",
- "version": "v3.0.0-beta",
+ "version": "v3.1.0-beta",
  
  "error.nopermission": "You don't have permission to do this.",
  "error.noviewpage": "You don't have permission to view this page.",
