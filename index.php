@@ -72,6 +72,12 @@ if ($config["installed"]) {
     $db = mysqli_connect($config["SQLServer"], $config["SQLUsername"], $config["SQLPassword"], $config["SQLDatabase"]);
     // Run the upgrade script.
     require "core/upgrade.php";
+    // Purge old log entries.
+    // Keep logs for a minimum of 30 days.
+    if ($config["logPeriod"] < 2592000) {
+        $config["logPeriod"] = 2592000;
+    }
+    preparedQuery("DELETE FROM `logs` WHERE (`logtype`<>'image_upload' AND `logtype`<>'image_delete') AND `timestamp`<=?", array(time() - $config["logPeriod"]));
 }
 
 // Initialize the language file.

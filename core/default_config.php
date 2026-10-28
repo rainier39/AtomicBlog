@@ -79,7 +79,9 @@ $default_config = array(
     "customCSS" => "",
     "feedEnabled" => true,
     // Who can see the userlist. "public", "users", or "admins".
-    "userlist" => "admins"
+    "userlist" => "admins",
+    // Amount of time (in seconds) to retain logs. A minimum of 30 days is strictly enforced by the software.
+    "logPeriod" => 2592000
 );
 
 ?>
