@@ -2,10 +2,12 @@
   <h1>[[ global.posts ]]</h1>
   <h2>Search</h2>
   <form method='get' class='form'>
-   <label for='by'>By:</label>
+   <label for='by'>Author:</label>
    <input type='text' id='by' name='by' placeholder='Name' maxlength='64' value='{{{ by }}}'>
    <label for='title'>Title:</label>
    <input type='text' id='title' name='title' maxlength='32' value='{{{ title }}}'>
+   <label for='content'>Content:</label>
+   <input type='text' id='content' name='content' maxlength='2048' value='{{{ content }}}'>
    <br>
    <input type='submit' value='Search' class='button'>
   </form>

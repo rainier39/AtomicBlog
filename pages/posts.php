@@ -29,7 +29,8 @@ $postsvars = array(
  "tagCloud" => "",
  "pagination" => "",
  "by" => "",
- "title" => ""
+ "title" => "",
+ "content" => ""
 );
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
@@ -60,12 +61,19 @@ if (isset($_GET["tag"])) {
     $tagQuery = " AND EXISTS( SELECT * FROM `tags` WHERE `tags`.`post`=p.`id` AND `tag`='" . $db->real_escape_string($_GET["tag"]) . "')";
 }
 if (isset($_GET["by"]) and $_GET["by"]) {
+    $_GET["by"] = substr($_GET["by"], 0, 64);
     $tagQuery .= " AND a.`name`='" . $db->real_escape_string($_GET["by"]) . "'";
     $postsvars["by"] = $_GET["by"];
 }
 if (isset($_GET["title"]) and $_GET["title"]) {
+    $_GET["title"] = substr($_GET["title"], 0, 32);
     $tagQuery .= " AND p.`title`='" . $db->real_escape_string($_GET["title"]) . "'";
     $postsvars["title"] = $_GET["title"];
+}
+if (isset($_GET["content"]) and $_GET["content"]) {
+    $_GET["content"] = substr($_GET["content"], 0, 2048);
+    $tagQuery .= " AND p.`content` LIKE '%" . $db->real_escape_string($_GET["content"]) . "%'";
+    $postsvars["content"] = $_GET["content"];
 }
 
 $itemsPerPage = 24;
@@ -87,8 +95,6 @@ $offset = ($page - 1) * $itemsPerPage;
 
 // Get all of the blog posts.
 $posts = $db->query("SELECT p.`id`, p.`title`, p.`account`, p.`starred`, p.`published`,a.`namevisible`,a.`name` FROM `posts` AS p LEFT JOIN `accounts` AS a ON p.`account`=a.`id` WHERE (`published`='1' OR `account`='{$id}'){$tagQuery} ORDER BY `id` DESC LIMIT {$itemsPerPage} OFFSET {$offset}");
-
-// TODO: an actual post searching/filtering system
 
 // Only do this ONCE.
 $uploads = scandir("images/");
