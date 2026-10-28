@@ -175,7 +175,7 @@ if (!$registerSuccess) {
     
     // Add the CAPTCHA if we can and it's enabled.
     if (extension_loaded("gd") and $config["captchaEnabled"]) {
-        $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='CAPTCHA image'>";
+        $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='CAPTCHA image' class='captchaImg'>";
         $registervars["captcha"] .= "<label for='captcha'>CAPTCHA:</label>
         <input id='captcha' name='captcha' type='text' required>";
     }

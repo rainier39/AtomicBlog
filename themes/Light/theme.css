@@ -186,6 +186,9 @@ footer span {
 .registerForm label {
  min-width: 8em;
 }
+.captchaImg {
+ filter: contrast(120%);
+}
 /* New post page */
 .newPostForm textarea {
  min-height: 250px;

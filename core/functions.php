@@ -557,7 +557,7 @@ function upload($file, $name) {
 // TODO: make a function for generating thumbnails of existing images.
 
 function generateCaptchaText(int $length) {
-    $characters = "abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+    $characters = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789";
     $text = "";
     for ($i = 0; $i < $length; $i++) {
         $text .= $characters[random_int(0, strlen($characters)-1)];
@@ -572,14 +572,17 @@ function generateCaptcha() {
 
     $_SESSION["captcha"] = generateCaptchaText($length);
     
-    // Pick a random font.
-    $font = random_int(2, 5);
+    // We need this for some versions of PHP GD.
+    putenv('GDFONTPATH=' . realpath('.'));
+    $fonts = array("fonts/GNU/FreeMono", "fonts/GNU/FreeMonoBold", "fonts/GNU/FreeMonoBoldOblique", "fonts/GNU/FreeMonoOblique", "fonts/GNU/FreeSans", "fonts/GNU/FreeSansBold", "fonts/GNU/FreeSansBoldOblique", "fonts/GNU/FreeSansOblique", "fonts/GNU/FreeSerif", "fonts/GNU/FreeSerifBold", "fonts/GNU/FreeSerifBoldItalic", "fonts/GNU/FreeSerifItalic");
     
-    $fontwidth = imagefontwidth($font);
-    $fontheight = imagefontheight($font);
+    // Pick a random font.
+    $font = $fonts[random_int(0, count($fonts)-1)];
+    $sizept = random_int(12, 14);
+    $sizepx = $sizept * 1.333333;
 
-    $width = $length*$fontwidth+($length*5)+5;
-    $height = $fontheight+20;
+    $width = $length*$sizepx+($length*5)+5;
+    $height = $sizepx+20;
 
     $img = imagecreatetruecolor($width, $height);
     
@@ -600,7 +603,8 @@ function generateCaptcha() {
     // Draw the letters.
     for ($i = 0; $i < $length; $i++) {
         $rand = imagecolorallocate($img, random_int(180, 255), random_int(180, 255), random_int(180, 255));
-        imagestring($img, $font, $i*($fontwidth+5)+5+random_int(-3, 3), $fontheight/2+random_int(-6, 6), $_SESSION["captcha"][$i], $rand);
+        $angle = random_int(-45, 45);
+        imagefttext($img, $sizept, $angle, $i*($sizepx+5)+5+random_int(-2, 2), $height/2+random_int(-1, 1), $rand, $font, $_SESSION["captcha"][$i]);
     }
     
     // Make the image larger so it's easier to read.
