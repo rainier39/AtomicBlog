@@ -53,6 +53,23 @@ function format($string) {
     return $string;
 }
 
+// Special reduced formatting for comments.
+function formatInline($string) {
+    // Make sure to sanitize the string first to prevent XSS.
+    $string = htmlspecialchars($string);
+
+    // Apply the various formatter functions to the string.
+    $string = format_bold($string);
+    $string = format_italic($string);
+    $string = format_inline_code($string);
+    // Extended Markdown.
+    $string = format_strike($string);
+    $string = format_highlight($string);
+
+    // In the end, return the string.
+    return $string;
+}
+
 // Define the various formatter functions.
 function format_code_block($string) {
     return preg_replace_callback("/```(.*?)$(.+?)```/mis",

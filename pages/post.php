@@ -735,7 +735,7 @@ if ($displayPost) {
             if (!$editing) {
                 $postvars["comments"] .= "</div></div>
                 <div class='commentContent'>"
-                . htmlspecialchars($c["content"]) . 
+                . formatInline($c["content"]) . 
                 "</div>
                 </div>";
             }
