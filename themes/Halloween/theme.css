@@ -1,0 +1,21 @@
+@import url("../Light/theme.css");
+
+a {
+ color: darkorange;
+}
+a:hover {
+ color: orange;
+}
+
+/* Header */
+header {
+ background: #e1811b;
+}
+#blogtitle, #blogdesc {
+ text-shadow: 2px 2px 4px black;
+}
+/* Buttons */
+.button, .tag {
+ background: orange;
+ color: black;
+}
