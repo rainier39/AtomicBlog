@@ -19,3 +19,7 @@ header {
  background: orange;
  color: black;
 }
+.button:hover, .tag:hover {
+ background: #ffbc43;
+ color: black;
+}
