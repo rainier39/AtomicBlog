@@ -125,6 +125,12 @@ if ($config["version"] != VERSION) {
         // Bump the version.
         $config["version"] = "v3.1.0-beta";
     }
+    if ($config["version"] == "v3.1.0-beta") {
+        // Change from 16 to 24 so that tags can be longer.
+        $db->query("ALTER TABLE `tags` MODIFY COLUMN `tag` varchar(24) NOT NULL");
+        // Bump the version.
+        $config["version"] = "v3.2.0-beta";
+    }
     
     // Write the new config to a file.
     flushConfig();

@@ -174,8 +174,8 @@ function validatePost($edit=false) {
     if (strlen($_POST["tags"] ?? "") > 128) {
         $errors[] = "Post tags field cannot be more than 128 characters long.";
     }
-    if ((($_POST["tags"] ?? "") != "") and (max(array_map("strlen", parseTags($_POST["tags"]))) > 16)) {
-        $errors[] = "Post tags cannot be longer than 16 characters.";
+    if ((($_POST["tags"] ?? "") != "") and (max(array_map("strlen", parseTags($_POST["tags"]))) > 24)) {
+        $errors[] = "Individual post tags cannot be longer than 24 characters.";
     }
     // Content.
     if (strlen($_POST["content"] ?? "") < 1) {

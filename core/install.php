@@ -184,7 +184,7 @@ if (validateCSRFToken()) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         
         $db->query("CREATE TABLE IF NOT EXISTS `tags` (
-            `tag` varchar(16) NOT NULL,
+            `tag` varchar(24) NOT NULL,
             `post` int unsigned NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         
