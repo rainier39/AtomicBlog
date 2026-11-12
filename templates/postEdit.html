@@ -1,24 +1,24 @@
 <!-- pages/post.php -->
-  <h1>Edit Post</h1>
+  <h1>[[ post.editpost ]]</h1>
   <form method='post' class='form editPostForm'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
-   <label for='title'>Title: </label>
+   <label for='title'>[[ global.title: ]]</label>
    <input type='text' name='title' id='title' maxlength='32' required value='{{{ title }}}'>
-   <label for='tags'>Tags: </label>
+   <label for='tags'>[[ global.tags: ]]</label>
    <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
    {{ buttons }}
-   <label for='content'>Content: </label>
+   <label for='content'>[[ global.content: ]]</label>
    <textarea name='content' id='content' maxlength='65500' required>{{{ content }}}</textarea>
    <br>
    <div>
-    <button type='button' onclick='dopreview();' id='preview' class='button'>Preview</button>
-    <button type='button' onclick='removepreview();' id='clearpreview' class='button' style='display: none;'>Clear preview</button>
+    <button type='button' onclick='dopreview();' id='preview' class='button'>[[ global.preview ]]</button>
+    <button type='button' onclick='removepreview();' id='clearpreview' class='button' style='display: none;'>[[ global.clearpreview ]]</button>
    </div>
    <br id='previewdummy' style='display: none;'><div class='postContent' id='previewcontent' style='display: none;'></div>
    <br>
    <div>
-    <input type='submit' value='Edit post' class='button' name='edit'>
-    <input type='submit' value='Cancel edit' class='button' name='cancel' formnovalidate>
+    <input type='submit' value='[[ post.editpost ]]' class='button' name='edit'>
+    <input type='submit' value='[[ post.canceledit ]]' class='button' name='cancel' formnovalidate>
    </div>
   </form>
  </div>

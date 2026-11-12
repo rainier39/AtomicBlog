@@ -566,8 +566,7 @@ if ($displayPost) {
      "postbuttons" => "",
      "title" => $p["title"],
      "author" => "Nobody",
-     "ptime" => date("g:i:sa", $p["starttime"]),
-     "pdate" => date("F jS, Y", $p["starttime"]),
+     "published" => "<abbr class='date' title='" . date("g:i:sa", $p["starttime"]) . "'>" . date("F jS, Y", $p["starttime"]) . "</abbr>",
      "edited" => "",
      "icon" => "",
      "tags" => "",
@@ -614,7 +613,7 @@ if ($displayPost) {
         $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>Anonymous</a>";
     }
     if (!empty($p["edittime"])) {
-        $postvars["edited"] .= " | Modified: <abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr>";
+        $postvars["edited"] .= "<abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr>";
     }
     // Display the post's icon if it exists.
     $icon = $p["id"] . ".webp";

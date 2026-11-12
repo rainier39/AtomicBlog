@@ -1,6 +1,6 @@
   <!-- pages/panel/account-settings.php -->
-  <h1>Account Settings</h1>
-  <h2>Change username</h2>
+  <h1>[[ panel.accountsettings ]]</h1>
+  <h2>[[ panel.accountsettings.changeusername ]]</h2>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='username'>[[ global.username: ]]</label>
@@ -8,9 +8,9 @@
    <label for='upassword'>[[ global.password: ]]</label>
    <input type='password' name='password' id='upassword' minlength='{{{ minlength }}}' autocomplete='password' required>
    <br>
-   <input type='submit' value='Change username' class='button'>
+   <input type='submit' value='[[ panel.accountsettings.changeusername ]]' class='button'>
   </form>
-  <h2>Change email address</h2>
+  <h2>[[ panel.accountsettings.changeemail ]]</h2>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='email'>[[ global.email: ]]</label>
@@ -18,17 +18,17 @@
    <label for='epassword'>[[ global.password: ]]</label>
    <input type='password' name='password' id='epassword' minlength='{{{ minlength }}}' autocomplete='password' required>
    <br>
-   <input type='submit' value='Change settings' class='button'>
+   <input type='submit' value='[[ panel.accountsettings.changeemail ]]' class='button'>
   </form>
-  <h2>Change password</h2>
+  <h2>[[ panel.accountsettings.changepassword ]]</h2>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='ppassword'>[[ global.password: ]]</label>
    <input type='password' name='password' id='ppassword' autocomplete='password' minlength='{{{ minlength }}}' required>
-   <label for='newpassword'>New Password: </label>
+   <label for='newpassword'>[[ panel.accountsettings.newpassword: ]]</label>
    <input type='password' name='newpassword' id='newpassword' autocomplete='new-password' minlength='{{{ minlength }}}' required>
    <label for='repeatpassword'>[[ global.repeatpassword: ]]</label>
    <input type='password' name='repeatpassword' id='repeatpassword' minlength='{{{ minlength }}}' required>
    <br>
-   <input type='submit' value='Change password' class='button'>
+   <input type='submit' value='[[ panel.accountsettings.changepassword ]]' class='button'>
   </form>

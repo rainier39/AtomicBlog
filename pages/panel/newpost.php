@@ -23,11 +23,11 @@
 if (!defined('INDEX')) exit;
 
 if (!checkPerm(PERM_NEW_POST)) {
-    $messages[] = error("You don't have permission to do this.");
+    $messages[] = error("error.nopermission");
     render_page("", array(), $title);
     exit();
 }
-$title = "New Post";
+$title = lang("panel.newpost");
 // Handle requests.
 if (validateCSRFToken()) {
     // Remove ampersands from tags because they can be used to inject URL parameters.

@@ -24,7 +24,7 @@ if (!defined('INDEX')) exit;
 
 // No need for a permission check, any user who can log in should be able to perform all actions on this page.
 
-$title = "Profile Settings";
+$title = lang("panel.profilesettings");
 
 // Handle requests.
 if (validateCSRFToken()) {
@@ -181,7 +181,7 @@ foreach ($avatars as $avatar) {
      <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this avatar?\");'>
       <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
       <input type='hidden' value='{$avatar}' name='davatar'>
-      <input type='submit' value='Delete' name='deleteAvatar' class='button'>
+      <input type='submit' value='" . lang("global.delete") . "' name='deleteAvatar' class='button'>
      </form>
     </div>";
 }

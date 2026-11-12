@@ -1,24 +1,24 @@
 <!-- pages/post.php -->
   <p>
-   <a href='{{ back }}' class='button'>Back to post</a>
+   <a href='{{ back }}' class='button'>[[ post.backtopost ]]</a>
   </p>
   <div class='manageUploads'>
-   <h1>Manage Uploads</h1>
-   <h2>Icon</h2>
+   <h1>[[ post.manageuploads ]]</h1>
+   <h2>[[ post.icon ]]</h2>
    {{ icons }}
    <h3>Upload a new icon</h3>
    <form method='post' enctype='multipart/form-data'>
     <input type='hidden' name='csrf_token' value='{{ token }}'>
     <input type='file' name='icon'>
-    <input type='submit' value='Upload icon'>
+    <input type='submit' class='button' value='[[ post.uploadicon ]]'>
    </form>
    <hr>
-   <h2>Attachments</h2>
+   <h2>[[ post.attachments ]]</h2>
    {{ attachments }}
-   <h3>Upload a new attachment</h3>
+   <h3>[[ post.uploadanewattachment ]]</h3>
    <form method='post' enctype='multipart/form-data'>
     <input type='hidden' name='csrf_token' value='{{ token }}'>
     <input type='file' name='attachment'>
-    <input type='submit' value='Upload attachment'>
+    <input type='submit' class='button' value='[[ post.uploadattachment ]]'>
    </form>
   </div>

@@ -34,6 +34,7 @@ foreach ($langdir as $entry) {
 }
 
 if (count($languages) < 1) {
+    // It's ok for this to be a hardcoded English string since we have no valid language file.
     $messages[] = error("No valid language files detected.");
     $language = "";
 }
@@ -54,21 +55,28 @@ function updateLang() {
     global $messages, $language, $lang;
 
     // Get the language.
-    if ($language != "") {
-        $json = file_get_contents("languages/" . $language . ".json");
-    
-        if ($json === false) {
-            $messages[] = error("Failed to read language file.");
-        }
-        else {
-            $lang = json_decode($json, true);
-        }
+    if ($language == "") {
+        return false;
     }
+    
+    $json = file_get_contents("languages/{$language}.json");
 
+    if ($json === false) {
+        // It's ok for this to be a hardcoded English string since we have no valid language file.
+        $messages[] = error("Failed to read language file.");
+        return false;
+    }
+    
+    $lang = json_decode($json, true);
+    
     if ($lang == NULL) {
         $lang = array();
+        // It's ok for this to be a hardcoded English string since we have no valid language file.
         $messages[] = error("Invalid JSON in language file.");
+        return false;
     }
+    
+    return true;
 }
 
 updateLang();
@@ -77,7 +85,7 @@ function lang($identifier, $arg="") {
     global $lang;
     
     if (count($lang) < 1) {
-        return "MISSING";
+        return $identifier;
     }
     elseif (array_key_exists($identifier, $lang)) {
         if (str_contains($lang[$identifier], "%s")) {
@@ -92,7 +100,7 @@ function lang($identifier, $arg="") {
         return "";
     }
     else {
-        return "MISSING";
+        return $identifier;
     }
 }
 

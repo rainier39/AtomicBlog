@@ -28,7 +28,7 @@ if (!checkPerm(PERM_MANAGE_BLOG)) {
     exit();
 }
 
-$title = "Blog Statistics";
+$title = lang("panel.blogstatistics");
 
 $totalposts = $db->query("SELECT COUNT(*) FROM `posts`")->fetch_assoc()["COUNT(*)"];
 $published = $db->query("SELECT COUNT(*) FROM `posts` WHERE `published`='1'")->fetch_assoc()["COUNT(*)"];

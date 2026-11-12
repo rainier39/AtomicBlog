@@ -5,18 +5,18 @@
    </div>
    <div class='postHeader'>
    <h1>{{{ title }}}</h1>
-   By: {{ author }}
+   [[ global.by,author ]]
    <br>
-   Published: <abbr class='date' title='{{ ptime }}'>{{ pdate }}</abbr>{{ edited }}
+   [[ post.published:,published ]]{% if (edited) %}[[ post.modified:,edited ]]{% endif %}
    {{ icon }}
    <p>
-    <div class='tagslabel'>Tags:</div>{{ tags }}
+    <div class='tagslabel'>[[ global.tags: ]]</div>{{ tags }}
    </p>
    </div>
    <div class='postContent'>
    {{{{ content }}}}
    </div>
-   <h2>Comments</h2>
+   <h2>[[ post.comments ]]</h2>
    {{ commentForm }}
    {{ pagination }}
    {{ comments }}

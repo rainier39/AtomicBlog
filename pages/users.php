@@ -106,10 +106,8 @@ else {
         $tilevars = array(
          "name" => $u["namevisible"] ? $u["name"] : lang("user.anonymous"),
          "role" => htmlspecialchars($u["role"]),
-         "joindate" => date("F jS, Y", $u["jointime"]),
-         "jointime" => date("g:i:sa", $u["jointime"]),
-         "lastactivedate" => date("F jS, Y", $u["lastactive"]),
-         "lastactivetime" => date("g:i:sa", $u["lastactive"]),
+         "joined" => "<abbr class='date' title='" . date("g:i:sa", $u["jointime"]) . "'>" . date("F jS, Y", $u["jointime"]) . "</abbr>",
+         "lastactive" => "<abbr class='date' title='" . date("g:i:sa", $u["lastactive"]) . "'>" . date("F jS, Y", $u["lastactive"]) . "</abbr>",
          "color" => $u["color"],
          "profile" => makeURL("profile/" . $u["id"]),
          "admininfo" => ""
@@ -117,11 +115,11 @@ else {
         if (checkPerm(PERM_MANAGE_USERS)) {
             if ($permissions[$_SESSION["role"]] > $permissions[$u["role"]]) {
                 $tilevars["admininfo"] = "<details>
-                 <summary>More info</summary>
-                 <div>[[ global.username: ]] " . htmlspecialchars($u["username"]) . "</div>
-                 <div>[[ global.email: ]] " . htmlspecialchars($u["email"]) . "</div>
-                 <div>[[ user.joinip ]] " . htmlspecialchars($u["joinip"]) . "</div>
-                 <div>[[ user.currentip ]] " . htmlspecialchars($u["ip"]) . "</div>
+                 <summary>[[ user.moreinfo ]]</summary>
+                 <div>" . lang("global.username:", htmlspecialchars($u["username"])) . "</div>
+                 <div>" . lang("global.email:", htmlspecialchars($u["email"])) . "</div>
+                 <div>" . lang("user.joinip", htmlspecialchars($u["joinip"])) . "</div>
+                 <div>" . lang("user.currentip:", htmlspecialchars($u["ip"])) . "</div>
                 </details>";
             }
             if (($permissions[$_SESSION["role"]] > $permissions[$u["role"]])

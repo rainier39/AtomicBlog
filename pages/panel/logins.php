@@ -24,7 +24,7 @@ if (!defined('INDEX')) exit;
 
 // No permission check needed.
 
-$title = "Login Logs";
+$title = lang("panel.loginlogs");
 
 $loginsVars = array(
  "logins" => "",

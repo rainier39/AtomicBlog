@@ -28,7 +28,7 @@ if (!checkPerm(PERM_MANAGE_BLOG)) {
     exit();
 }
 
-$title = "View logs";
+$title = lang("panel.viewlogs");
 
 $logVars = array(
  "entries" => "",
@@ -162,12 +162,12 @@ while ($log = $logsQuery->fetch_assoc()) {
             $postid = $log["targetid"];
             $titleQuery = preparedQuery("SELECT `title` FROM `posts` WHERE `id`=?", array($postid));
             if ($titleQuery->num_rows < 1) {
-                $title = "Deleted post";
+                $ptitle = "Deleted post";
             }
             else {
-                $title = htmlspecialchars($titleQuery->fetch_assoc()["title"], ENT_NOQUOTES);
+                $ptitle = htmlspecialchars($titleQuery->fetch_assoc()["title"], ENT_NOQUOTES);
             }
-            $post = "<a href='" . makeURL("post/{$postid}") . "'>{$title}</a>";
+            $post = "<a href='" . makeURL("post/{$postid}") . "'>{$ptitle}</a>";
             break;
         // Instances in which target and perp are users.
         case "change_role":

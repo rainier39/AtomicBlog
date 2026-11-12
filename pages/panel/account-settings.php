@@ -24,7 +24,7 @@ if (!defined('INDEX')) exit;
 
 // No need for a permission check, any user who can log in should be able to perform all actions on this page.
 
-$title = "Account Settings";
+$title = lang("panel.accountsettings");
 
 // Get the information for this account.
 $accountInfo = preparedQuery("SELECT `username`, `email`, `password` FROM `accounts` WHERE `id`=?", array($_SESSION["id"]));

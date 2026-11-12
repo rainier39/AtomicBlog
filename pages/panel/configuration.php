@@ -28,7 +28,7 @@ if (!checkPerm(PERM_MANAGE_BLOG)) {
     exit();
 }
 
-$title = "Blog Configuration";
+$title = lang("panel.configureblog");
 
 // Timezone stuff.
 // Every timezone that PHP supports as of July 31st, 2026.

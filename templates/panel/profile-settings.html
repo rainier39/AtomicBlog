@@ -1,25 +1,25 @@
   <!-- pages/panel/profile-settings.php -->
-  <h1>Profile Settings</h1>
+  <h1>[[ panel.profilesettings ]]</h1>
   <form method='post' class='form'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
    <label for='name'>[[ global.name: ]]</label>
    <input type='text' name='name' id='name' autocomplete='name' maxlength='64' value='{{{ name }}}' required>
-   <label for='color'>Color:</label>
+   <label for='color'>[[ panel.profilesettings.color: ]]</label>
    <input id='color' type='color' name='color' value='{{{ color }}}'>
-   <label for='bio'>Bio:</label>
+   <label for='bio'>[[ panel.profilesettings.bio: ]]</label>
    <textarea id='bio' name='bio' maxlength='4096'>{{{ bio }}}</textarea>
-   <label for='namevisible'>Name Visible:</label>
+   <label for='namevisible'>[[ panel.profilesettings.namevisible: ]]</label>
    <input type='checkbox' name='namevisible' id='namevisible'{{ namevisible }}>
-   <label for='emailvisible'>Email Visible:</label>
+   <label for='emailvisible'>[[ panel.profilesettings.emailvisible: ]]</label>
    <input type='checkbox' name='emailvisible' id='emailvisible'{{ emailvisible }}>
    <br>
-   <input type='submit' value='Change settings' class='button'>
+   <input type='submit' value='[[ panel.profilesettings.changesettings ]]' class='button'>
   </form>
-  <h2>Avatar</h2>
+  <h2>[[ panel.profilesettings.avatar ]]</h2>
    {{ avatars }}
-   <h3>Upload a new avatar</h3>
+   <h3>[[ panel.profilesettings.uploadanewavatar ]]</h3>
    <form method='post' enctype='multipart/form-data'>
     <input type='hidden' name='csrf_token' value='{{ token }}'>
     <input type='file' name='avatar'>
-    <input type='submit' value='Upload avatar' class='button'>
+    <input type='submit' value='[[ panel.profilesettings.uploadavatar ]]' class='button'>
    </form>

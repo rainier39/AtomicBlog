@@ -1,22 +1,22 @@
 <!-- pages/panel/newpost.php -->
-  <h1>New Post</h1>
+  <h1>[[ panel.newpost ]]</h1>
   <form method='post' class='form newPostForm'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
-   <label for='title'>Title: </label>
+   <label for='title'>[[ global.title: ]]</label>
    <input type='text' name='title' id='title' maxlength='32' required value='{{{ title }}}'>
-   <label for='tags'>Tags: </label>
+   <label for='tags'>[[ global.tags: ]]</label>
    <input type='text' name='tags' id='tags' maxlength='128' value='{{{ tags }}}'>
    {{ markdownbuttons }}
-   <label for='content'>Content: </label>
+   <label for='content'>[[ global.content: ]]</label>
    <textarea name='content' id='content' required maxlength='65500'>{{{ content }}}</textarea>
    <br>
    <div>
-    <button type='button' onclick='dopreview();' id='preview' class='button'>Preview</button>
-    <button type='button' onclick='removepreview();' id='clearpreview' class='button' style='display: none;'>Clear preview</button>
+    <button type='button' onclick='dopreview();' id='preview' class='button'>[[ global.preview ]]</button>
+    <button type='button' onclick='removepreview();' id='clearpreview' class='button' style='display: none;'>[[ global.clearpreview ]]</button>
    </div>
    <br id='previewdummy' style='display: none;'><div class='postContent' id='previewcontent' style='display: none;'></div>
-   <label for='unpublished'>Unpublished: </label>
+   <label for='unpublished'>[[ panel.newpost.unpublished: ]]</label>
    <input type='checkbox' name='unpublished' id='unpublished'{{ unpublished }}>
    <br>
-   <input type='submit' value='Submit post' class='button'>
+   <input type='submit' value='[[ panel.newpost.submitpost ]]' class='button'>
   </form>

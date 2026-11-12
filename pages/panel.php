@@ -23,7 +23,15 @@
 if (!defined('INDEX')) exit;
 
 $title = "";
-$panelActions = array("account-settings", "profile-settings", "logins", "newpost", "configuration", "stats", "logs");
+$panelActions = array(
+ "account-settings",
+ "profile-settings",
+ "logins",
+ "newpost",
+ "configuration",
+ "stats",
+ "logs"
+);
 
 // If the user isn't logged in, don't let them into the panel.
 if (!$_SESSION["logged_in"]) {
@@ -34,18 +42,20 @@ if (!$_SESSION["logged_in"]) {
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
     $title = "Panel";
-    $panelvars = array("useractions" => "",
-    "adminactions" => "");
-    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/account-settings") . "'>Account settings</a></p>";
-    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/profile-settings") . "'>Profile settings</a></p>";
-    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/logins") . "'>Login logs</a></p>";
+    $panelvars = array(
+     "useractions" => "",
+     "adminactions" => ""
+    );
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/account-settings") . "'>" . lang("panel.accountsettings") . "</a></p>";
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/profile-settings") . "'>" . lang("panel.profilesettings") . "</a></p>";
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/logins") . "'>" . lang("panel.loginlogs") . "</a></p>";
     if (checkPerm(PERM_NEW_POST)) {
-        $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>Create a new post</a></p>";
+        $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>" . lang("panel.newpost") . "</a></p>";
     }
     if (checkPerm(PERM_MANAGE_BLOG)) {
-        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/stats") . "'>Blog statistics</a></p>";
-        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>Configure blog</a></p>";
-        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/logs") . "'>View logs</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/stats") . "'>" . lang("panel.blogstatistics") . "</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>" . lang("panel.configureblog") . "</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/logs") . "'>" . lang("panel.viewlogs") . "</a></p>";
     }
     render_page("panel.html", $panelvars, $title);
 }
