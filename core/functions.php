@@ -383,7 +383,12 @@ function checkRolePerm($perm, $role) {
 
 // Whether or not one user outranks the other.
 function checkOutrank($actinguserid, $targetuserid) {
-    global $db, $permissions;
+    global $db, $permissions, $config;
+    
+    // The main owner always outranks everyone no matter what.
+    if ($_SESSION["id"] == $config["mainOwner"]) {
+        return true;
+    }
     
     // Default to Guest, since deleted accounts should have no rights.
     $targetuserrole = "Guest";

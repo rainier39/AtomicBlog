@@ -200,16 +200,20 @@ if (validateCSRFToken()) {
 
         // Write the administrator account. Will replace any existing account with the same username or email (if there is an old install of the software).
         preparedQuery("REPLACE INTO `accounts` (`username`, `email`, `password`, `name`, `role`, `joinip`, `ip`, `jointime`, `lastactive`) VALUES (?, ?, ?, ?, 'Owner', ?, ?, ?, ?)", array($_POST["username"], $_POST["email"], password_hash($_POST["password"], PASSWORD_DEFAULT), $_POST["name"], $_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_ADDR"], time(), time()));
+        $mainOwner = $db->insert_id;
 
         // Create a new array of our new config values.
-        $newConfig = array("installed" => true,
-        "SQLServer" => $_POST["SQLServer"],
-        "SQLDatabase" => $_POST["SQLDatabase"],
-        "SQLUsername" => $_POST["SQLUsername"],
-        "SQLPassword" => $_POST["SQLPassword"],
-        "title" => $_POST["title"],
-        "description" => $_POST["description"],
-        "baseURL" => $_POST["baseURL"]);
+        $newConfig = array(
+         "installed" => true,
+         "SQLServer" => $_POST["SQLServer"],
+         "SQLDatabase" => $_POST["SQLDatabase"],
+         "SQLUsername" => $_POST["SQLUsername"],
+         "SQLPassword" => $_POST["SQLPassword"],
+         "title" => $_POST["title"],
+         "description" => $_POST["description"],
+         "baseURL" => $_POST["baseURL"],
+         "mainOwner" => $mainOwner
+        );
 
         // Merge the old config array with the new one.
         $config = array_merge($config, $newConfig);

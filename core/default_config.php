@@ -81,7 +81,9 @@ $default_config = array(
     // Who can see the userlist. "public", "users", or "admins".
     "userlist" => "admins",
     // Amount of time (in seconds) to retain logs. A minimum of 30 days is strictly enforced by the software. Default here is 90 days.
-    "logPeriod" => 7776000
+    "logPeriod" => 7776000,
+    // ID of the primary blog owner.
+    "mainOwner" => 1
 );
 
 ?>

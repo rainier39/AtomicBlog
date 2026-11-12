@@ -44,19 +44,24 @@ if (validateCSRFToken()) {
     elseif ($_SESSION["id"] == $victim["id"]) {
         $messages[] = error("error.nopermission");
     }
-    // The current user must outrank the target user.
-    elseif ($permissions[$_SESSION["role"]] <= $permissions[$victim["role"]]) {
+    // The current user must outrank the target user (unless they are the main owner).
+    elseif ((($permissions[$_SESSION["role"]] <= $permissions[$victim["role"]]) and ($_SESSION["id"] != $config["mainOwner"]))
+    or (($_SESSION["id"] == $config["mainOwner"]) and ($permissions[$_SESSION["role"]] < $permissions[$victim["role"]]))) {
         $messages[] = error("error.nopermission");
     }
     elseif (!array_key_exists($_POST["changerole"], $permissions)) {
         $messages[] = error("error.norole");
     }
+    // The main owner's role can never be changed.
+    elseif ($victim["id"] == $config["mainOwner"]) {
+        $messages[] = error("error.nopermission");
+    }
     // User accounts cannot be turned into Guests.
     elseif ($_POST["changerole"] == "Guest") {
         $messages[] = error("error.nopermission");
     }
-    // The current user can't give someone a role above/including their own.
-    elseif ($permissions[$_POST["changerole"]] >= $permissions[$_SESSION["role"]]) {
+    // The current user can't give someone a role above/including their own, unless they are the main owner.
+    elseif (($permissions[$_POST["changerole"]] >= $permissions[$_SESSION["role"]]) and ($_SESSION["id"] != $config["mainOwner"])) {
         $messages[] = error("error.nopermission");
     }
     elseif ($_POST["changerole"] == $victim["role"]) {
@@ -119,12 +124,14 @@ else {
                  <div>[[ user.currentip ]] " . htmlspecialchars($u["ip"]) . "</div>
                 </details>";
             }
-            if ($permissions[$_SESSION["role"]] > $permissions[$u["role"]]) {
+            if (($permissions[$_SESSION["role"]] > $permissions[$u["role"]])
+            or ($_SESSION["id"] == $config["mainOwner"])
+            and ($_SESSION["id"] != $u["id"])) {
                 $tilevars["role"] = "<form method='post'>
                  <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>";
                 $tilevars["role"] .= "<select name='changerole'>";
                 foreach ($permissions as $role=>$perm) {
-                    if (($perm < $permissions[$_SESSION["role"]])
+                    if ((($perm < $permissions[$_SESSION["role"]]) or ($_SESSION["id"] == $config["mainOwner"]))
                     and ($role != "Guest")) {
                         if ($role == $u["role"]) $s = " selected";
                         else $s = "";
