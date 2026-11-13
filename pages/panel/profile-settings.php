@@ -175,15 +175,15 @@ foreach ($avatars as $avatar) {
     else {
         $ut = time();
     }
-    $settingsVars["avatars"] .= "<div class='uploadTile'>
-     <img src='" . makeURL("images/{$avatar}") . "?{$ut}'>
-     <hr>
-     <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this avatar?\");'>
-      <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-      <input type='hidden' value='{$avatar}' name='davatar'>
-      <input type='submit' value='" . lang("global.delete") . "' name='deleteAvatar' class='button'>
-     </form>
-    </div>";
+    $tileVars = array(
+     "uploadlink" => makeURL("images/{$avatar}") . "?{$ut}",
+     "token" => $_SESSION["csrf_token"],
+     "uploadname" => $avatar,
+     "name" => "Avatar",
+     "namelower" => "avatar",
+     "extra" => ""
+    );
+    $settingsVars["avatars"] .= render_template("uploadTile.html", $tileVars, false);
 }
 
 render_page("panel/profile-settings.html", $settingsVars, $title);

@@ -27,7 +27,7 @@ $updatePost = false;
 $title = "";
 
 if (!checkPerm(PERM_VIEW_POST)) {
-    $messages[] = error("You don't have permission to view this post.");
+    $messages[] = error("error.noviewpage");
     render_page("", array());
     exit();
 }
@@ -42,8 +42,8 @@ $p = $post->fetch_assoc();
 // Print a message if the post doesn't exist.
 if ($post->num_rows < 1) {
     http_response_code(404);
-    $messages[] = error("Post not found.");
-    render_page("", array(), "Post not found");
+    $messages[] = error("error.notfound");
+    render_page("", array(), "error.notfound.title");
     exit();
 }
 
@@ -66,7 +66,7 @@ if (isset($_POST["toggleStar"]) and validateCSRFToken()) {
         preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('post_togglestar', ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
 }
 // Handle published toggling.
@@ -78,7 +78,7 @@ elseif (isset($_POST["togglePublished"]) and validateCSRFToken()) {
         $p["published"] = !$p["published"];
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
 }
 // Handle deletions.
@@ -116,7 +116,7 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
         }
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
 }
 // Handle new comments.
@@ -195,7 +195,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         }
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
 }
 // Handle deleting a comment.
@@ -204,7 +204,7 @@ elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
         $commentinfo = preparedQuery("SELECT `id`, `account`, `ip` FROM `comments` WHERE `id`=?", array($_POST["commentid"]));
         
         if ($commentinfo->num_rows < 1) {
-            $messages[] = error("You don't have permission to do this.");
+            $messages[] = error("error.nopermission");
         }
         else {
             while ($c = $commentinfo->fetch_assoc()) {
@@ -227,7 +227,7 @@ elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
         }
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
 }
 // Handle editing a comment.
@@ -236,7 +236,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
         $commentinfo = preparedQuery("SELECT `id`, `account`, `ip`, `content` FROM `comments` WHERE `id`=?", array($_POST["commentid"]));
         
         if ($commentinfo->num_rows < 1) {
-            $messages[] = error("You don't have permission to do this.");
+            $messages[] = error("error.nopermission");
         }
         else {
             while ($c = $commentinfo->fetch_assoc()) {
@@ -294,7 +294,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
         }
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
     }
 }
 // Handle cancelling editing a comment.
@@ -375,7 +375,7 @@ elseif (($url[2] ?? "") == "edit") {
         }
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
         $displayPost = true;
     }
     if ($success) {
@@ -510,15 +510,15 @@ elseif (($url[2] ?? "") == "uploads") {
             else {
                 $ut = time();
             }
-            $postuploadsvars["icons"] .= "<div class='uploadTile'>
-              <img src='" . makeURL("images/{$icon}") . "?{$ut}'>
-              <hr>
-              <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this icon?\");'>
-                <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                <input type='hidden' value='{$icon}' name='dicon'>
-                <input type='submit' value='Delete' name='deleteIcon' class='button'>
-              </form>
-            </div>";
+            $tileVars = array(
+             "uploadlink" => makeURL("images/{$icon}") . "?{$ut}",
+             "token" => $_SESSION["csrf_token"],
+             "uploadname" => $icon,
+             "name" => "Icon",
+             "namelower" => "icon",
+             "extra" => ""
+            );
+            $postuploadsvars["icons"] .= render_template("uploadTile.html", $tileVars, false);
         }
         foreach ($attachments as $attachment) {
             // Get the upload time to add as a URL parameter when showing the image to avoid an old cached version being displayed by the browser.
@@ -529,22 +529,21 @@ elseif (($url[2] ?? "") == "uploads") {
             else {
                 $ut = time();
             }
-            $postuploadsvars["attachments"] .= "<div class='uploadTile'>
-              <img src='" . makeURL("images/{$attachment}") . "?{$ut}'>
-              URL: <a onclick='copy(\"" . $config["baseURL"] . makeURL("images/{$attachment}") . "\");'>copy me</a>
-              <hr>
-              <form method='post' onsubmit='return confirm(\"Are you sure you want to delete this attachment?\");'>
-                <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
-                <input type='hidden' value='{$attachment}' name='dattachment'>
-                <input type='submit' value='Delete' name='deleteAttachment' class='button'>
-              </form>
-            </div>";
+            $tileVars = array(
+             "uploadlink" => makeURL("images/{$attachment}") . "?{$ut}",
+             "token" => $_SESSION["csrf_token"],
+             "uploadname" => $attachment,
+             "name" => "Attachment",
+             "namelower" => "attachment",
+             "extra" => lang("uploadtile.url:", "<a onclick='copy(\"" . $config["baseURL"] . makeURL("images/{$attachment}") . "\");'>[[ uploadtile.copyme ]]</a>")
+            );
+            $postuploadsvars["attachments"] .= render_template("uploadTile.html", $tileVars, false);
         }
         
         render_page("postUploads.html", $postuploadsvars, $title);
     }
     else {
-        $messages[] = error("You don't have permission to do this.");
+        $messages[] = error("error.nopermission");
         $displayPost = true;
     }
 }
@@ -578,29 +577,30 @@ if ($displayPost) {
     
     $title = $p["title"];
     
+    // -- Post buttons -- //
     if ((($id == $p["account"]) and checkPerm(PERM_NEW_POST))
     or (checkPerm(PERM_MOD_EDIT_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .= "
-            <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='button postButton'>Edit</a>";
+            <a href='" . makeURL("post/{$p["id"]}/edit") . "' class='button postButton'>[[ global.edit ]]</a>";
     }
     if ((($id == $p["account"]) and checkPerm(PERM_DELETE_POST))
     or (checkPerm(PERM_MOD_DELETE_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .= 
-            "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='Delete'></form>";
+            "<form method='post' onsubmit='return confirm(\"[[ post.confirmdelete ]]\");'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='delete' value='[[ global.delete ]]'></form>";
     }
     if ((($id == $p["account"]) and checkPerm(PERM_STAR_POST))
     or (checkPerm(PERM_MOD_STAR_POST) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .=
-            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "Unstar" : "Star") . "' onclick='history.pushState(\"\", document.title, window.location.pathname)'></form>";
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='toggleStar' value='" . (($p["starred"] == "1") ? "[[ post.unstar ]]" : "[[ post.star ]]") . "' onclick='history.pushState(\"\", document.title, window.location.pathname)'></form>";
     }
     if (($id == $p["account"]) and checkPerm(PERM_NEW_POST)) {
         $postvars["postbuttons"] .=
-            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "Unpublish" : "Publish") . "' onclick='history.pushState(\"\", document.title, window.location.pathname)'></form>";
+            "<form method='post'><input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'><input type='submit' class='button postButton' name='togglePublished' value='" . (($p["published"] == "1") ? "[[ post.unpublish ]]" : "[[ publish ]]") . "' onclick='history.pushState(\"\", document.title, window.location.pathname)'></form>";
     }
     if ((($id == $p["account"]) and checkPerm(PERM_UPLOAD))
     or (checkPerm(PERM_MOD_UPLOAD) and checkOutrank($id, $p["account"]))) {
         $postvars["postbuttons"] .= "
-            <a href='" . makeURL("post/{$p["id"]}/uploads") . "' class='button postButton'>Manage Uploads</a>";
+            <a href='" . makeURL("post/{$p["id"]}/uploads") . "' class='button postButton'>[[ post.manageuploads ]]</a>";
     }
     // Show the post author's name if applicable.
     if ($p["namevisible"]) {
@@ -717,7 +717,7 @@ if ($displayPost) {
             or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS))
             and (!$editing)) {
-                $postvars["comments"] .= "<a href='" . makeURL("post/{$p["id"]}/{$page}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>Edit</a>";
+                $postvars["comments"] .= "<a href='" . makeURL("post/{$p["id"]}/{$page}/editcomment/{$c["id"]}#comment_{$c["id"]}") . "' class='button'>[[ global.edit ]]</a>";
             }
             
             if ((checkPerm(PERM_DELETE_COMMENT) and (($c["account"] === $id)
@@ -727,7 +727,7 @@ if ($displayPost) {
                 $postvars["comments"] .= "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this comment?\");'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <input type='hidden' name='commentid' value='" . $c["id"] . "'>
-                <input class='button' type='submit' name='deletecomment' value='Delete'>
+                <input class='button' type='submit' name='deletecomment' value='[[ global.delete ]]'>
                 </form>";
             }
             
@@ -747,8 +747,8 @@ if ($displayPost) {
                  <textarea name='newcontent' maxlength='" . $config["commentMaxLength"] . "' required>" . htmlspecialchars($_POST["newcontent"] ?? $c["content"]) . "</textarea>
                  <div></div>
                  <div>
-                  <input class='button' type='submit' name='editcomment' value='Edit'>
-                  <input class='button' type='submit' name='canceleditcomment' value='Cancel Edit' formnovalidate>
+                  <input class='button' type='submit' name='editcomment' value='[[ global.edit ]]'>
+                  <input class='button' type='submit' name='canceleditcomment' value='[[ global.canceledit ]]' formnovalidate>
                  </div>
                 </form>
                 </div>

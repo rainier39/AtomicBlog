@@ -2,68 +2,68 @@
   <h1>[[ panel.configureblog ]]</h1>
   <form method='post' class='form configForm'>
    <input type='hidden' name='csrf_token' value='{{ token }}'>
-   <label for='ctitle'>Blog Title:</label>
+   <label for='ctitle'>[[ global.blogtitle: ]]</label>
    <input type='text' name='ctitle' id='ctitle' maxlength='32' value='{{{ title }}}'>
-   <label for='cdescription'>Blog Description:</label>
+   <label for='cdescription'>[[ global.blogdescription: ]]</label>
    <textarea id='cdescription' name='cdescription' maxlength='128'>{{{ description }}}</textarea>
-   <label for='cfooter'>Footer:</label>
+   <label for='cfooter'>[[ panel.configureblog.footer: ]]</label>
    <textarea id='cfooter' name='cfooter' maxlength='4096'>{{{ footer }}}</textarea>
-   <label for='timezone'>Server Timezone:</label>
+   <label for='timezone'>[[ panel.configureblog.servertimezone: ]]</label>
    <select name='timezone' id='timezone'>
    {{ timezone }}
    </select>
-   <label for='clanguage'>Language:</label>
+   <label for='clanguage'>[[ panel.configureblog.language: ]]</label>
    <select name='clanguage' id='clanguage'>
    {{ language }}
    </select>
-   <label for='theme'>Theme:</label>
+   <label for='theme'>[[ panel.configureblog.theme: ]]</label>
    <select name='theme' id='theme'>
    {{ theme }}
    </select>
-   <h2>Customization</h2><div></div>
-   <label for='customCSS'>Custom CSS:</label>
+   <h2>[[ panel.configureblog.customization ]]</h2><div></div>
+   <label for='customCSS'>[[ panel.configureblog.customcss: ]]</label>
    <textarea id='customCSS' name='customCSS' maxlength='4096'>{{{ customcss }}}</textarea>
-   <h2>User Management</h2><div></div>
-   <label for='registration' title='Whether or not people can create new accounts.'>Allow Registration:</label>
+   <h2>[[ panel.configureblog.usermanagement ]]</h2><div></div>
+   <label for='registration' title='[[ panel.configureblog.allowregistration.title ]]'>[[ panel.configureblog.allowregistration: ]]</label>
    <input type='checkbox' id='registration' name='registration'{{ allowregistration }}>
-   <label for='registrationMode'>Registration Mode:</label>
+   <label for='registrationMode' title='[[ panel.configureblog.registrationmode.title ]]'>[[ panel.configureblog.registrationmode: ]]</label>
    <select name='registrationMode' id='registrationMode'>
    {{ registrationmode }}
    </select>
-   <label for='comments' title='Whether or not people can comment.'>Enable Comments:</label>
+   <label for='comments' title='[[ panel.configureblog.enablecomments.title ]]'>[[ panel.configureblog.enablecomments: ]]</label>
    <input type='checkbox' id='comments' name='comments'{{ comments }}>
-   <label for='captcha' title='Whether or not registration has a captcha.'>Enable Captcha:</label>
+   <label for='captcha' title='[[ panel.configureblog.enablecaptcha.title ]]'>[[ panel.configureblog.enablecaptcha: ]]</label>
    <input type='checkbox' id='captcha' name='captcha'{{ captcha }}>
-   <label for='captchaLength' title='How many characters the CAPTCHA contains.'>CAPTCHA Length:</label>
+   <label for='captchaLength' title='[[ panel.configureblog.captchalength.title ]]'>[[ panel.configureblog.captchalength: ]]</label>
    <input type='text' id='captchaLength' name='captchaLength' value='{{{ captchalength }}}'>
-   <label for='feedEnabled' title='Whether or not the Atom feed is enabled.'>Enable Feed:</label>
+   <label for='feedEnabled' title='[[ panel.configureblog.enablefeed.title ]]'>[[ panel.configureblog.enablefeed: ]]</label>
    <input type='checkbox' id='feedEnabled' name='feedEnabled'{{ feedEnabled }}>
-   <label for='userlist' title='Who can view the userlist.'>Userlist:</label>
+   <label for='userlist' title='[[ panel.configureblog.userlistvisibility.title ]]'>[[ panel.configureblog.userlistvisibility: ]]</label>
    <select name='userlist' id='userlist'>
    {{ userlist }}
    </select>
-   <h2>Uploads</h2><div></div>
-   <label for='maxUploadSize' title='Maximum size (in bytes) of a single upload.'>Max Upload Size:</label>
+   <h2>[[ panel.configureblog.uploads ]]</h2><div></div>
+   <label for='maxUploadSize' title='[[ panel.configureblog.maxuploadsize.title ]]'>[[ panel.configureblog.maxuploadsize: ]]</label>
    <input type='text' id='maxUploadSize' name='maxUploadSize' value='{{{ maxUploadSize }}}'>
-   <label for='totalDiskQuota' title='Maximum amount of file data (in bytes) that can be uploaded to the webserver.'>Total Disk Quota:</label>
+   <label for='totalDiskQuota' title='[[ panel.configureblog.totaldiskquota.title ]]'>[[ panel.configureblog.totaldiskquota: ]]</label>
    <input type='text' id='totalDiskQuota' name='totalDiskQuota' value='{{{ totalDiskQuota }}}'>
-   <label for='perUserDiskQuota' title='Maximum amount of file data (in bytes) that any single user can upload.'>Per User Disk Quota:</label>
+   <label for='perUserDiskQuota' title='[[ panel.configureblog.peruserdiskquota.title ]]'>[[ panel.configureblog.peruserdiskquota: ]]</label>
    <input type='text' id='perUserDiskQuota' name='perUserDiskQuota' value='{{{ perUserDiskQuota }}}'>
-   <h2>Rate Limits</h2><div></div>
-   <label for='logins' title='Maximum login attempts per hour from an IP.'>Logins Per Hour:</label>
+   <h2>[[ panel.configureblog.ratelimits ]]</h2><div></div>
+   <label for='logins' title='[[ panel.configureblog.loginsperhour.title ]]'>[[ panel.configureblog.loginsperhour: ]]</label>
    <input type='text' id='logins' name='logins' value='{{{ loginsperhour }}}'>
-   <label for='accounts' title='Maximum number of accounts that can be created per IP.'>Accounts Per IP:</label>
+   <label for='accounts' title='[[ panel.configureblog.accountsperip.title ]]'>[[ panel.configureblog.accountsperip: ]]</label>
    <input type='text' id='accounts' name='accounts' value='{{{ accountsperip }}}'>
-   <label for='accountcooldown' title='Time (in seconds) one must wait in between creating accounts.'>Registration Cooldown:</label>
+   <label for='accountcooldown' title='[[ panel.configureblog.registrationcooldown.title ]]'>[[ panel.configureblog.registrationcooldown: ]]</label>
    <input type='text' id='accountcooldown' name='accountcooldown' value='{{{ accountcooldown }}}'>
-   <label for='postdelay' title='Time (in seconds) one must wait in between making blog posts.'>Post Delay:</label>
+   <label for='postdelay' title='[[ panel.configureblog.postdelay.title ]]'>[[ panel.configureblog.postdelay: ]]</label>
    <input type='text' id='postdelay' name='postdelay' value='{{{ postdelay }}}'>
-   <label for='editdelay' title='Time (in seconds) one must wait in between making edits to blog posts.'>Edit Delay:</label>
+   <label for='editdelay' title='[[ panel.configureblog.editdelay.title ]]'>[[ panel.configureblog.editdelay: ]]</label>
    <input type='text' id='editdelay' name='editdelay' value='{{{ editdelay }}}'>
-   <label for='commentdelay' title='Time (in seconds) one must wait in between making another comment.'>Comment Delay:</label>
+   <label for='commentdelay' title='[[ panel.configureblog.commentdelay.title ]]'>[[ panel.configureblog.commentdelay: ]]</label>
    <input type='text' id='commentdelay' name='commentdelay' value='{{{ commentdelay }}}'>
-   <label for='uploadsPerHour' title='Maximum number of images a user can upload in an hour.'>Uploads Per Hour:</label>
+   <label for='uploadsPerHour' title='[[ panel.configureblog.uploadsperhour.title ]]'>[[ panel.configureblog.uploadsperhour: ]]</label>
    <input type='text' id='uploadsPerHour' name='uploadsPerHour' value='{{{ uploadsPerHour }}}'>
    <br>
-   <input type='submit' value='Save changes' class='button'>
+   <input type='submit' value='[[ panel.configureblog.savechanges ]]' class='button'>
   </form>

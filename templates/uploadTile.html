@@ -1,0 +1,11 @@
+<!-- Used by multiple pages: pages/post.php, pages/panel/profile-settings.php -->
+<div class='uploadTile'>
+ <img src='{{{ uploadlink }}}'>
+ {{ extra }}
+ <hr>
+ <form method='post' onsubmit='return confirm("[[ uploadtile.confirm ]]");'>
+  <input type='hidden' name='csrf_token' value='{{{ token }}}'>
+  <input type='hidden' value='{{{ uploadname }}}' name='d{{{ namelower }}}'>
+  <input type='submit' value='[[ global.delete ]]' name='delete{{{ name }}}' class='button'>
+ </form>
+</div>
