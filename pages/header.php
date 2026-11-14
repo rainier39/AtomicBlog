@@ -22,18 +22,21 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-$headervars = array("pagetitle" => $htitle,
-"head" => "",
-"theme" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true),
-"icon" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true),
-"blogtitle" => $config["title"],
-"description" => $config["description"],
-"installed" => $config["installed"],
-"navbar" => "",
-"messages" => implode($messages));
+$headervars = array(
+ "pagetitle" => $htitle,
+ "head" => "",
+ "theme" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/theme.css", true),
+ "icon" => makeURL("themes/" . htmlspecialchars($config["theme"]) . "/icon.png", true),
+ "blogtitle" => $config["title"],
+ "description" => $config["description"],
+ "installed" => $config["installed"],
+ "navbar" => "",
+ "messages" => implode($messages)
+);
 
-if (strlen($config["customCSS"]) > 0) {
-    // *** This may be dangerous security-wise. ***
+if (!$config["disableCustomCSS"] and (strlen($config["customCSS"]) > 0)) {
+    // *** This may be mildly dangerous security-wise. ***
+    // You can disable custom CSS by changing the config value "disableCustomCSS" to true in config/config.php.
     $headervars["head"] .= "<style>" . htmlspecialchars($config["customCSS"], ENT_NOQUOTES) . "</style>";
 }
 

@@ -217,7 +217,7 @@ if (validateCSRFToken()) {
         }
     }
     // --- Customization ---
-    if (isset($_POST["customCSS"])) {
+    if (isset($_POST["customCSS"]) and !$config["disableCustomCSS"]) {
         if (strlen($_POST["customCSS"]) > 4096) {
             $errors[] = "Custom CSS cannot be longer than 4096 characters.";
         }
@@ -493,7 +493,8 @@ $configvars = array(
  "postdelay" => $_POST["postdelay"] ?? $config["postDelay"],
  "editdelay" => $_POST["editdelay"] ?? $config["editDelay"],
  "commentdelay" => $_POST["commentdelay"] ?? $config["commentDelay"],
- "uploadsPerHour" => $_POST["uploadsPerHour"] ?? $config["uploadsPerHour"]
+ "uploadsPerHour" => $_POST["uploadsPerHour"] ?? $config["uploadsPerHour"],
+ "customCSSEnabled" => !$config["disableCustomCSS"]
 );
 
 render_page("panel/configuration.html", $configvars, $title);

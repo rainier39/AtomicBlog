@@ -20,9 +20,11 @@
    <select name='theme' id='theme'>
    {{ theme }}
    </select>
+   {% if (customCSSEnabled) %}
    <h2>[[ panel.configureblog.customization ]]</h2><div></div>
    <label for='customCSS'>[[ panel.configureblog.customcss: ]]</label>
    <textarea id='customCSS' name='customCSS' maxlength='4096'>{{{ customcss }}}</textarea>
+   {% endif %}
    <h2>[[ panel.configureblog.usermanagement ]]</h2><div></div>
    <label for='registration' title='[[ panel.configureblog.allowregistration.title ]]'>[[ panel.configureblog.allowregistration: ]]</label>
    <input type='checkbox' id='registration' name='registration'{{ allowregistration }}>
