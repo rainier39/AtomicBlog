@@ -20,7 +20,7 @@
 // Shows some statistics.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 if (!checkPerm(PERM_MANAGE_BLOG)) {
     $messages[] = error("error.noviewpage");

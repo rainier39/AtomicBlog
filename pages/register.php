@@ -20,24 +20,21 @@
 // Allow a user to sign up for an account.
 
 // TODO: allow resending email (with strict limits)
-// TODO: improve captcha, use the fontttf function instead of imagestring
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $registervars = array();
 $title = lang("global.register");
 
-// If the user is already logged in, don't let them into the page.
 if ($_SESSION["logged_in"]) {
-    $messages[] = error("You're already logged in.");
+    $messages[] = error("error.alreadyloggedin");
     render_page("", $registervars, $title);
     exit();
 }
 
-// If registration is disabled, don't let them in.
 if (!$config["allowRegistration"]) {
-    $messages[] = error("Registration is disabled.");
+    $messages[] = error("error.registrationdisabled");
     render_page("", $registervars, $title);
     exit();
 
@@ -48,7 +45,7 @@ if (isset($url[1]) and ($config["registrationMode"] == "email")) {
     $account = preparedQuery("SELECT `id` FROM `accounts` WHERE `cookie`=? AND `cookietime`>? AND `role`='Unapproved'", array(hash("sha256", $url[1]), (time()-3600)));
     
     if ($account->num_rows < 1) {
-        $messages[] = error("Invalid account activation link.");
+        $messages[] = error("error.invalidregisterlink");
         render_page("", $registervars, $title);
         exit();
     }
@@ -57,7 +54,7 @@ if (isset($url[1]) and ($config["registrationMode"] == "email")) {
     
     preparedQuery("UPDATE `accounts` SET `cookie`=NULL, `cookietime`=0, `role`='Member' WHERE `id`=?", array($a["id"]));
 
-    $messages[] = unsafe_success("Successfully activated your account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
+    $messages[] = unsafe_success("success.registeractivate", makeURL("login"));
     render_page("", $registervars, $title);
     exit();
 }
@@ -74,12 +71,12 @@ if (validateCSRFToken()) {
     // Make sure there aren't too many accounts from this IP.
     $ipCheck = preparedQuery("SELECT `jointime` FROM `accounts` WHERE `ip`=? OR `joinip`=?", array($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_ADDR"]));
     if ($ipCheck->num_rows >= $config["accountsPerIP"]) {
-        $errors[] = "You've made too many accounts.";
+        $errors[] = "error.toomanyaccounts";
     }
     // Enforce a time based rate limit.
     while ($r = $ipCheck->fetch_assoc()) {
         if ((time()-$r["jointime"]) <= $config["accountCooldown"]) {
-            $errors[] = "You've made an account too recently. Wait a while and try again.";
+            $errors[] = "error.registercooldown";
         }
     }
             
@@ -97,13 +94,13 @@ if (validateCSRFToken()) {
         
     // Make sure their password entries match.
     if ($_POST["password"] != $_POST["repeatpassword"]) {
-        $errors[] = "Your passwords don't match. Please try again.";
+        $errors[] = "error.passwordsdontmatch";
     }
         
     // Make sure the CAPTCHA was filled out correctly.
     if (extension_loaded("gd") and $config["captchaEnabled"]) {
         if (strtolower($_POST["captcha"] ?? "") != strtolower($_SESSION["captcha"])) {
-            $errors[] = "CAPTCHA was not filled out correctly.";
+            $errors[] = "error.incorrectcaptcha";
         }
     }
             
@@ -134,21 +131,21 @@ if (validateCSRFToken()) {
         if ($role == "Unapproved") {
             switch ($config["registrationMode"]) {
                 case "approval":
-                    $messages[] = success("You've successfully registered for an account. Note that it must be approved before it's usable.");
+                    $messages[] = success("success.registerapproval");
                     break;
                 case "email":
-                    $emailSuccess = sendEmail($_POST["email"], "Activate your account", "Someone has registered for an account on " . $config["title"] . " with this email address.\n\nIf this wasn't you, this email can be ignored. If it was, click the link below to verify your email\n\n" . ($config["baseURL"] . makeURL("register/" . $cookie)));
+                    $emailSuccess = sendEmail($_POST["email"], lang("register.emailtitle"), lang("register.emailbody", $config["title"]) . ($config["baseURL"] . makeURL("register/" . $cookie)));
                     if ($emailSuccess) {
-                        $messages[] = success("You've successfully registered for an account. Click the link provided to the email you specified to activate your account.");
+                        $messages[] = success("success.registeremail");
                     }
                     else {
-                        $messages[] = error("Failed to send activation email. Please contact the blog owner/administrator(s).");
+                        $messages[] = error("error.registeremailfail");
                     }
                     break;
             }
         }
         elseif ($role == "Member") {
-            $messages[] = unsafe_success("You've successfully registered for an account. You may now <a href='" . makeURL("login") . "'>log in</a>.");
+            $messages[] = unsafe_success("success.registeropen", makeURL("login"));
         }
         $accountid = $db->insert_id;
         $db->query("UNLOCK TABLES");
@@ -166,17 +163,19 @@ if (validateCSRFToken()) {
 }
 // Display the registration form if the user didn't successfully register.
 if (!$registerSuccess) {
-    $registervars = array("token" => $_SESSION["csrf_token"],
-    "name" => $_POST["name"] ?? "",
-    "username" => $_POST["username"] ?? "",
-    "email" => $_POST["email"] ?? "",
-    "minlength" => MIN_PASSWORD_LENGTH,
-    "captcha" => "");
+    $registervars = array(
+     "token" => $_SESSION["csrf_token"],
+     "name" => $_POST["name"] ?? "",
+     "username" => $_POST["username"] ?? "",
+     "email" => $_POST["email"] ?? "",
+     "minlength" => MIN_PASSWORD_LENGTH,
+     "captcha" => ""
+    );
     
     // Add the CAPTCHA if we can and it's enabled.
     if (extension_loaded("gd") and $config["captchaEnabled"]) {
-        $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='CAPTCHA image' class='captchaImg'>";
-        $registervars["captcha"] .= "<label for='captcha'>CAPTCHA:</label>
+        $registervars["captcha"] .= "<br>" . "<img src='data:image/webp;base64," . generateCaptcha() . "' alt='[[ register.captchaimage ]]' class='captchaImg'>";
+        $registervars["captcha"] .= "<label for='captcha'>[[ register.captcha: ]]</label>
         <input id='captcha' name='captcha' type='text' required>";
     }
 }

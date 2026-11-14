@@ -20,7 +20,7 @@
 // Provides an interface for conveniently changing the blog's config.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 if (!checkPerm(PERM_MANAGE_BLOG)) {
     $messages[] = error("error.noviewpage");
@@ -463,7 +463,7 @@ if (validateCSRFToken()) {
         preparedQuery("INSERT INTO `logs` (`logtype`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('panel_blogconfig', ?, ?, ?, ?)", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
     }
     else {
-        $messages[] = info("Nothing to change.");
+        $messages[] = info("info.nochange");
     }
 }
 

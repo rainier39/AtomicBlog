@@ -20,7 +20,7 @@
 // Display's a given user's profile.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $title = "";
 
@@ -49,7 +49,7 @@ if ($p["namevisible"]) {
     $name = $p["name"];
 }
 else {
-    $name = lang("user.anonymous");
+    $name = lang("global.anonymous");
 }
 
 if ($p["emailvisible"]) {
@@ -67,9 +67,9 @@ else {
     $bio = info("info.nobio");
 }
 
-$jointime = "<abbr class='date' title='" . date("g:i:sa", $p["jointime"]) . "'>" . date("F jS, Y", $p["jointime"]) . "</abbr>";
+$jointime = "<abbr class='date' title='" . date(lang("date.time"), $p["jointime"]) . "'>" . date(lang("date.date"), $p["jointime"]) . "</abbr>";
 
-$lastactiveHTML = "<abbr class='date' title='" . date("g:i:sa", $p["lastactive"]) . "'>" . date("F jS, Y", $p["lastactive"]) . "</abbr>";
+$lastactiveHTML = "<abbr class='date' title='" . date(lang("date.time"), $p["lastactive"]) . "'>" . date(lang("date.date"), $p["lastactive"]) . "</abbr>";
 
 $title = lang("user.profile", htmlspecialchars($name));
 
@@ -119,7 +119,7 @@ if ($posts > 0) {
     $profilevars["recentposts"] .= "</div>";
 }
 else {
-    $profilevars["recentposts"] = info("No posts to display.");
+    $profilevars["recentposts"] = info("info.nopostsyet");
 }
 
 render_page("profile.html", $profilevars, $title);

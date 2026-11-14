@@ -20,7 +20,7 @@
 // Handles creating a new post.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 if (!checkPerm(PERM_NEW_POST)) {
     $messages[] = error("error.nopermission");
@@ -68,7 +68,7 @@ if (validateCSRFToken()) {
             preparedQuery($tagQuery, $tagParams);
         }
         // Print a message.
-        $_SESSION["messages"][] = success("Successfully made new post.");
+        $_SESSION["messages"][] = success("success.newpost");
         redirect("post/{$postid}");
     }
     // Otherwise, print the errors.

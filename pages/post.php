@@ -20,7 +20,7 @@
 // Displays an individual post.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $displayPost = true;
 $updatePost = false;
@@ -43,7 +43,7 @@ $p = $post->fetch_assoc();
 if ($post->num_rows < 1) {
     http_response_code(404);
     $messages[] = error("error.notfound");
-    render_page("", array(), "error.notfound.title");
+    render_page("", array(), lang("error.notfound.title"));
     exit();
 }
 
@@ -107,7 +107,7 @@ elseif (isset($_POST["delete"]) and validateCSRFToken()) {
                 }
             }
                     
-            $_SESSION["messages"][] = success("Successfully deleted the post.");
+            $_SESSION["messages"][] = success("success.deletepost");
             
             // Log the event.
             preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `content`, `ip`, `useragent`, `timestamp`) VALUES ('post_delete', ?, ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $p["title"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
@@ -162,7 +162,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         $errors = array();
             
         if ($rateLimited) {
-            $errors[] = "You must wait a little bit before making another comment.";
+            $errors[] = "error.commentdelay";
         }
 
         // Only validate Guest emails.
@@ -172,10 +172,10 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
         }
             
         if (strlen($content) < 1) {
-            $errors[] = "Comment cannot be blank.";
+            $errors[] = "error.commentblank";
         }
         elseif (strlen($content) > $config["commentMaxLength"]) {
-            $errors[] = "Comment is too long.";
+            $errors[] = "error.commentlong";
         }
             
         if (count($errors) != 0) {
@@ -189,7 +189,7 @@ elseif (isset($_POST["newcomment"]) and validateCSRFToken()) {
             preparedQuery("INSERT INTO `comments` (`account`,`post`,`email`,`ip`,`timestamp`,`content`) VALUES (?, ?, ?, ?, ?, ?)", array($commentid, $p["id"], $email, $_SERVER["REMOTE_ADDR"], time(), $content));
             $newcomment = $db->insert_id;
             $db->query("UNLOCK TABLES");
-            $_SESSION["messages"][] = success("Successfully made comment.");
+            $_SESSION["messages"][] = success("success.comment");
             $_POST["content"] = "";
             redirect("post/{$p["id"]}#comment_{$newcomment}");
         }
@@ -220,7 +220,7 @@ elseif (isset($_POST["deletecomment"]) and validateCSRFToken()) {
                 // Delete the comment.
                 preparedQuery("DELETE FROM `comments` WHERE `id`=?", array($c_id));
                     
-                $messages[] = success("Successfully deleted comment.");
+                $messages[] = success("success.deletecomment");
                 // Log the event.
                 preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('comment_delete', ?, ?, ?, ?, ?)", array($c_id, $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             }
@@ -263,17 +263,17 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
                 }
             
                 if ($rateLimited) {
-                    $errors[] = "You must wait a few seconds before making another edit.";
+                    $errors[] = "error.editdelay";
                 }
                     
                 if (strlen($content) < 1) {
-                    $errors[] = "Comment cannot be blank.";
+                    $errors[] = "error.commentblank";
                 }
                 elseif (strlen($content) > $config["commentMaxLength"]) {
-                    $errors[] = "Comment is too long.";
+                    $errors[] = "error.commentlong";
                 }
                 elseif ($content == $c_content) {
-                    $errors[] = "Nothing to change.";
+                    $errors[] = "info.nochange";
                 }
             
                 if (count($errors) != 0) {
@@ -285,7 +285,7 @@ elseif (isset($_POST["editcomment"]) and validateCSRFToken()) {
                     // Edit the comment.
                     preparedQuery("UPDATE `comments` SET `content`=?, `timestamp`=? WHERE `id`=?", array($content, time(), $c_id));
                 
-                    $_SESSION["messages"][] = success("Successfully edited comment.");
+                    $_SESSION["messages"][] = success("success.editcomment");
                     // Log the event.
                     preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('comment_edit', ?, ?, ?, ?, ?)", array($c_id, $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                     redirect("post/" . $p["id"]);
@@ -303,7 +303,7 @@ elseif (isset($_POST["canceleditcomment"]) and validateCSRFToken()) {
 }
 // Handle editing.
 elseif (($url[2] ?? "") == "edit") {
-    $title = "Edit Post";
+    $title = lang("post.editpost");
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to edit the post.
@@ -320,7 +320,7 @@ elseif (($url[2] ?? "") == "edit") {
             $tagstring = unparseTags($tags);
 
             if (($_POST["title"] == $p["title"]) and (unparseTags(parseTags($_POST["tags"])) == $tagstring) and ($_POST["content"] == $p["content"])) {
-                $errors[] = "Nothing has been changed.";
+                $errors[] = "info.nochange";
             }
         	
             // If there are no errors, edit the post.
@@ -344,7 +344,7 @@ elseif (($url[2] ?? "") == "edit") {
                 }
                 $success = true;
                 $updatePost = true;
-                $_SESSION["messages"][] = success("Successfully edited post.");
+                $_SESSION["messages"][] = success("success.editpost");
                 // Log the event.
                 preparedQuery("INSERT INTO `logs` (`logtype`, `targetid`, `perpid`, `ip`, `useragent`, `timestamp`) VALUES ('post_edit', ?, ?, ?, ?, ?)", array($p["id"], $_SESSION["id"], $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
             }
@@ -385,7 +385,7 @@ elseif (($url[2] ?? "") == "edit") {
 }
 // Handle uploading.
 elseif (($url[2] ?? "") == "uploads") {
-    $title = "Manage Uploads";
+    $title = lang("post.manageuploads");
     $displayPost = false;
     $success = false;
     // Make sure the user is allowed to upload.
@@ -401,7 +401,7 @@ elseif (($url[2] ?? "") == "uploads") {
         if (isset($_FILES["icon"])) {
             $upload = upload("icon", $p["id"]);
             if ($upload == "") {
-                $messages[] = success("Successfully uploaded icon.");
+                $messages[] = success("success.uploadicon");
             }
             else {
                 $messages[] = error($upload);
@@ -416,7 +416,7 @@ elseif (($url[2] ?? "") == "uploads") {
             }
             $upload = upload("attachment", $p["id"] . "_" . $a_id);
             if ($upload === "") {
-                $messages[] = success("Successfully uploaded attachment.");
+                $messages[] = success("success.uploadattachment");
             }
             else {
                 $messages[] = error($upload);
@@ -428,11 +428,11 @@ elseif (($url[2] ?? "") == "uploads") {
             $target = basename($_POST["dicon"]);
             // Make sure that this icon is actually from the same post.
             if (!str_starts_with($target, $p["id"] . ".")) {
-                $messages[] = error("Nice try.");
+                $messages[] = error("error.nopermission");
             }
             // Make sure that the target icon exists.
             elseif (!is_file("images/" . $target)) {
-                $messages[] = error("Specified icon doesn't exist.");
+                $messages[] = error("error.filenotfound");
             }
             else {
                 $size = filesize("images/" . $target);
@@ -442,10 +442,10 @@ elseif (($url[2] ?? "") == "uploads") {
                     preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
                     // Log the deletion.
                     preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
-                    $messages[] = success("Successfully deleted icon.");
+                    $messages[] = success("success.deleteicon");
                 }
                 else {
-                    $messages[] = error("Failed to delete icon.");
+                    $messages[] = error("error.deleteiconfail");
                 }
             }
         }
@@ -455,11 +455,11 @@ elseif (($url[2] ?? "") == "uploads") {
             $target = basename($_POST["dattachment"]);
             // Make sure that this attachment is actually from the same post.
             if (!str_starts_with($target, $p["id"] . "_")) {
-                $messages[] = error("Nice try.");
+                $messages[] = error("error.nopermission");
             }
             // Make sure that the target attachment exists.
             elseif (!is_file("images/" . $target)) {
-                $messages[] = error("Specified attachment doesn't exist.");
+                $messages[] = error("error.filenotfound");
             }
             else {
                 $size = filesize("images/" . $target);
@@ -469,10 +469,10 @@ elseif (($url[2] ?? "") == "uploads") {
                     preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
                     // Log the deletion.
                     preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
-                    $messages[] = success("Successfully deleted attachment.");
+                    $messages[] = success("success.deleteattachment");
                 }
                 else {
-                    $messages[] = error("Failed to delete attachment.");
+                    $messages[] = error("error.deleteattachmentfail");
                 }
             }
         }
@@ -564,8 +564,8 @@ if ($displayPost) {
     $postvars = array(
      "postbuttons" => "",
      "title" => $p["title"],
-     "author" => "Nobody",
-     "published" => "<abbr class='date' title='" . date("g:i:sa", $p["starttime"]) . "'>" . date("F jS, Y", $p["starttime"]) . "</abbr>",
+     "author" => lang("global.nobody"),
+     "published" => "<abbr class='date' title='" . date(lang("date.time"), $p["starttime"]) . "'>" . date(lang("date.date"), $p["starttime"]) . "</abbr>",
      "edited" => "",
      "icon" => "",
      "tags" => "",
@@ -607,13 +607,13 @@ if ($displayPost) {
         $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($p["name"], ENT_NOQUOTES) . "</a>";
     }
     elseif (!$p["name"]) {
-        $postvars["author"] = "Nobody";
+        $postvars["author"] = lang("global.nobody");
     }
     else {
-        $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>Anonymous</a>";
+        $postvars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>[[ global.anonymous ]]</a>";
     }
     if (!empty($p["edittime"])) {
-        $postvars["edited"] .= "<abbr class='date' title='" . date("g:i:sa", $p["edittime"]) . "'>" . date("F jS, Y", $p["edittime"]) . "</abbr>";
+        $postvars["edited"] .= "<abbr class='date' title='" . date(lang("date.time"), $p["edittime"]) . "'>" . date(lang("date.date"), $p["edittime"]) . "</abbr>";
     }
     // Display the post's icon if it exists.
     $icon = $p["id"] . ".webp";
@@ -647,7 +647,7 @@ if ($displayPost) {
             $postvars["commentForm"] = render_template("postCommentForm.html", $commentformvars, false);
         }
         else {
-            $postvars["comments"] .= error("You don't have permission to comment.");
+            $postvars["comments"] .= error("error.commentnopermission");
         }
         $itemsPerPage = 5;
         $commentCountQuery = preparedQuery("SELECT COUNT(*) FROM `comments` WHERE `post`=?", array($p["id"]));
@@ -673,7 +673,7 @@ if ($displayPost) {
         $comments = preparedQuery("SELECT `comments`.*,`accounts`.`namevisible`,`accounts`.`name`,`accounts`.`color` FROM `comments` LEFT JOIN `accounts` ON `comments`.`account`=`accounts`.`id` WHERE `post`=? ORDER BY `comments`.`id` DESC LIMIT ? OFFSET ?", array($p["id"], $itemsPerPage, $offset));
         
         if ($comments->num_rows < 1) {
-            $postvars["comments"] .= "<br>" . info("No comments to display yet.");
+            $postvars["comments"] .= "<br>" . info("info.nocomments");
         }
         
         while ($c = $comments->fetch_assoc()) {
@@ -682,10 +682,10 @@ if ($displayPost) {
             // Get author name.
             if ($c["account"] == 0) {
                 if (checkPerm(PERM_MANAGE_USERS)) {
-                    $authorname = "Guest (" . htmlspecialchars($c["email"]) . ", " . htmlspecialchars($c["ip"]) . ")";
+                    $authorname = lang("global.guest") . " (" . htmlspecialchars($c["email"]) . ", " . htmlspecialchars($c["ip"]) . ")";
                 }
                 else {
-                    $authorname = "Guest";
+                    $authorname = lang("global.guest");
                 }
                 $authorcolor = "";
             }
@@ -694,7 +694,7 @@ if ($displayPost) {
                     $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>" . htmlspecialchars($c["name"], ENT_NOQUOTES) . "</a>";
                 }
                 else {
-                    $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>Anonymous</a>";
+                    $authorname = "<a class='profileLink' href='" . makeURL("profile/" . $c["account"]) . "'>[[ global.anonymous ]]</a>";
                 }
                 // This is safe because the value of `color` is constrained.
                 $authorcolor = " style='background: #" . $c["color"] . ";'";
@@ -708,9 +708,9 @@ if ($displayPost) {
                 $editing = true;
             }
             
-            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . "><div class='commentHeaderItems'><div>By: " . $authorname . "</div>";
+            $postvars["comments"] .= "<div class='commentHeader' " . $authorcolor . "><div class='commentHeaderItems'><div>" . lang("global.by", $authorname) . "</div>";
             
-            $postvars["comments"] .= "<small><abbr class='date' title='" . date("g:i:sa", $c["timestamp"]) . "'>" . date("F jS, Y", $c["timestamp"]) . "</abbr></small>";
+            $postvars["comments"] .= "<small><abbr class='date' title='" . date(lang("date.time"), $c["timestamp"]) . "'>" . date(lang("date.date"), $c["timestamp"]) . "</abbr></small>";
             
             if (((checkPerm(PERM_EDIT_COMMENT) and (($c["account"] === $id)
             // Guest with same IP.
@@ -724,7 +724,7 @@ if ($displayPost) {
             // Guest with same IP.
             or (($c["account"] === "0") and ($c["ip"] == $_SERVER["REMOTE_ADDR"]))))
             or checkPerm(PERM_MOD_COMMENTS)) {
-                $postvars["comments"] .= "<form method='post' onsubmit='return confirm(\"Are you sure you want to delete this comment?\");'>
+                $postvars["comments"] .= "<form method='post' onsubmit='return confirm(\"[[ post.commentconfirmdelete ]]\");'>
                 <input type='hidden' name='csrf_token' value='" . $_SESSION["csrf_token"] . "'>
                 <input type='hidden' name='commentid' value='" . $c["id"] . "'>
                 <input class='button' type='submit' name='deletecomment' value='[[ global.delete ]]'>
@@ -757,7 +757,7 @@ if ($displayPost) {
         }
     }
     else {
-        $postvars["comments"] .= error("Comments are disabled.");
+        $postvars["comments"] .= error("error.commentsdisabled");
     }
 
     // Lock to avoid race conditions.

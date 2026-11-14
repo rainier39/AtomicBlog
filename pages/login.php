@@ -20,7 +20,7 @@
 // Allow account logins.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $success = false;
 $title = lang("global.login");
@@ -140,11 +140,13 @@ if (validateCSRFToken()) {
 
 // Display the login form.
 if (!$success) {
-    $loginvars = array("token" => $_SESSION["csrf_token"],
-    "username" => $_POST["username"] ?? "",
-    "https" => $ishttps,
-    "minlength" => MIN_PASSWORD_LENGTH,
-    "test" => true);
+    $loginvars = array(
+     "token" => $_SESSION["csrf_token"],
+     "username" => $_POST["username"] ?? "",
+     "https" => $ishttps,
+     "minlength" => MIN_PASSWORD_LENGTH,
+     "test" => true
+    );
     render_page("login.html", $loginvars, $title);
 }
 // Otherwise redirect the successfully logged-in user.

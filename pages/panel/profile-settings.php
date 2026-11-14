@@ -20,7 +20,7 @@
 // Allows a user to edit their profile.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 // No need for a permission check, any user who can log in should be able to perform all actions on this page.
 
@@ -101,7 +101,7 @@ if (validateCSRFToken()) {
             $messages[] = success("Successfully updated profile settings.");
         }
         else {
-            $messages[] = info("Nothing to change.");
+            $messages[] = info("info.nochange");
         }
     }
     // Handle uploading an avatar.

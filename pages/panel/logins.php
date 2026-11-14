@@ -20,7 +20,7 @@
 // Shows recent logins and login attempts.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 // No permission check needed.
 
@@ -57,8 +57,8 @@ while ($a = $attempts->fetch_assoc()) {
     else {
         $type = "<span class='loginFail'>Failed login</span>";
     }
-    $date = date("F jS, Y", $a["timestamp"]);
-    $time = date("g:i:sa", $a["timestamp"]);
+    $date = date(lang("date.date"), $a["timestamp"]);
+    $time = date(lang("date.time"), $a["timestamp"]);
     // Admins get to see IPs.
     if (checkPerm(PERM_MANAGE_USERS)) {
         $ip = htmlspecialchars($a["ip"]);

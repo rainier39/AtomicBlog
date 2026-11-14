@@ -20,7 +20,7 @@
 // Serves as an all-purpose utility for the blog administrator and users.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $title = "";
 $panelActions = array(
@@ -41,21 +41,21 @@ if (!$_SESSION["logged_in"]) {
 }
 // Display the default page.
 elseif (!isset($url[1]) or $url[1] == "") {
-    $title = "Panel";
+    $title = lang("global.panel");
     $panelvars = array(
      "useractions" => "",
      "adminactions" => ""
     );
-    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/account-settings") . "'>" . lang("panel.accountsettings") . "</a></p>";
-    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/profile-settings") . "'>" . lang("panel.profilesettings") . "</a></p>";
-    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/logins") . "'>" . lang("panel.loginlogs") . "</a></p>";
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/account-settings") . "'>[[ panel.accountsettings ]]</a></p>";
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/profile-settings") . "'>[[ panel.profilesettings ]]</a></p>";
+    $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/logins") . "'>[[ panel.loginlogs ]]</a></p>";
     if (checkPerm(PERM_NEW_POST)) {
-        $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>" . lang("panel.newpost") . "</a></p>";
+        $panelvars["useractions"] .= "<p><a href='" . makeURL("panel/newpost") . "'>[[ panel.newpost ]]</a></p>";
     }
     if (checkPerm(PERM_MANAGE_BLOG)) {
-        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/stats") . "'>" . lang("panel.blogstatistics") . "</a></p>";
-        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>" . lang("panel.configureblog") . "</a></p>";
-        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/logs") . "'>" . lang("panel.viewlogs") . "</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/stats") . "'>[[ panel.blogstatistics ]]</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/configuration") . "'>[[ panel.configureblog ]]</a></p>";
+        $panelvars["adminactions"] .= "<p><a href='" . makeURL("panel/logs") . "'>[[ panel.viewlogs ]]</a></p>";
     }
     render_page("panel.html", $panelvars, $title);
 }
@@ -67,7 +67,7 @@ elseif (in_array($url[1], $panelActions)) {
 else {
     http_response_code(404);
     $messages[] = error("error.notfound");
-    render_page("", array(), "Page not found");
+    render_page("", array(), lang("error.notfound.title"));
 }
 
 ?>

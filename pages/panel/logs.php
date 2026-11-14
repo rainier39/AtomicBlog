@@ -20,7 +20,7 @@
 // Displays the blog's logs.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 if (!checkPerm(PERM_MANAGE_BLOG)) {
     $messages[] = error("error.noviewpage");
@@ -69,8 +69,8 @@ else {
 while ($log = $logsQuery->fetch_assoc()) {
     $entry = "<div class='logEntry'>%s</div>";
     
-    $date = date("F jS, Y", $log["timestamp"]);
-    $time = date("g:i:sa", $log["timestamp"]);
+    $date = date(lang("date.date"), $log["timestamp"]);
+    $time = date(lang("date.time"), $log["timestamp"]);
     $ip = htmlspecialchars($log["ip"], ENT_NOQUOTES);
     $ua = parseUserAgent($log["useragent"]);
     $useragent = "<span class='date' title='" . htmlspecialchars($log["useragent"]) . "'>{$ua["os"]}, {$ua["browser"]}</span>";

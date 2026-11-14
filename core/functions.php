@@ -119,7 +119,11 @@ function success($message, $arg="") {
 }
 
 // This function does not htmlspecialchars() its content, so user supplied input needs to be escaped by the caller beforehand.
-function unsafe_success($message) {
+function unsafe_success($message, $arg="") {
+    global $lang;
+    if (array_key_exists($message, $lang)) {
+        $message = lang($message, $arg);
+    }
     return "<div class='message success'>" . $message . "</div>";
 }
 

@@ -20,14 +20,16 @@
 // Displays the homepage.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
-$homevars = array("starred" => "",
-"recent" => "",
-"viewed" => "");
+$homevars = array(
+ "starred" => "",
+ "recent" => "",
+ "viewed" => ""
+);
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
-    $messages[] = error("You don't have permission to view posts.");
+    $messages[] = error("error.noviewpage");
     render_page("", array());
     exit();
 }
@@ -51,7 +53,7 @@ if ($starred->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $homevars["starred"] .= info("No starred posts yet.");
+    $homevars["starred"] .= info("info.nopostsyet");
 }
 
 // Get the 6 most recent posts.
@@ -68,7 +70,7 @@ if ($recent->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $homevars["recent"] .= info("No posts yet.");
+    $homevars["recent"] .= info("info.nopostsyet");
 }
 
 // Get the top 6 most viewed posts.
@@ -85,7 +87,7 @@ if ($mostViewedPosts->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $homevars["viewed"] .= info("No posts yet.");
+    $homevars["viewed"] .= info("info.nopostsyet");
 }
 
 // Finally, render the page.

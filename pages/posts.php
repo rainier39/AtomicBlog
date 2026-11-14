@@ -20,7 +20,7 @@
 // Displays the blog posts.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $title = lang("global.posts");
 
@@ -34,7 +34,7 @@ $postsvars = array(
 );
 
 if (!checkPerm(PERM_VIEW_POSTS)) {
-    $messages[] = error("You don't have permission to view posts.");
+    $messages[] = error("error.noviewpage");
     render_page("", $postsvars, $title);
     exit();
 }
@@ -118,7 +118,7 @@ if ($posts->num_rows > 0) {
 }
 // Otherwise print a message.
 else {
-    $postsvars["posts"] .= info("No posts yet.");
+    $postsvars["posts"] .= info("info.nopostsyet");
 }
 
 // Generate the pagination.

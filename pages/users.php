@@ -20,9 +20,9 @@
 // Displays a list of all user accounts.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
-$title = "Users";
+$title = lang("global.users");
 
 if (!checkPerm(PERM_VIEW_PROFILE)
 or (($config["userlist"] == "users") and !$_SESSION["logged_in"])
@@ -104,10 +104,10 @@ if ($usersQuery->num_rows < 1) {
 else {
     while ($u = $usersQuery->fetch_assoc()) {
         $tilevars = array(
-         "name" => $u["namevisible"] ? $u["name"] : lang("user.anonymous"),
+         "name" => $u["namevisible"] ? $u["name"] : lang("global.anonymous"),
          "role" => htmlspecialchars($u["role"]),
-         "joined" => "<abbr class='date' title='" . date("g:i:sa", $u["jointime"]) . "'>" . date("F jS, Y", $u["jointime"]) . "</abbr>",
-         "lastactive" => "<abbr class='date' title='" . date("g:i:sa", $u["lastactive"]) . "'>" . date("F jS, Y", $u["lastactive"]) . "</abbr>",
+         "joined" => "<abbr class='date' title='" . date(lang("date.time"), $u["jointime"]) . "'>" . date(lang("date.date"), $u["jointime"]) . "</abbr>",
+         "lastactive" => "<abbr class='date' title='" . date(lang("date.time"), $u["lastactive"]) . "'>" . date(lang("date.date"), $u["lastactive"]) . "</abbr>",
          "color" => $u["color"],
          "profile" => makeURL("profile/" . $u["id"]),
          "admininfo" => ""

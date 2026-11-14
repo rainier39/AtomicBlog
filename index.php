@@ -200,8 +200,8 @@ elseif ($url[0] == "") {
 else
 {
     http_response_code(404);
-    $messages[] = error("Page not found.");
-    render_page("", array(), "Page not found");
+    $messages[] = error("error.notfound");
+    render_page("", array(), lang("error.notfound.title"));
 }
 
 ?>
