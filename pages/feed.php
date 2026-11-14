@@ -22,16 +22,15 @@
 // Only load the page if it's being requested via the index file.
 if (!defined('INDEX')) exit;
 
-if (!$config["feedEnabled"]) {
+// The feed must be enabled, and the viewer must have permission to view posts and their contents.
+if (!$config["feedEnabled"] or !checkPerm(PERM_VIEW_POSTS) or !checkPerm(PERM_VIEW_POST)) {
     http_response_code(404);
-    $messages[] = error("Page not found.");
-    render_page("", array(), "Page not found");
+    $messages[] = error("error.notfound");
+    render_page("", array(), lang("error.notfound.title"));
     exit();
 }
 
 header("Content-Type: application/atom+xml");
-// This is here for debugging purposes.
-//header("Content-Type: text/plain");
 
 $uri = $config["baseURL"] . "/";
 
@@ -55,7 +54,7 @@ echo('<?xml version="1.0" encoding="utf-8"?>
 ');
 
 echo('  <id>' . $uri . makeURL("feed") . '</id>
-  <generator uri="https://github.com/rainier39/AtomicBlog/releases/tag/' . $config["version"] . '" version="' . $config["version"] . '">
+  <generator uri="https://github.com/rainier39/AtomicBlog">
     AtomicBlog
   </generator>
 ');
