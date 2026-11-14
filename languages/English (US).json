@@ -238,6 +238,7 @@
  "panel.blogstatistics.totalviews:": "Total views:",
  "panel.blogstatistics.uniqueviewers:": "Unique viewers:",
  "panel.blogstatistics.logentries:": "Log entries:",
+ "panel.blogstatistics.totaldiskquota:": "Total disk quota usage:",
  
  "footer.feed": "Feed"
 }

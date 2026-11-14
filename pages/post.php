@@ -431,15 +431,25 @@ elseif (($url[2] ?? "") == "uploads") {
                 $messages[] = error("error.nopermission");
             }
             // Make sure that the target icon exists.
-            elseif (!is_file("images/" . $target)) {
+            elseif (!is_file("images/{$target}")) {
                 $messages[] = error("error.filenotfound");
             }
             else {
-                $size = filesize("images/" . $target);
-                $deleted = unlink("images/" . $target);
+                $size = filesize("images/{$target}");
+                $deleted = unlink("images/{$target}");
                 if ($deleted) {
+                    // By default we assume the current user uploaded the icon.
+                    $uploaderid = $_SESSION["id"];
+                    // If not, try to get the ID of the actual uploader.
+                    if ($p["account"] != $_SESSION["id"]) {
+                        $uploaderquery = preparedQuery("SELECT `perpid` FROM `logs` WHERE `logtype`='image_upload' AND `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$target}"));
+                        if ($uploaderquery->num_rows == 1) {
+                            $uploaderid = $uploaderquery->fetch_assoc()["perpid"];
+                        }
+                        // If we (somehow) fail, oh well.
+                    }
                     // Subtract from the quota, ensuring it never drops below zero.
-                    preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
+                    preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $uploaderid));
                     // Log the deletion.
                     preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                     $messages[] = success("success.deleteicon");
@@ -458,15 +468,25 @@ elseif (($url[2] ?? "") == "uploads") {
                 $messages[] = error("error.nopermission");
             }
             // Make sure that the target attachment exists.
-            elseif (!is_file("images/" . $target)) {
+            elseif (!is_file("images/{$target}")) {
                 $messages[] = error("error.filenotfound");
             }
             else {
-                $size = filesize("images/" . $target);
-                $deleted = unlink("images/" . $target);
+                $size = filesize("images/{$target}");
+                $deleted = unlink("images/{$target}");
                 if ($deleted) {
+                    // By default we assume the current user uploaded the attachment.
+                    $uploaderid = $_SESSION["id"];
+                    // If not, try to get the ID of the actual uploader.
+                    if ($p["account"] != $_SESSION["id"]) {
+                        $uploaderquery = preparedQuery("SELECT `perpid` FROM `logs` WHERE `logtype`='image_upload' AND `content`=? ORDER BY `timestamp` DESC LIMIT 1", array("images/{$target}"));
+                        if ($uploaderquery->num_rows == 1) {
+                            $uploaderid = $uploaderquery->fetch_assoc()["perpid"];
+                        }
+                        // If we (somehow) fail, oh well.
+                    }
                     // Subtract from the quota, ensuring it never drops below zero.
-                    preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $_SESSION["id"]));
+                    preparedQuery("UPDATE `accounts` SET `quota`=GREATEST(`quota`-?, 0) WHERE `id`=?", array($size, $uploaderid));
                     // Log the deletion.
                     preparedQuery("INSERT INTO `logs` (`logtype`,`perpid`,`content`,`ip`,`useragent`,`timestamp`) VALUES ('image_delete', ?, ?, ?, ?, ?)", array($_SESSION["id"], $target, $_SERVER["REMOTE_ADDR"], substr($_SERVER["HTTP_USER_AGENT"], 0, 256), time()));
                     $messages[] = success("success.deleteattachment");

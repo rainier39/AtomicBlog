@@ -38,6 +38,7 @@ $totalcomments = $db->query("SELECT COUNT(*) FROM `comments`")->fetch_assoc()["C
 $totalviews = $db->query("SELECT COUNT(*) FROM `views`")->fetch_assoc()["COUNT(*)"];
 $uniqueviewers = $db->query("SELECT COUNT(DISTINCT `ip`) FROM `views`")->fetch_assoc()["COUNT(DISTINCT `ip`)"];
 $logentries = $db->query("SELECT COUNT(*) FROM `logs`")->fetch_assoc()["COUNT(*)"];
+$totaldiskquota = $db->query("SELECT SUM(`quota`) AS `total` FROM `accounts`")->fetch_assoc()["total"];
 
 $statsVars = array(
  "version" => $config["version"],
@@ -48,7 +49,8 @@ $statsVars = array(
  "totalcomments" => $totalcomments,
  "totalviews" => $totalviews,
  "uniqueviewers" => $uniqueviewers,
- "logentries" => $logentries
+ "logentries" => $logentries,
+ "totaldiskquota" => bytesToReadable($totaldiskquota) . "/" . bytesToReadable($config["totalDiskQuota"])
 );
 
 render_page("panel/stats.html", $statsVars, $title);
