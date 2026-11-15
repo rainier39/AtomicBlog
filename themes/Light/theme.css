@@ -270,7 +270,12 @@ footer span {
  color: #444;
 }
 /* Post content formatting */
-code, .codeblock {
+code {
+ background: #ddd;
+ padding: 1px 2px;
+ font-family: monospace;
+}
+.codeblock {
  background: #bbb;
  padding: 3px 6px;
  white-space: pre-wrap;
