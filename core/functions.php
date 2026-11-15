@@ -20,7 +20,7 @@
 // Defines global functions used throughout the software.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 // Delete the login cookie on the client end.
 function clearLoginCookie() {
@@ -66,7 +66,7 @@ function displayPost($p) {
     $postTilevars = array("url" => makeURL("post/" . $p["id"]),
     "image" => "",
     "title" => $p["title"],
-    "author" => "Nobody",
+    "author" => lang("global.nobody"),
     "classes" => "");
     
     if ($p["starred"]) {
@@ -101,10 +101,10 @@ function displayPost($p) {
         $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>" . htmlspecialchars($p["name"], ENT_NOQUOTES) . "</a>";
     }
     elseif (!$p["name"]) {
-        $postTilevars["author"] = "Nobody";
+        $postTilevars["author"] = lang("global.nobody");
     }
     else {
-        $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>Anonymous</a>";
+        $postTilevars["author"] = "<a class='profileLink' href='" . makeURL("profile/" . $p["account"]) . "'>[[ global.anonymous ]]</a>";
     }
     
     return render_template("postTile.html", $postTilevars, false);
@@ -169,37 +169,37 @@ function validatePost($edit=false) {
         	
     // Title.
     if (strlen($_POST["title"] ?? "") < 1) {
-        $errors[] = "Post title cannot be less than 1 character long.";
+        $errors[] = "error.posttitleblank";
     }
     elseif (strlen($_POST["title"]) > 32) {
-        $errors[] = "Post title cannot be more than 32 characters long.";
+        $errors[] = "error.posttitlelong";
     }
     // Tags.
     if (strlen($_POST["tags"] ?? "") > 128) {
-        $errors[] = "Post tags field cannot be more than 128 characters long.";
+        $errors[] = "error.posttagslong";
     }
     if ((($_POST["tags"] ?? "") != "") and (max(array_map("strlen", parseTags($_POST["tags"]))) > 24)) {
-        $errors[] = "Individual post tags cannot be longer than 24 characters.";
+        $errors[] = "error.posttaglong";
     }
     // Content.
     if (strlen($_POST["content"] ?? "") < 1) {
-        $errors[] = "Post content cannot be less than 1 character long.";
+        $errors[] = "error.postblank";
     }
     elseif (strlen($_POST["content"]) > 65500) {
-        $errors[] = "Post content cannot be more than 65500 characters long.";
+        $errors[] = "error.postlong";
     }
     
     // Rate limit.
     if ($edit) {
         $lastPost = preparedQuery("SELECT 1 FROM `posts` WHERE `account`=? AND `edittime`>=?", array($_SESSION["id"], (time()-$config["editDelay"])));
         if ($lastPost->num_rows > 0) {
-            $errors[] = "You edited a post too recently. Wait a few seconds and try again.";
+            $errors[] = "error.editdelay";
         }
     }
     else {
         $lastPost = preparedQuery("SELECT 1 FROM `posts` WHERE `account`=? AND `starttime`>=?", array($_SESSION["id"], (time()-$config["postDelay"])));
         if ($lastPost->num_rows > 0) {
-            $errors[] = "You made a post too recently. Wait a little while and try again.";
+            $errors[] = "error.postdelay";
         }
     }
             
@@ -211,10 +211,10 @@ function validateName($name) {
     $errors = array();
     
     if (strlen($name) < 1) {
-        $errors[] = "Your name must be at least 1 character long.";
+        $errors[] = "error.blankname";
     }
     elseif (strlen($name) > 64) {
-        $errors[] = "Your name cannot be longer than 64 characters.";
+        $errors[] = "error.namelong";
     }
     
     return $errors;
@@ -226,16 +226,16 @@ function validateUsername($username) {
     $errors = array();
     
     if (strlen($username) < 1) {
-        $errors[] = "Your username must be at least 1 character long.";
+        $errors[] = "error.blankusername";
     }
     elseif (strlen($username) > 32) {
-        $errors[] = "Your username cannot be longer than 32 characters.";
+        $errors[] = "error.usernamelong";
     }
     
     if ($config["installed"]) {
         $usernameCheck = preparedQuery("SELECT 1 FROM `accounts` WHERE `username`=?", array($username));
         if ($usernameCheck->num_rows != 0) {
-            $errors[] = "Your username is already taken.";
+            $errors[] = "error.usernametaken";
         }
     }
     
@@ -249,22 +249,22 @@ function validateEmail($email, $takenCheck=false) {
     
     // Make sure their email isn't too short.
     if (strlen($email) < 1) {
-        $errors[] = "Your email address is too short. Make sure your email address is at least 1 character in length.";
+        $errors[] = "error.emailblank";
     }
     // Make sure their email isn't too long.
     elseif (strlen($email) > 64) {
-        $errors[] = "Your email address is too long. Make sure your email address is no more than 64 characters in length.";
+        $errors[] = "error.emaillong";
     }
     // Make sure their email is valid.
     // May replace this with custom regex.
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Your email address is invalid. Please try entering a valid email address.";
+        $errors[] = "error.emailinvalid";
     }
     // Make sure their email isn't taken.
     if ($config["installed"] and $takenCheck) {
         $emailCheck = preparedQuery("SELECT 1 FROM `accounts` WHERE `email`=?", array($email));
         if ($emailCheck->num_rows != 0) {
-            $errors[] = "Your email address is already taken.";
+            $errors[] = "error.emailtaken";
         }
     }
     
@@ -278,18 +278,21 @@ function validatePassword($password) {
     
     // Enforce minimum password length requirement.
     if ($passwordLen < MIN_PASSWORD_LENGTH) {
-        $errors[] = "Password must be at least " . MIN_PASSWORD_LENGTH . " characters long.";
+        $errors[] = lang("error.passwordshort", MIN_PASSWORD_LENGTH);
     }
     
     // Protect against mostly numeric passwords (these will be relatively weak).
-    $numbers = array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-    $numberCount = 0;
-    foreach ($numbers as $number) {
-        $numberCount += substr_count($password, $number);
-    }
-    $otherCount = $passwordLen - $numberCount;
-    if ($numberCount > $otherCount) {
-        $errors[] = "More than half of your password cannot be numeric.";
+    // Unless their password is long.
+    if ($passwordLen < 16) {
+        $numbers = array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+        $numberCount = 0;
+        foreach ($numbers as $number) {
+            $numberCount += substr_count($password, $number);
+        }
+        $otherCount = $passwordLen - $numberCount;
+        if ($numberCount > $otherCount) {
+            $errors[] = "error.passwordnumeric";
+        }
     }
 
     return $errors;
@@ -419,40 +422,40 @@ function upload($file, $name) {
     $upload_dir = "images/";
     
     if (!extension_loaded("gd")) {
-        return "PHP GD is not enabled.";
+        return "error.nogd";
     }
     if (!is_writable($upload_dir)) {
-        return "Upload failed, image directory isn't writable.";
+        return "error.imagedirnotwritable";
     }
     if ($_FILES[$file]["size"] < 1) {
-        return "Upload failed, content empty (file may be too large).";
+        return "error.uploadempty";
     }
     if (!file_exists($_FILES[$file]["tmp_name"])) {
-        return "Upload failed, file likely too large or non-existent.";
+        return "error.uploadfail";
     }
     if ($_FILES[$file]["size"] > $config["maxUploadSize"]) {
-        return "Upload failed, file too large.";
+        return "error.uploadtoolarge";
     }
     $size = getimagesize($_FILES[$file]["tmp_name"]);
     if ($size === false) {
-        return "Upload failed, couldn't get image size.";
+        return "error.uploadsizefail";
     }
     $width = $size[0];
     $height = $size[1];
     // Impose a resolution limit.
     if (($width > $config["maxUploadWidth"]) or ($height > $config["maxUploadHeight"])) {
-        return "Upload failed, the image's dimensions are too big.";
+        return "error.uploaddimensionslarge";
     }
     // Basic sanity check, not intended as a true security measure.
     if (false === getimagesize($_FILES[$file]["tmp_name"])) {
-        return "Upload failed, invalid image.";
+        return "error.uploadinvalid";
     }
     
     // Figure out what kind of image we are dealing with by reading the magic bytes.
     $bytes = file_get_contents($_FILES[$file]["tmp_name"], false, null, 0, 12);
     
     if ($bytes === false) {
-        return "Upload failed, didn't recognize image type.";
+        return "error.uploadtypefail";
     }
     
     // Get the current user's disk quota.
@@ -467,18 +470,18 @@ function upload($file, $name) {
     // Enforce disk quotas.
     if (($uq + $_FILES[$file]["size"]) > $config["perUserDiskQuota"]) {
         $db->query("UNLOCK TABLES");
-        return "Upload failed, your disk quota would be exceeded.";
+        return "error.uploaduserquota";
     }
     if (($gq + $_FILES[$file]["size"]) > $config["totalDiskQuota"]) {
         $db->query("UNLOCK TABLES");
-        return "Upload failed, the total disk quota would be exceeded.";
+        return "error.uploadtotalquota";
     }
     
     // Enforce rate limits.
     $rateLimit = preparedQuery("SELECT 1 FROM `logs` WHERE `logtype`='image_upload' AND (`perpid`=? OR `ip`=?) AND `timestamp`>?", array($_SESSION["id"], $_SERVER["REMOTE_ADDR"], (time()-3600)));
     if ($rateLimit->num_rows >= $config["uploadsPerHour"]) {
         $db->query("UNLOCK TABLES");
-        return "Upload failed, rate limited. Try again later.";
+        return "error.uploadratelimited";
     }
     
     $overwriting = false;
@@ -496,7 +499,7 @@ function upload($file, $name) {
         
         if ($image === false) {
             $db->query("UNLOCK TABLES");
-            return "Upload failed, invalid GIF image.";
+            return "error.uploadinvalidgif";
         }
     }
     // JPEGs. (technically signature analysis could be tighter, as in the above GIF example)
@@ -505,7 +508,7 @@ function upload($file, $name) {
         
         if ($image === false) {
             $db->query("UNLOCK TABLES");
-            return "Upload failed, invalid JPEG image.";
+            return "error.uploadinvalidjpeg";
         }
     }
     // PNGs.
@@ -514,7 +517,7 @@ function upload($file, $name) {
         
         if ($image === false) {
             $db->query("UNLOCK TABLES");
-            return "Upload failed, invalid PNG image.";
+            return "error.uploadinvalidpng";
         }
     }
     // WEBPs.
@@ -523,12 +526,12 @@ function upload($file, $name) {
         
         if ($image === false) {
             $db->query("UNLOCK TABLES");
-            return "Upload failed, invalid WEBP image.";
+            return "error.uploadinvalidwebp";
         }
     }
     else {
         $db->query("UNLOCK TABLES");
-        return "Upload failed, unsupported or unrecognized image type.";
+        return "error.uploadbadimagetype";
     }
     
     $success = imagewebp($image, $target, clamp($config["uploadQuality"], 0, 100));
@@ -542,18 +545,18 @@ function upload($file, $name) {
 
     if (!$success) {
         $db->query("UNLOCK TABLES");
-        return "Failed to write image to file.";
+        return "";
     }
     // We do these checks in case the filesize grows after the image has been processed.
     elseif ((filesize($target) + $uq) > $config["perUserDiskQuota"]) {
         unlink($target);
         $db->query("UNLOCK TABLES");
-        return "Upload failed, your disk quota would be exceeded.";
+        return "error.uploaduserquota";
     }
     elseif ((filesize($target) + $gq) > $config["totalDiskQuota"]) {
         unlink($target);
         $db->query("UNLOCK TABLES");
-        return "Upload failed, the total disk quota would be exceeded.";
+        return "error.uploadtotalquota";
     }
     preparedQuery("UPDATE `accounts` SET `quota`=`quota`+? WHERE `id`=?", array(filesize($target), $_SESSION["id"]));
     // Log the upload.

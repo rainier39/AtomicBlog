@@ -20,7 +20,7 @@
 // Atom feed.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 // The feed must be enabled, and the viewer must have permission to view posts and their contents.
 if (!$config["feedEnabled"] or !checkPerm(PERM_VIEW_POSTS) or !checkPerm(PERM_VIEW_POST)) {

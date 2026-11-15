@@ -20,7 +20,7 @@
 // Serves the header.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 $headervars = array(
  "pagetitle" => $htitle,

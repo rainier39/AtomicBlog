@@ -20,7 +20,7 @@
 // Custom PHP template engine.
 
 // Only load the page if it's being requested via the index file.
-if (!defined('INDEX')) exit;
+if (!defined("INDEX")) exit;
 
 // Render a given template.
 function render_template($filename, $variables, $echo=true) {
